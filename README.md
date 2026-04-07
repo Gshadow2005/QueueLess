@@ -1,4 +1,2 @@
 # queueless
 Queue Management
-
-HI
