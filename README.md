@@ -69,10 +69,10 @@ No more standing in line the whole time.
 
 > Update this section based on your actual implementation
 
-- **Frontend:** HTML, CSS, JavaScript
-- **Backend:** (e.g. Node.js / Django / Laravel)
-- **Database:** (e.g. MySQL / Firebase)
-- **Real-time:** (e.g. WebSockets / Firebase Realtime DB)
+- **Frontend:** Typescript, React, Vite, Tailwind
+- **Backend:** Django
+- **Database:** Postman
+- **Real-time:**
 
 ---
 
@@ -98,9 +98,11 @@ npm start
 
 > Add your group members here
 
-- Member 1
-- Member 2
-- Member 3
+- Anino, Glenn Mark R.
+- Antonio, Den Jester B.
+- Casia, John Jaybird L.
+- Espina, John Cyril G.
+- Flores, Sophia Marie M.
 
 ---
 
