@@ -242,7 +242,7 @@ export default function LandingPage() {
             <span className="ql-logo-text">Queue<strong>Less</strong></span>
           </div>
           <p className="ql-footer-tag">Your place in line, wherever you go.</p>
-          <p className="ql-footer-copy">© 2025 QueueLess. All rights reserved.</p>
+          <p className="ql-footer-copy">© 2026 QueueLess. All rights reserved.</p>
         </div>
       </footer>
     </div>
