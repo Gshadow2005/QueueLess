@@ -67,8 +67,6 @@ No more standing in line the whole time.
 
 ## Tech Stack
 
-> Update this section based on your actual implementation
-
 - **Frontend:** Typescript, React, Vite, Tailwind
 - **Backend:** Django
 - **Database:** Postman
@@ -77,8 +75,6 @@ No more standing in line the whole time.
 ---
 
 ## How to Run
-
-> Update this section based on your actual setup
 
 ```bash
 # Clone the repository
@@ -95,8 +91,6 @@ npm start
 ---
 
 ## Team Members
-
-> Add your group members here
 
 - Anino, Glenn Mark R.
 - Antonio, Den Jester B.
