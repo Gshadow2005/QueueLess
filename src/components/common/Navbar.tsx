@@ -1,0 +1,56 @@
+export default function Navbar() {
+  const handleSmoothScroll = (e: React.MouseEvent<HTMLAnchorElement>, id: string) => {
+    e.preventDefault();
+    document.getElementById(id)?.scrollIntoView({ behavior: "smooth" });
+  };
+
+  return (
+    <nav
+      className="sticky top-0 z-50 border-b"
+      style={{
+        background: "rgba(255,255,255,0.92)",
+        backdropFilter: "blur(12px)",
+        borderColor: "rgba(13,43,110,0.12)",
+      }}
+    >
+      <div className="max-w-6xl mx-auto px-8 h-16 flex items-center gap-8">
+        {/* Logo */}
+        <div className="flex items-center gap-2">
+          <span className="text-2xl">⏱</span>
+          <span className="font-head text-xl" style={{ color: "var(--navy)" }}>
+            Queue<strong className="font-extrabold">Less</strong>
+          </span>
+        </div>
+
+        {/* Nav links */}
+        <div className="hidden md:flex gap-6 ml-auto">
+          {[
+            { label: "How It Works", id: "how" },
+            { label: "Features", id: "features" },
+            { label: "Who It's For", id: "sectors" },
+          ].map(({ label, id }) => (
+            <a
+              key={id}
+              href={`#${id}`}
+              onClick={(e) => handleSmoothScroll(e, id)}
+              className="text-sm font-medium transition-colors duration-200 hover:opacity-100"
+              style={{ color: "var(--sky)", opacity: 0.7 }}
+            >
+              {label}
+            </a>
+          ))}
+        </div>
+
+        {/* CTA */}
+        <a
+          href="#join"
+          onClick={(e) => handleSmoothScroll(e, "join")}
+          className="text-sm font-semibold px-5 py-2 rounded-full text-white transition-all duration-200 hover:-translate-y-px"
+          style={{ background: "var(--navy)", border: "2px solid var(--navy)" }}
+        >
+          Get Started
+        </a>
+      </div>
+    </nav>
+  );
+}

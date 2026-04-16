@@ -1,1 +1,48 @@
 @import "tailwindcss";
+
+@import url('https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700;800&family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;1,9..40,400&display=swap');
+
+:root {
+  --navy: #0D2B6E;
+  --navy-mid: #1A3E8C;
+  --navy-light: #2A57B5;
+  --sky: #5BA3E0;
+  --sky-light: #A8D0F5;
+  --sky-pale: #E8F4FD;
+  --font-head: 'Sora', sans-serif;
+  --font-body: 'DM Sans', sans-serif;
+}
+
+body {
+  font-family: var(--font-body);
+  overflow-x: hidden;
+}
+
+.font-head {
+  font-family: var(--font-head);
+}
+
+/* Animations */
+@keyframes float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-8px); }
+}
+
+@keyframes pulse-ring {
+  0%, 100% { box-shadow: 0 0 0 4px rgba(34, 197, 94, 0.2); }
+  50% { box-shadow: 0 0 0 8px rgba(34, 197, 94, 0.08); }
+}
+
+.animate-float {
+  animation: float 4s ease-in-out infinite;
+}
+
+.animate-pulse-ring {
+  animation: pulse-ring 2s ease-in-out infinite;
+}
+
+/* Flash transition for queue number */
+.queue-flash {
+  color: var(--sky) !important;
+  transform: scale(1.08) !important;
+}
