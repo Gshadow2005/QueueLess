@@ -21,7 +21,7 @@ export default function LiveDemoCard() {
           className="w-2 h-2 rounded-full animate-pulse-ring"
           style={{ background: "#22c55e" }}
         />
-        <span className="text-sm font-semibold" style={{ color: "var(--sky)" }}>
+        <span className="text-sm font-semibold" style={{ color: "#6B82A8" }}>
           City Bank – Main Branch
         </span>
       </div>
@@ -30,7 +30,7 @@ export default function LiveDemoCard() {
       <div className="text-center mb-4">
         <p
           className="text-xs uppercase tracking-widest mb-1"
-          style={{ color: "var(--sky)", letterSpacing: "0.08em" }}
+          style={{ color: "#6B82A8", letterSpacing: "0.08em" }}
         >
           Now Serving
         </p>
@@ -51,7 +51,7 @@ export default function LiveDemoCard() {
       <div className="text-center mb-4">
         <p
           className="text-xs uppercase tracking-widest mb-1"
-          style={{ color: "var(--sky)", letterSpacing: "0.08em" }}
+          style={{ color: "#6B82A8", letterSpacing: "0.08em" }}
         >
           Your Number
         </p>
@@ -73,18 +73,19 @@ export default function LiveDemoCard() {
             className="h-full rounded-full transition-all duration-700"
             style={{
               width: `${progressPct}%`,
-              background: `linear-gradient(90deg, var(--sky), var(--navy-light))`,
+              background: "linear-gradient(90deg, var(--sky), var(--navy-light))",
             }}
           />
         </div>
         <span
-          className={`block text-center text-sm font-medium ${
-            spotsAway <= 3 ? "font-bold" : ""
-          }`}
-          style={{ color: spotsAway <= 3 ? "#22c55e" : "var(--sky)" }}
+          className={`block text-center text-sm font-medium`}
+          style={{
+            color: spotsAway <= 3 ? "#22c55e" : "#6B82A8",
+            fontWeight: spotsAway <= 3 ? 700 : 500,
+          }}
         >
           {spotsAway <= 0
-            ? "🎉 It's your turn!"
+            ? "It's your turn!"
             : `${spotsAway} spot${spotsAway !== 1 ? "s" : ""} away`}
         </span>
       </div>
@@ -99,7 +100,7 @@ export default function LiveDemoCard() {
             borderColor: "var(--sky-light)",
           }}
         >
-          🔔 Notify me when I'm close
+          Notify me when I'm close
         </button>
       </div>
     </div>

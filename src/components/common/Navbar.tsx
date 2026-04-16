@@ -33,8 +33,10 @@ export default function Navbar() {
               key={id}
               href={`#${id}`}
               onClick={(e) => handleSmoothScroll(e, id)}
-              className="text-sm font-medium transition-colors duration-200 hover:opacity-100"
-              style={{ color: "var(--sky)", opacity: 0.7 }}
+              className="text-sm font-medium transition-colors duration-200"
+              style={{ color: "#6B82A8" }}
+              onMouseEnter={(e) => (e.currentTarget.style.color = "var(--navy)")}
+              onMouseLeave={(e) => (e.currentTarget.style.color = "#6B82A8")}
             >
               {label}
             </a>

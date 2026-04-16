@@ -66,10 +66,10 @@ export default function HeroSection() {
           <span style={{ color: "var(--sky)" }}>wherever you go.</span>
         </h1>
 
-        {/* Subtitle */}
+        {/* Subtitle — matches original text-muted color #6B82A8, no extra opacity */}
         <p
           className="text-lg leading-relaxed max-w-lg mb-8"
-          style={{ color: "#6B82A8", opacity: 0.8 }}
+          style={{ color: "#6B82A8" }}
         >
           Stop standing in line. QueueLess lets you track your queue position
           remotely — get notified when your turn is near, so you can use your
@@ -91,15 +91,17 @@ export default function HeroSection() {
             onClick={(e) => handleScroll(e, "how")}
             className="text-base font-medium px-6 py-3 rounded-full transition-all duration-200"
             style={{
-              color: "var(--navy)",
+              color: "#6B82A8",
               border: "2px solid rgba(13,43,110,0.2)",
             }}
-            onMouseEnter={(e) =>
-              (e.currentTarget.style.borderColor = "var(--sky)")
-            }
-            onMouseLeave={(e) =>
-              (e.currentTarget.style.borderColor = "rgba(13,43,110,0.2)")
-            }
+            onMouseEnter={(e) => {
+              e.currentTarget.style.borderColor = "var(--sky)";
+              e.currentTarget.style.color = "var(--navy)";
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.borderColor = "rgba(13,43,110,0.2)";
+              e.currentTarget.style.color = "#6B82A8";
+            }}
           >
             See how it works
           </a>
@@ -116,7 +118,7 @@ export default function HeroSection() {
                 >
                   {stat.value}
                 </strong>
-                <span className="text-xs" style={{ color: "var(--sky)" }}>
+                <span className="text-xs" style={{ color: "#6B82A8" }}>
                   {stat.label}
                 </span>
               </div>

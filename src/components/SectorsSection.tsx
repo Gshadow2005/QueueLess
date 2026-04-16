@@ -24,11 +24,12 @@ export default function SectorsSection() {
           {SECTORS.map((sector) => (
             <div
               key={sector}
-              className="px-6 py-2.5 rounded-full text-sm font-semibold border-2 transition-all duration-200 cursor-default"
+              className="px-6 py-2.5 rounded-full text-sm font-semibold cursor-default"
               style={{
                 background: "white",
-                borderColor: "rgba(13,43,110,0.12)",
+                border: "1.5px solid rgba(13,43,110,0.12)",
                 color: "var(--navy)",
+                transition: "background 0.2s, border-color 0.2s",
               }}
               onMouseEnter={(e) => {
                 e.currentTarget.style.background = "var(--sky-pale)";

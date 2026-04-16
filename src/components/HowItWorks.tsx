@@ -34,7 +34,7 @@ export default function HowItWorks() {
         >
           How QueueLess works
         </h2>
-        <p className="text-base mb-12" style={{ color: "var(--sky)" }}>
+        <p className="text-base mb-12" style={{ color: "#6B82A8" }}>
           Four steps between you and a stress-free wait.
         </p>
 
@@ -54,7 +54,7 @@ export default function HowItWorks() {
                 >
                   {step.label}
                 </h3>
-                <p className="text-sm leading-relaxed" style={{ color: "var(--sky)" }}>
+                <p className="text-sm leading-relaxed" style={{ color: "#6B82A8" }}>
                   {step.sub}
                 </p>
               </div>

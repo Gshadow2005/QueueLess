@@ -1,21 +1,17 @@
 const FEATURES = [
   {
-    icon: "📍",
     title: "Real-Time Position",
     desc: "See your exact queue number and who's currently being served — updated live, no refresh needed.",
   },
   {
-    icon: "🔔",
     title: "Smart Notifications",
     desc: "Get alerted when your turn is approaching so you can return right on time.",
   },
   {
-    icon: "📱",
     title: "Remote Monitoring",
     desc: "Track your queue from anywhere on your phone. Run errands, grab food — we'll hold your spot.",
   },
   {
-    icon: "⚡",
     title: "Zero Physical Wait",
     desc: "No more standing in line. Use your waiting time productively while the system tracks your place.",
   },
@@ -56,14 +52,13 @@ export default function FeaturesSection() {
                 (e.currentTarget.style.boxShadow = "none")
               }
             >
-              <div className="text-3xl mb-4">{f.icon}</div>
               <h3
                 className="font-head text-base font-bold mb-2"
                 style={{ color: "var(--navy)" }}
               >
                 {f.title}
               </h3>
-              <p className="text-sm leading-relaxed" style={{ color: "var(--sky)" }}>
+              <p className="text-sm leading-relaxed" style={{ color: "#6B82A8" }}>
                 {f.desc}
               </p>
             </div>

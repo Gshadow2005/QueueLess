@@ -11,10 +11,10 @@ export default function Footer() {
             Queue<strong className="font-extrabold">Less</strong>
           </span>
         </div>
-        <p className="text-sm mb-1" style={{ color: "var(--sky)" }}>
+        <p className="text-sm mb-1" style={{ color: "#6B82A8" }}>
           Your place in line, wherever you go.
         </p>
-        <p className="text-xs" style={{ color: "var(--sky)", opacity: 0.6 }}>
+        <p className="text-xs" style={{ color: "#6B82A8", opacity: 0.6 }}>
           © 2026 QueueLess. All rights reserved.
         </p>
       </div>

@@ -16,7 +16,7 @@ function PhoneMockup() {
         boxShadow: "0 32px 80px rgba(13,43,110,0.25)",
       }}
     >
-      {/* Notch */}
+      {/* Notch — dark navy matching original #111a30 */}
       <div
         className="w-24 h-6 rounded-full mx-auto mb-2"
         style={{ background: "#111a30" }}
@@ -24,8 +24,8 @@ function PhoneMockup() {
 
       {/* Screen */}
       <div
-        className="rounded-[28px] p-6 min-h-105"
-        style={{ background: "#F7F9FC" }}
+        className="rounded-[28px] p-6"
+        style={{ background: "#F7F9FC", minHeight: "420px" }}
       >
         <p
           className="font-head text-lg font-extrabold text-center mb-5"
@@ -42,12 +42,15 @@ function PhoneMockup() {
             border: "1px solid rgba(13,43,110,0.12)",
           }}
         >
-          <p className="text-xs font-semibold mb-4" style={{ color: "var(--sky)" }}>
-            🏦 City Bank
+          <p className="text-xs font-semibold mb-4" style={{ color: "#6B82A8" }}>
+            City Bank
           </p>
           <div className="flex justify-around items-center mb-4">
             <div>
-              <p className="text-xs uppercase tracking-widest mb-1" style={{ color: "var(--sky)", fontSize: "0.65rem" }}>
+              <p
+                className="uppercase tracking-widest mb-1"
+                style={{ color: "#6B82A8", fontSize: "0.65rem" }}
+              >
                 Serving
               </p>
               <p className="font-head text-3xl font-extrabold" style={{ color: "var(--navy)" }}>
@@ -56,7 +59,10 @@ function PhoneMockup() {
             </div>
             <div className="w-px h-12" style={{ background: "rgba(13,43,110,0.12)" }} />
             <div>
-              <p className="text-xs uppercase tracking-widest mb-1" style={{ color: "var(--sky)", fontSize: "0.65rem" }}>
+              <p
+                className="uppercase tracking-widest mb-1"
+                style={{ color: "#6B82A8", fontSize: "0.65rem" }}
+              >
                 Yours
               </p>
               <p className="font-head text-3xl font-extrabold" style={{ color: "var(--sky)" }}>
@@ -64,16 +70,25 @@ function PhoneMockup() {
               </p>
             </div>
           </div>
-          <div className="h-1.5 rounded-full overflow-hidden mb-1.5" style={{ background: "var(--sky-pale)" }}>
-            <div className="h-full rounded-full" style={{ width: "40%", background: "var(--sky)" }} />
+          <div
+            className="h-1.5 rounded-full overflow-hidden mb-1.5"
+            style={{ background: "var(--sky-pale)" }}
+          >
+            <div
+              className="h-full rounded-full"
+              style={{ width: "40%", background: "var(--sky)" }}
+            />
           </div>
-          <p className="text-center text-xs" style={{ color: "var(--sky)" }}>
+          <p className="text-center text-xs" style={{ color: "#6B82A8" }}>
             ~15 spots away · est. 18 min
           </p>
         </div>
 
         {/* Notification */}
-        <div className="rounded-xl p-4 flex gap-3 items-start" style={{ background: "var(--navy)" }}>
+        <div
+          className="rounded-xl p-4 flex gap-3 items-start"
+          style={{ background: "var(--navy)" }}
+        >
           <div>
             <strong className="block text-white text-xs mb-1">Almost your turn!</strong>
             <p className="text-xs" style={{ color: "var(--sky-light)" }}>
@@ -106,7 +121,7 @@ export default function ScenarioSection() {
               <li
                 key={i}
                 className="text-base leading-relaxed pl-6 relative"
-                style={{ color: "var(--sky)" }}
+                style={{ color: "#6B82A8" }}
               >
                 <span
                   className="absolute left-0 font-bold"
