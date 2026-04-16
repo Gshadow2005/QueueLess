@@ -6,6 +6,7 @@ import ScenarioSection from "../components/ScenarioSection";
 import SectorsSection from "../components/SectorsSection";
 import CtaSection from "../components/CtaSection";
 import Footer from "../components/common/Footer";
+import BackToTop from "../components/common/BackToTop";
 
 export default function LandingPage() {
   return (
@@ -18,6 +19,7 @@ export default function LandingPage() {
       <SectorsSection />
       <CtaSection />
       <Footer />
+      <BackToTop />
     </div>
   );
 }
