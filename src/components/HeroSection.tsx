@@ -69,7 +69,7 @@ export default function HeroSection() {
         {/* Subtitle */}
         <p
           className="text-lg leading-relaxed max-w-lg mb-8"
-          style={{ color: "var(--sky)", opacity: 0.8 }}
+          style={{ color: "#6B82A8", opacity: 0.8 }}
         >
           Stop standing in line. QueueLess lets you track your queue position
           remotely — get notified when your turn is near, so you can use your
