@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { Check, X, Star } from "lucide-react";
 import { type Institution } from "../../data/institutions";
 import { formatQueueNumber } from "../../utils/queueHelpers";
 
@@ -37,7 +38,7 @@ export default function DoneScreen({
             border: `3px solid ${cancelled ? "#f97316" : "#22c55e"}`,
           }}
         >
-          {cancelled ? "✕" : "✓"}
+          {cancelled ? <X size={32} strokeWidth={3} /> : <Check size={32} strokeWidth={3} />}
         </div>
         <h1
           className="font-head"
@@ -186,18 +187,22 @@ export default function DoneScreen({
                     key={n}
                     onClick={() => setRating(n)}
                     style={{
-                      fontSize: "2rem",
+                      width: 36,
+                      height: 36,
                       background: "none",
                       border: "none",
                       cursor: "pointer",
                       opacity: n <= rating ? 1 : 0.25,
                       transition: "opacity 0.15s, transform 0.15s",
                       padding: 4,
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
                     }}
                     onMouseEnter={(e) => (e.currentTarget.style.transform = "scale(1.15)")}
                     onMouseLeave={(e) => (e.currentTarget.style.transform = "scale(1)")}
                   >
-                    ★
+{n <= rating ? <Star size={20} strokeWidth={1.5} fill="currentColor" /> : <Star size={20} strokeWidth={2.5} />}
                   </button>
                 ))}
               </div>

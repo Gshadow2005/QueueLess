@@ -24,9 +24,9 @@ export const INSTITUTIONS: Institution[] = [
 ];
 
 export const INSTITUTION_ICONS: Record<InstitutionType, string> = {
-  bank: "🏦",
-  government: "🏛️",
-  utility: "⚡",
+  bank: "Building2",
+  government: "Landmark",
+  utility: "Zap",
 };
 
 export const TYPE_LABELS: Record<InstitutionType, string> = {
