@@ -2,10 +2,11 @@ import { useState, useCallback } from "react";
 import { type Institution } from "../data/institutions";
 import InstitutionList from "../components/app/InstitutionList";
 import JoinQueue from "../components/app/JoinQueue";
+import EnterQueueNumber from "../components/app/Enterqueuenumber";
 import LiveTracker from "../components/app/LiveTracker";
 import DoneScreen from "../components/app/DoneScreen";
 
-type Screen = "list" | "join" | "tracker" | "done";
+type Screen = "list" | "join" | "enter-number" | "tracker" | "done";
 
 interface AppState {
   institution: Institution | null;
@@ -35,11 +36,17 @@ export default function AppPage({ onBack }: AppPageProps) {
     setScreen("join");
   };
 
-  const handleJoin = (_phone: string, _notifyEnabled: boolean) => {
+  // After filling in optional details, move to manual number entry
+  const handleJoin = (phone: string, notifyEnabled: boolean) => {
     if (!state.institution) return;
-    const inst = state.institution;
-    const yourNum = inst.serving + inst.inQueue + 1;
-    setState((s) => ({ ...s, yourNumber: yourNum, joinedAt: new Date() }));
+    // Store optional fields in state if needed later (e.g. for SMS)
+    console.log("Optional details:", { phone, notifyEnabled });
+    setScreen("enter-number");
+  };
+
+  // Called when user manually submits their queue number
+  const handleNumberSubmit = (queueNumber: number) => {
+    setState((s) => ({ ...s, yourNumber: queueNumber, joinedAt: new Date() }));
     setTrackerBadge("Waiting");
     setScreen("tracker");
   };
@@ -57,13 +64,15 @@ export default function AppPage({ onBack }: AppPageProps) {
 
   const handleBack = () => {
     if (screen === "join") setScreen("list");
+    else if (screen === "enter-number") setScreen("join");
     else onBack();
   };
 
-  const showBack = screen === "join" || screen === "list";
+  const showBack = screen === "join" || screen === "list" || screen === "enter-number";
   const title =
     screen === "list" ? null :
     screen === "join" ? (state.institution?.name.split("–")[0].trim() ?? "Join Queue") :
+    screen === "enter-number" ? "Your Queue Number" :
     screen === "tracker" ? (state.institution?.name.split("–")[0].trim() ?? "Live Tracker") :
     "All done!";
 
@@ -84,11 +93,11 @@ export default function AppPage({ onBack }: AppPageProps) {
           style={{
             maxWidth: 1160,
             margin: "0 auto",
-            padding: "0 2rem",
+            padding: "0 1.25rem",
             height: 64,
             display: "flex",
             alignItems: "center",
-            gap: "1.5rem",
+            gap: "1rem",
           }}
         >
           {/* Back button */}
@@ -106,6 +115,7 @@ export default function AppPage({ onBack }: AppPageProps) {
                 cursor: "pointer",
                 fontFamily: "var(--font-body)",
                 padding: 0,
+                flexShrink: 0,
               }}
               onMouseEnter={(e) => (e.currentTarget.style.color = "var(--navy)")}
               onMouseLeave={(e) => (e.currentTarget.style.color = "#6B82A8")}
@@ -126,7 +136,17 @@ export default function AppPage({ onBack }: AppPageProps) {
               </span>
             </div>
           ) : (
-            <span className="font-head" style={{ fontSize: "1rem", fontWeight: 700, color: "var(--navy)" }}>
+            <span
+              className="font-head"
+              style={{
+                fontSize: "1rem",
+                fontWeight: 700,
+                color: "var(--navy)",
+                overflow: "hidden",
+                textOverflow: "ellipsis",
+                whiteSpace: "nowrap",
+              }}
+            >
               {title}
             </span>
           )}
@@ -138,7 +158,7 @@ export default function AppPage({ onBack }: AppPageProps) {
             <span
               style={{
                 fontSize: "0.72rem",
-                fontWeight: 700,
+                fontWeight: 600,
                 padding: "4px 12px",
                 borderRadius: 999,
                 background: "var(--sky-pale)",
@@ -146,6 +166,7 @@ export default function AppPage({ onBack }: AppPageProps) {
                 border: "1px solid var(--sky-light)",
                 letterSpacing: "0.04em",
                 textTransform: "uppercase",
+                flexShrink: 0,
               }}
             >
               {trackerBadge}
@@ -166,10 +187,7 @@ export default function AppPage({ onBack }: AppPageProps) {
         style={{
           maxWidth: 1160,
           margin: "0 auto",
-          padding: "2rem",
-          display: "grid",
-          gridTemplateColumns: screen === "list" ? "1fr" : "minmax(0,1fr)",
-          gap: "2rem",
+          padding: "1.5rem 1.25rem",
         }}
       >
         {screen === "list" && <InstitutionList onSelect={handleSelectInst} />}
@@ -179,6 +197,14 @@ export default function AppPage({ onBack }: AppPageProps) {
             institution={state.institution}
             onBack={() => setScreen("list")}
             onJoin={handleJoin}
+          />
+        )}
+
+        {screen === "enter-number" && state.institution && (
+          <EnterQueueNumber
+            institution={state.institution}
+            onSubmit={handleNumberSubmit}
+            onBack={() => setScreen("join")}
           />
         )}
 

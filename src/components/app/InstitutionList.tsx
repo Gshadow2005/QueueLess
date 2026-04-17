@@ -28,7 +28,7 @@ export default function InstitutionList({ onSelect }: InstitutionListProps) {
   const filters: { label: string; value: FilterType }[] = [
     { label: "All", value: "all" },
     { label: "Banks", value: "bank" },
-    { label: "Government", value: "government" },
+    { label: "Gov't", value: "government" },
     { label: "Utilities", value: "utility" },
   ];
 
@@ -47,11 +47,11 @@ export default function InstitutionList({ onSelect }: InstitutionListProps) {
   return (
     <div>
       {/* ── Page header ── */}
-      <div style={{ marginBottom: "2rem" }}>
+      <div style={{ marginBottom: "1.75rem" }}>
         <p
           style={{
-            fontSize: "0.72rem",
-            fontWeight: 700,
+            fontSize: "0.7rem",
+            fontWeight: 600,
             textTransform: "uppercase",
             letterSpacing: "0.1em",
             color: "var(--sky)",
@@ -63,38 +63,31 @@ export default function InstitutionList({ onSelect }: InstitutionListProps) {
         <h1
           className="font-head"
           style={{
-            fontSize: "clamp(1.5rem, 2.5vw, 2rem)",
-            fontWeight: 800,
+            fontSize: "clamp(1.35rem, 3vw, 1.875rem)",
+            fontWeight: 700,
             color: "var(--navy)",
-            marginBottom: "0.5rem",
+            marginBottom: "0.4rem",
+            lineHeight: 1.25,
           }}
         >
           Where do you need to queue?
         </h1>
-        <p style={{ color: "#6B82A8", fontSize: "0.95rem" }}>
+        <p style={{ color: "#6B82A8", fontSize: "0.875rem", lineHeight: 1.6, fontWeight: 400 }}>
           Pick an institution to check live queue status and get your number.
         </p>
       </div>
 
-      {/* ── Search + filters row ── */}
-      <div
-        style={{
-          display: "flex",
-          flexWrap: "wrap",
-          gap: "0.75rem",
-          alignItems: "center",
-          marginBottom: "1.5rem",
-        }}
-      >
+      {/* ── Search + filters ── */}
+      <div style={{ marginBottom: "1.25rem" }}>
         {/* Search */}
-        <div style={{ position: "relative", flex: "1 1 260px", minWidth: 220 }}>
+        <div style={{ position: "relative", marginBottom: "0.75rem" }}>
           <span
             style={{
               position: "absolute",
               left: 14,
               top: "50%",
               transform: "translateY(-50%)",
-              fontSize: "0.9rem",
+              fontSize: "0.875rem",
               color: "#6B82A8",
             }}
           >
@@ -117,25 +110,36 @@ export default function InstitutionList({ onSelect }: InstitutionListProps) {
               color: "var(--navy)",
               fontFamily: "var(--font-body)",
               fontSize: "0.875rem",
+              fontWeight: 400,
               outline: "none",
               boxSizing: "border-box",
+              transition: "border-color 0.15s",
             }}
             onFocus={(e) => (e.currentTarget.style.borderColor = "var(--sky)")}
             onBlur={(e) => (e.currentTarget.style.borderColor = "rgba(13,43,110,0.14)")}
           />
         </div>
 
-        {/* Filter tabs */}
-        <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
+        {/* Filter tabs — scrollable on small screens */}
+        <div
+          style={{
+            display: "flex",
+            gap: 8,
+            overflowX: "auto",
+            paddingBottom: 2,
+            WebkitOverflowScrolling: "touch",
+            scrollbarWidth: "none",
+          }}
+        >
           {filters.map((f) => (
             <button
               key={f.value}
               onClick={() => setFilter(f.value)}
               style={{
-                padding: "8px 18px",
+                padding: "7px 16px",
                 borderRadius: 999,
-                fontSize: "0.8rem",
-                fontWeight: 600,
+                fontSize: "0.78rem",
+                fontWeight: 500,
                 border: "1.5px solid",
                 fontFamily: "var(--font-body)",
                 cursor: "pointer",
@@ -143,6 +147,8 @@ export default function InstitutionList({ onSelect }: InstitutionListProps) {
                 background: filter === f.value ? "var(--navy)" : "white",
                 color: filter === f.value ? "white" : "#6B82A8",
                 borderColor: filter === f.value ? "var(--navy)" : "rgba(13,43,110,0.14)",
+                whiteSpace: "nowrap",
+                flexShrink: 0,
               }}
             >
               {f.label}
@@ -154,12 +160,12 @@ export default function InstitutionList({ onSelect }: InstitutionListProps) {
       {/* ── Results label ── */}
       <p
         style={{
-          fontSize: "0.72rem",
-          fontWeight: 700,
+          fontSize: "0.7rem",
+          fontWeight: 500,
           textTransform: "uppercase",
           letterSpacing: "0.08em",
-          color: "#6B82A8",
-          marginBottom: "1rem",
+          color: "#94a3b8",
+          marginBottom: "0.875rem",
         }}
       >
         {filtered.length} location{filtered.length !== 1 ? "s" : ""} available
@@ -169,8 +175,8 @@ export default function InstitutionList({ onSelect }: InstitutionListProps) {
       <div
         style={{
           display: "grid",
-          gridTemplateColumns: "repeat(auto-fill, minmax(300px, 1fr))",
-          gap: "1rem",
+          gridTemplateColumns: "repeat(auto-fill, minmax(min(100%, 300px), 1fr))",
+          gap: "0.875rem",
         }}
       >
         {filtered.map((inst) => {
@@ -182,43 +188,43 @@ export default function InstitutionList({ onSelect }: InstitutionListProps) {
               onClick={() => !disabled && onSelect(inst)}
               style={{
                 background: "white",
-                border: "1.5px solid rgba(13,43,110,0.12)",
-                borderRadius: 16,
-                padding: "1.25rem",
-                opacity: disabled ? 0.55 : 1,
+                border: "1.5px solid rgba(13,43,110,0.10)",
+                borderRadius: 14,
+                padding: "1.125rem",
+                opacity: disabled ? 0.5 : 1,
                 cursor: disabled ? "not-allowed" : "pointer",
                 transition: "border-color 0.15s, box-shadow 0.15s, transform 0.15s",
                 display: "flex",
                 flexDirection: "column",
-                gap: 12,
+                gap: 10,
               }}
               onMouseEnter={(e) => {
                 if (!disabled) {
                   const el = e.currentTarget;
                   el.style.borderColor = "var(--sky)";
-                  el.style.boxShadow = "0 4px 20px rgba(91,163,224,0.15)";
+                  el.style.boxShadow = "0 4px 16px rgba(91,163,224,0.12)";
                   el.style.transform = "translateY(-2px)";
                 }
               }}
               onMouseLeave={(e) => {
                 const el = e.currentTarget;
-                el.style.borderColor = "rgba(13,43,110,0.12)";
+                el.style.borderColor = "rgba(13,43,110,0.10)";
                 el.style.boxShadow = "none";
                 el.style.transform = "translateY(0)";
               }}
             >
               {/* Card top row */}
-              <div style={{ display: "flex", alignItems: "flex-start", gap: 12 }}>
+              <div style={{ display: "flex", alignItems: "flex-start", gap: 10 }}>
                 <div
                   style={{
-                    width: 44,
-                    height: 44,
-                    borderRadius: 12,
+                    width: 40,
+                    height: 40,
+                    borderRadius: 10,
                     background: iconBg[inst.type],
                     display: "flex",
                     alignItems: "center",
                     justifyContent: "center",
-                    fontSize: "1.2rem",
+                    fontSize: "1.1rem",
                     flexShrink: 0,
                   }}
                 >
@@ -228,8 +234,8 @@ export default function InstitutionList({ onSelect }: InstitutionListProps) {
                   <p
                     className="font-head"
                     style={{
-                      fontWeight: 700,
-                      fontSize: "0.95rem",
+                      fontWeight: 600,
+                      fontSize: "0.9rem",
                       color: "var(--navy)",
                       marginBottom: 2,
                       overflow: "hidden",
@@ -239,17 +245,18 @@ export default function InstitutionList({ onSelect }: InstitutionListProps) {
                   >
                     {inst.name}
                   </p>
-                  <p style={{ fontSize: "0.8rem", color: "#6B82A8" }}>{inst.address}</p>
+                  <p style={{ fontSize: "0.775rem", color: "#6B82A8", fontWeight: 400 }}>{inst.address}</p>
                 </div>
                 <span
                   style={{
-                    fontSize: "0.75rem",
-                    fontWeight: 700,
-                    padding: "4px 10px",
+                    fontSize: "0.7rem",
+                    fontWeight: 600,
+                    padding: "3px 9px",
                     borderRadius: 999,
                     background: s.bg,
                     color: s.text,
                     flexShrink: 0,
+                    alignSelf: "flex-start",
                   }}
                 >
                   {s.label}
@@ -261,8 +268,8 @@ export default function InstitutionList({ onSelect }: InstitutionListProps) {
                 style={{
                   display: "grid",
                   gridTemplateColumns: "1fr 1px 1fr 1px 1fr",
-                  borderTop: "1px solid rgba(13,43,110,0.08)",
-                  paddingTop: 12,
+                  borderTop: "1px solid rgba(13,43,110,0.07)",
+                  paddingTop: 10,
                   gap: 0,
                   alignItems: "center",
                 }}
@@ -275,16 +282,16 @@ export default function InstitutionList({ onSelect }: InstitutionListProps) {
                   { label: "Est. wait", value: `~${inst.inQueue * inst.waitPer}m` },
                 ].map((item, i) =>
                   item === null ? (
-                    <div key={i} style={{ height: 28, background: "rgba(13,43,110,0.08)" }} />
+                    <div key={i} style={{ height: 24, background: "rgba(13,43,110,0.07)" }} />
                   ) : (
                     <div key={item.label} style={{ textAlign: "center" }}>
                       <p
                         className="font-head"
-                        style={{ fontWeight: 700, fontSize: "1rem", color: "var(--navy)" }}
+                        style={{ fontWeight: 700, fontSize: "0.95rem", color: "var(--navy)" }}
                       >
                         {item.value}
                       </p>
-                      <p style={{ fontSize: "0.7rem", color: "#6B82A8", marginTop: 1 }}>
+                      <p style={{ fontSize: "0.65rem", color: "#94a3b8", marginTop: 1, fontWeight: 400 }}>
                         {item.label}
                       </p>
                     </div>
@@ -294,6 +301,22 @@ export default function InstitutionList({ onSelect }: InstitutionListProps) {
             </div>
           );
         })}
+
+        {/* Empty state */}
+        {filtered.length === 0 && (
+          <div
+            style={{
+              gridColumn: "1 / -1",
+              textAlign: "center",
+              padding: "3rem 1rem",
+              color: "#94a3b8",
+            }}
+          >
+            <p style={{ fontSize: "2rem", marginBottom: "0.75rem" }}>🔍</p>
+            <p style={{ fontWeight: 600, color: "var(--navy)", marginBottom: "0.35rem" }}>No results found</p>
+            <p style={{ fontSize: "0.875rem" }}>Try a different search term or filter.</p>
+          </div>
+        )}
       </div>
     </div>
   );

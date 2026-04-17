@@ -1,6 +1,5 @@
 import { useState } from "react";
 import { type Institution, TYPE_LABELS } from "../../data/institutions";
-import { formatQueueNumber } from "../../utils/queueHelpers";
 
 interface JoinQueueProps {
   institution: Institution;
@@ -15,11 +14,11 @@ export default function JoinQueue({ institution, onJoin }: JoinQueueProps) {
   return (
     <div>
       {/* ── Page header ── */}
-      <div style={{ marginBottom: "2rem" }}>
+      <div style={{ marginBottom: "1.75rem" }}>
         <p
           style={{
-            fontSize: "0.72rem",
-            fontWeight: 700,
+            fontSize: "0.7rem",
+            fontWeight: 600,
             textTransform: "uppercase",
             letterSpacing: "0.1em",
             color: "var(--sky)",
@@ -31,23 +30,26 @@ export default function JoinQueue({ institution, onJoin }: JoinQueueProps) {
         <h1
           className="font-head"
           style={{
-            fontSize: "clamp(1.5rem, 2.5vw, 2rem)",
-            fontWeight: 800,
+            fontSize: "clamp(1.35rem, 3vw, 1.875rem)",
+            fontWeight: 700,
             color: "var(--navy)",
-            marginBottom: "0.25rem",
+            marginBottom: "0.35rem",
+            lineHeight: 1.25,
           }}
         >
           {institution.name}
         </h1>
-        <p style={{ color: "#6B82A8", fontSize: "0.95rem" }}>{institution.address}</p>
+        <p style={{ color: "#6B82A8", fontSize: "0.875rem", fontWeight: 400, lineHeight: 1.5 }}>
+          {institution.address}
+        </p>
       </div>
 
       {/* ── Two-column layout on desktop ── */}
       <div
         style={{
           display: "grid",
-          gridTemplateColumns: "repeat(auto-fit, minmax(300px, 1fr))",
-          gap: "1.5rem",
+          gridTemplateColumns: "repeat(auto-fit, minmax(min(100%, 280px), 1fr))",
+          gap: "1.25rem",
           alignItems: "start",
         }}
       >
@@ -57,8 +59,8 @@ export default function JoinQueue({ institution, onJoin }: JoinQueueProps) {
           <div
             style={{
               background: "var(--navy)",
-              borderRadius: 16,
-              padding: "1.5rem",
+              borderRadius: 14,
+              padding: "1.25rem 1.5rem",
             }}
           >
             <div
@@ -70,40 +72,40 @@ export default function JoinQueue({ institution, onJoin }: JoinQueueProps) {
               }}
             >
               {[
-                { label: "Now Serving", value: formatQueueNumber(institution.serving), highlight: false },
+                { label: "Now Serving", value: `#${String(institution.serving).padStart(2, "0")}` },
                 null,
-                { label: "In Queue", value: institution.inQueue.toString(), highlight: false },
+                { label: "In Queue", value: institution.inQueue.toString() },
                 null,
                 {
                   label: "Est. Wait",
                   value: `~${institution.inQueue * institution.waitPer}`,
                   sub: "min",
-                  highlight: false,
                 },
               ].map((item, i) =>
                 item === null ? (
-                  <div key={i} style={{ height: 40, background: "rgba(255,255,255,0.12)" }} />
+                  <div key={i} style={{ height: 36, background: "rgba(255,255,255,0.12)" }} />
                 ) : (
-                  <div key={item.label} style={{ textAlign: "center", padding: "0 0.5rem" }}>
+                  <div key={item.label} style={{ textAlign: "center", padding: "0 0.375rem" }}>
                     <p
                       style={{
-                        fontSize: "0.65rem",
+                        fontSize: "0.6rem",
                         textTransform: "uppercase",
                         letterSpacing: "0.08em",
                         color: "var(--sky-light)",
                         marginBottom: 4,
+                        fontWeight: 500,
                       }}
                     >
                       {item.label}
                     </p>
                     <p
                       className="font-head"
-                      style={{ fontWeight: 800, fontSize: "1.6rem", color: "white", lineHeight: 1 }}
+                      style={{ fontWeight: 800, fontSize: "clamp(1.25rem, 3vw, 1.6rem)", color: "white", lineHeight: 1 }}
                     >
                       {item.value}
                     </p>
                     {"sub" in item && item.sub && (
-                      <p style={{ fontSize: "0.7rem", color: "var(--sky-light)", marginTop: 2 }}>
+                      <p style={{ fontSize: "0.65rem", color: "var(--sky-light)", marginTop: 2 }}>
                         {item.sub}
                       </p>
                     )}
@@ -117,20 +119,20 @@ export default function JoinQueue({ institution, onJoin }: JoinQueueProps) {
           <div
             style={{
               background: "white",
-              border: "1.5px solid rgba(13,43,110,0.12)",
-              borderRadius: 16,
-              padding: "1.25rem",
+              border: "1.5px solid rgba(13,43,110,0.10)",
+              borderRadius: 14,
+              padding: "1.125rem",
             }}
           >
             <h3
               className="font-head"
-              style={{ fontWeight: 700, fontSize: "0.95rem", color: "var(--navy)", marginBottom: "0.75rem" }}
+              style={{ fontWeight: 700, fontSize: "0.875rem", color: "var(--navy)", marginBottom: "0.75rem" }}
             >
               What to expect
             </h3>
             {[
-              { icon: "🔢", text: `Your number will be #${String(institution.serving + institution.inQueue + 1).padStart(2, "0")}` },
-              { icon: "⏱", text: `Estimated wait: ~${institution.inQueue * institution.waitPer} minutes` },
+              { icon: "🎫", text: "Get a physical ticket at the counter first" },
+              { icon: "🔢", text: "Then enter your number here to start tracking" },
               { icon: "🔔", text: "We'll notify you when your turn is near" },
               { icon: "📍", text: "You can track from anywhere" },
             ].map((item) => (
@@ -140,12 +142,14 @@ export default function JoinQueue({ institution, onJoin }: JoinQueueProps) {
                   display: "flex",
                   alignItems: "flex-start",
                   gap: 10,
-                  padding: "8px 0",
+                  padding: "7px 0",
                   borderBottom: "1px solid rgba(13,43,110,0.06)",
                 }}
               >
-                <span style={{ fontSize: "0.95rem", flexShrink: 0 }}>{item.icon}</span>
-                <span style={{ fontSize: "0.875rem", color: "#6B82A8" }}>{item.text}</span>
+                <span style={{ fontSize: "0.9rem", flexShrink: 0 }}>{item.icon}</span>
+                <span style={{ fontSize: "0.84rem", color: "#6B82A8", fontWeight: 400, lineHeight: 1.5 }}>
+                  {item.text}
+                </span>
               </div>
             ))}
           </div>
@@ -156,27 +160,28 @@ export default function JoinQueue({ institution, onJoin }: JoinQueueProps) {
           <div
             style={{
               background: "white",
-              border: "1.5px solid rgba(13,43,110,0.12)",
-              borderRadius: 16,
+              border: "1.5px solid rgba(13,43,110,0.10)",
+              borderRadius: 14,
               padding: "1.5rem",
             }}
           >
             <h3
               className="font-head"
-              style={{ fontWeight: 700, fontSize: "1rem", color: "var(--navy)", marginBottom: "1.25rem" }}
+              style={{ fontWeight: 700, fontSize: "0.95rem", color: "var(--navy)", marginBottom: "1.125rem" }}
             >
               Your details{" "}
-              <span style={{ fontWeight: 400, fontSize: "0.875rem", color: "#6B82A8" }}>(optional)</span>
+              <span style={{ fontWeight: 400, fontSize: "0.84rem", color: "#94a3b8" }}>(optional)</span>
             </h3>
 
-            <div style={{ marginBottom: "1.25rem" }}>
+            <div style={{ marginBottom: "1.125rem" }}>
               <label
                 style={{
                   display: "block",
-                  fontSize: "0.78rem",
-                  fontWeight: 600,
+                  fontSize: "0.75rem",
+                  fontWeight: 500,
                   color: "#6B82A8",
                   marginBottom: 6,
+                  letterSpacing: "0.03em",
                 }}
               >
                 Phone number
@@ -189,14 +194,16 @@ export default function JoinQueue({ institution, onJoin }: JoinQueueProps) {
                 style={{
                   width: "100%",
                   padding: "10px 14px",
-                  borderRadius: 12,
+                  borderRadius: 10,
                   border: "1.5px solid rgba(13,43,110,0.14)",
                   background: "var(--off)",
                   color: "var(--navy)",
                   fontFamily: "var(--font-body)",
                   fontSize: "0.875rem",
+                  fontWeight: 400,
                   outline: "none",
                   boxSizing: "border-box",
+                  transition: "border-color 0.15s",
                 }}
                 onFocus={(e) => (e.currentTarget.style.borderColor = "var(--sky)")}
                 onBlur={(e) => (e.currentTarget.style.borderColor = "rgba(13,43,110,0.14)")}
@@ -209,11 +216,11 @@ export default function JoinQueue({ institution, onJoin }: JoinQueueProps) {
                 display: "flex",
                 alignItems: "center",
                 gap: 12,
-                padding: "12px 0",
-                borderTop: "1px solid rgba(13,43,110,0.08)",
+                padding: "10px 0",
+                borderTop: "1px solid rgba(13,43,110,0.07)",
               }}
             >
-              <span style={{ flex: 1, fontSize: "0.875rem", color: "var(--navy)" }}>
+              <span style={{ flex: 1, fontSize: "0.84rem", color: "var(--navy)", fontWeight: 400, lineHeight: 1.4 }}>
                 Notify me when my turn is near
               </span>
               <button
@@ -274,11 +281,11 @@ export default function JoinQueue({ institution, onJoin }: JoinQueueProps) {
               e.currentTarget.style.background = "var(--navy)";
             }}
           >
-            Get My Queue Number →
+            Continue →
           </button>
 
-          <p style={{ fontSize: "0.78rem", textAlign: "center", color: "#6B82A8" }}>
-            No account needed. Your session is private and temporary.
+          <p style={{ fontSize: "0.78rem", textAlign: "center", color: "#94a3b8", lineHeight: 1.5 }}>
+            You'll enter your ticket number on the next screen.
           </p>
         </div>
       </div>

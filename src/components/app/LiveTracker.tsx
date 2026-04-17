@@ -44,7 +44,9 @@ export default function LiveTracker({
         return next;
       });
     }, 2000);
-    return () => { if (tickerRef.current) clearInterval(tickerRef.current); };
+    return () => {
+      if (tickerRef.current) clearInterval(tickerRef.current);
+    };
   }, [yourNumber, joinedAt, onDone]);
 
   useEffect(() => {
@@ -87,6 +89,13 @@ export default function LiveTracker({
 
   const statusColor = isTurn ? "#22c55e" : isAlmost || isNext ? "#22c55e" : "#6B82A8";
   const statusBadge = isTurn ? "Your Turn!" : isAlmost ? "Almost!" : "Waiting";
+
+  // Defined outside JSX map to avoid refs-during-render lint error
+  const actionButtons = [
+    { label: "↻ Refresh", action: handleRefresh, danger: false },
+    { label: "↑ Share", action: handleShare, danger: false },
+    { label: "✕ Cancel", action: handleCancel, danger: true },
+  ];
 
   return (
     <div>
@@ -133,7 +142,7 @@ export default function LiveTracker({
       <div
         style={{
           display: "grid",
-          gridTemplateColumns: "repeat(auto-fit, minmax(300px, 1fr))",
+          gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))",
           gap: "1.5rem",
           alignItems: "start",
         }}
@@ -154,14 +163,14 @@ export default function LiveTracker({
                 className="animate-pulse-ring"
                 style={{ width: 8, height: 8, borderRadius: "50%", background: "#22c55e", flexShrink: 0 }}
               />
-              <span style={{ fontSize: "0.875rem", fontWeight: 600, color: "#6B82A8" }}>
+              <span style={{ fontSize: "0.875rem", fontWeight: 500, color: "#6B82A8" }}>
                 Live updates · {institution.name}
               </span>
               <span
                 style={{
                   marginLeft: "auto",
                   fontSize: "0.72rem",
-                  fontWeight: 700,
+                  fontWeight: 600,
                   padding: "3px 10px",
                   borderRadius: 999,
                   background: isAlmost || isTurn ? "rgba(34,197,94,0.1)" : "var(--sky-pale)",
@@ -191,6 +200,7 @@ export default function LiveTracker({
                     letterSpacing: "0.08em",
                     color: "#6B82A8",
                     marginBottom: 6,
+                    fontWeight: 500,
                   }}
                 >
                   Now serving
@@ -199,7 +209,7 @@ export default function LiveTracker({
                   className={`font-head ${isFlashing ? "queue-flash" : ""}`}
                   style={{
                     fontWeight: 800,
-                    fontSize: "clamp(2.5rem, 5vw, 4rem)",
+                    fontSize: "clamp(2rem, 5vw, 4rem)",
                     color: "var(--navy)",
                     lineHeight: 1,
                     transition: "color 0.2s, transform 0.2s",
@@ -217,6 +227,7 @@ export default function LiveTracker({
                     letterSpacing: "0.08em",
                     color: "#6B82A8",
                     marginBottom: 6,
+                    fontWeight: 500,
                   }}
                 >
                   Your number
@@ -225,7 +236,7 @@ export default function LiveTracker({
                   className="font-head"
                   style={{
                     fontWeight: 800,
-                    fontSize: "clamp(2.5rem, 5vw, 4rem)",
+                    fontSize: "clamp(2rem, 5vw, 4rem)",
                     color: "var(--sky)",
                     lineHeight: 1,
                   }}
@@ -259,7 +270,7 @@ export default function LiveTracker({
               style={{
                 textAlign: "center",
                 fontSize: "0.9rem",
-                fontWeight: isTurn || isAlmost || isNext ? 700 : 500,
+                fontWeight: isTurn || isAlmost || isNext ? 600 : 400,
                 color: statusColor,
               }}
             >
@@ -267,13 +278,9 @@ export default function LiveTracker({
             </p>
           </div>
 
-          {/* Action buttons */}
+          {/* Action buttons — defined outside map to avoid refs-during-render */}
           <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 10 }}>
-            {[
-              { label: "↻ Refresh", action: handleRefresh, danger: false },
-              { label: "↑ Share", action: handleShare, danger: false },
-              { label: "✕ Cancel", action: handleCancel, danger: true },
-            ].map((btn) => (
+            {actionButtons.map((btn) => (
               <button
                 key={btn.label}
                 onClick={btn.action}
@@ -281,7 +288,7 @@ export default function LiveTracker({
                   padding: "10px",
                   borderRadius: 12,
                   fontSize: "0.85rem",
-                  fontWeight: 600,
+                  fontWeight: 500,
                   border: "1.5px solid",
                   fontFamily: "var(--font-body)",
                   cursor: "pointer",
@@ -296,7 +303,9 @@ export default function LiveTracker({
                 }}
                 onMouseLeave={(e) => {
                   e.currentTarget.style.background = "white";
-                  e.currentTarget.style.borderColor = btn.danger ? "rgba(220,38,38,0.2)" : "rgba(13,43,110,0.12)";
+                  e.currentTarget.style.borderColor = btn.danger
+                    ? "rgba(220,38,38,0.2)"
+                    : "rgba(13,43,110,0.12)";
                 }}
               >
                 {btn.label}
@@ -317,7 +326,7 @@ export default function LiveTracker({
           >
             <h4
               className="font-head"
-              style={{ fontWeight: 700, fontSize: "0.95rem", color: "var(--navy)", marginBottom: "1rem" }}
+              style={{ fontWeight: 700, fontSize: "0.9rem", color: "var(--navy)", marginBottom: "1rem" }}
             >
               Session info
             </h4>
@@ -339,10 +348,22 @@ export default function LiveTracker({
                   alignItems: "center",
                   padding: "10px 0",
                   borderBottom: i < arr.length - 1 ? "1px solid rgba(13,43,110,0.08)" : "none",
+                  gap: 8,
                 }}
               >
-                <span style={{ fontSize: "0.875rem", color: "#6B82A8" }}>{row.label}</span>
-                <span style={{ fontSize: "0.875rem", fontWeight: 600, color: "var(--navy)" }}>
+                <span style={{ fontSize: "0.85rem", color: "#6B82A8", fontWeight: 400 }}>{row.label}</span>
+                <span
+                  style={{
+                    fontSize: "0.85rem",
+                    fontWeight: 600,
+                    color: "var(--navy)",
+                    textAlign: "right",
+                    maxWidth: "60%",
+                    overflow: "hidden",
+                    textOverflow: "ellipsis",
+                    whiteSpace: "nowrap",
+                  }}
+                >
                   {row.value}
                 </span>
               </div>
@@ -378,6 +399,7 @@ export default function LiveTracker({
                   gap: 8,
                   alignItems: "flex-start",
                   marginBottom: 6,
+                  lineHeight: 1.5,
                 }}
               >
                 <span style={{ color: "var(--sky)", flexShrink: 0 }}>→</span>
