@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef, useCallback } from "react";
+import { Bell, RefreshCw, Share2, X, ArrowRight } from "lucide-react";
 import { type Institution } from "../../data/institutions";
 import { formatQueueNumber } from "../../utils/queueHelpers";
 
@@ -26,8 +27,6 @@ export default function LiveTracker({
   const isNext = spotsAway === 0;
   const isTurn = serving >= yourNumber;
   const isAlmost = spotsAway <= 3 && spotsAway > 0;
-
-  // Banner text derived directly from state — no extra state needed
   const bannerBody = `You're ${formatQueueNumber(yourNumber)}, currently serving ${formatQueueNumber(serving)}. Head back now!`;
 
   useEffect(() => {
@@ -35,12 +34,9 @@ export default function LiveTracker({
       setServing((prev) => {
         const next = prev + 1;
 
-        // Flash animation
         setIsFlashing(true);
         setTimeout(() => setIsFlashing(false), 400);
 
-        // Trigger "almost" banner inside the interval callback (external system),
-        // not synchronously in an effect body — this satisfies react-hooks/set-state-in-effect
         if (!notifiedRef.current && next >= yourNumber - 3 && next < yourNumber) {
           notifiedRef.current = true;
           setShowBanner(true);
@@ -120,7 +116,7 @@ export default function LiveTracker({
             marginBottom: "1.5rem",
           }}
         >
-          <span style={{ fontSize: "1.2rem", flexShrink: 0 }}>🔔</span>
+          <Bell style={{ fontSize: "1.2rem", flexShrink: 0, width: 24, height: 24 }} />
           <div style={{ flex: 1 }}>
             <strong style={{ display: "block", color: "white", fontSize: "0.9rem", marginBottom: 2 }}>
               Almost your turn!
@@ -290,7 +286,7 @@ export default function LiveTracker({
           <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 10 }}>
             <button
               onClick={handleRefresh}
-              style={{ ...btnBase, color: "var(--navy)", borderColor: "rgba(13,43,110,0.12)" }}
+              style={{ ...btnBase, color: "var(--navy)", borderColor: "rgba(13,43,110,0.12)", display: "flex", alignItems: "center", gap: 6, paddingLeft: 12 }}
               onMouseEnter={(e) => {
                 e.currentTarget.style.background = "var(--sky-pale)";
                 e.currentTarget.style.borderColor = "var(--sky)";
@@ -300,11 +296,11 @@ export default function LiveTracker({
                 e.currentTarget.style.borderColor = "rgba(13,43,110,0.12)";
               }}
             >
-              ↻ Refresh
+              <RefreshCw size={16} /> Refresh
             </button>
             <button
               onClick={handleShare}
-              style={{ ...btnBase, color: "var(--navy)", borderColor: "rgba(13,43,110,0.12)" }}
+              style={{ ...btnBase, color: "var(--navy)", borderColor: "rgba(13,43,110,0.12)", display: "flex", alignItems: "center", gap: 6, paddingLeft: 12 }}
               onMouseEnter={(e) => {
                 e.currentTarget.style.background = "var(--sky-pale)";
                 e.currentTarget.style.borderColor = "var(--sky)";
@@ -314,11 +310,11 @@ export default function LiveTracker({
                 e.currentTarget.style.borderColor = "rgba(13,43,110,0.12)";
               }}
             >
-              ↑ Share
+              <Share2 size={16} /> Share
             </button>
             <button
               onClick={handleCancel}
-              style={{ ...btnBase, color: "#dc2626", borderColor: "rgba(220,38,38,0.2)" }}
+              style={{ ...btnBase, color: "#dc2626", borderColor: "rgba(220,38,38,0.2)", display: "flex", alignItems: "center", gap: 6, paddingLeft: 12 }}
               onMouseEnter={(e) => {
                 e.currentTarget.style.background = "#fff5f5";
                 e.currentTarget.style.borderColor = "#dc2626";
@@ -328,7 +324,7 @@ export default function LiveTracker({
                 e.currentTarget.style.borderColor = "rgba(220,38,38,0.2)";
               }}
             >
-              ✕ Cancel
+              <X size={16} /> Cancel
             </button>
           </div>
         </div>
@@ -421,7 +417,7 @@ export default function LiveTracker({
                   lineHeight: 1.5,
                 }}
               >
-                <span style={{ color: "var(--sky)", flexShrink: 0 }}>→</span>
+                <ArrowRight style={{ color: "var(--sky)", flexShrink: 0, width: 16, height: 16, marginTop: 2 }} />
                 {tip}
               </p>
             ))}

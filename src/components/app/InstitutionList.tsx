@@ -5,6 +5,18 @@ import {
   type Institution,
   type InstitutionType,
 } from "../../data/institutions";
+import {
+  Building2,
+  Landmark,
+  Zap,
+  Search,
+} from "lucide-react";
+
+const renderIcon = (iconName: string) => {
+  const icons = { Building2, Landmark, Zap };
+  const IconComponent = icons[iconName as keyof typeof icons];
+  return IconComponent ? <IconComponent size={28} strokeWidth={2} /> : null;
+};
 
 type FilterType = "all" | InstitutionType;
 
@@ -80,18 +92,18 @@ export default function InstitutionList({ onSelect }: InstitutionListProps) {
       {/* ── Search + filters ── */}
       <div style={{ marginBottom: "1.25rem" }}>
         <div style={{ position: "relative", marginBottom: "0.75rem" }}>
-          <span
-            style={{
-              position: "absolute",
-              left: 14,
-              top: "50%",
-              transform: "translateY(-50%)",
-              fontSize: "0.875rem",
-              color: "#6B82A8",
-            }}
-          >
-            🔍
-          </span>
+            <Search
+              style={{
+                position: "absolute",
+                left: 14,
+                top: "50%",
+                transform: "translateY(-50%)",
+                fontSize: "0.875rem",
+                color: "#6B82A8",
+                width: 20,
+                height: 20,
+              }}
+            />
           <input
             type="text"
             placeholder="Search institutions…"
@@ -223,12 +235,11 @@ export default function InstitutionList({ onSelect }: InstitutionListProps) {
                   display: "flex",
                   alignItems: "center",
                   justifyContent: "center",
-                  fontSize: "1.1rem",
-                  flexShrink: 0,
-                }}
-              >
-                {INSTITUTION_ICONS[inst.type]}
-              </div>
+                flexShrink: 0,
+              }}
+            >
+              {renderIcon(INSTITUTION_ICONS[inst.type])}
+            </div>
 
               {/* Name + address */}
               <div style={{ flex: 1, minWidth: 0 }}>
@@ -328,7 +339,7 @@ export default function InstitutionList({ onSelect }: InstitutionListProps) {
               color: "#94a3b8",
             }}
           >
-            <p style={{ fontSize: "2rem", marginBottom: "0.75rem" }}>🔍</p>
+            <Search style={{ fontSize: "2rem", marginBottom: "0.75rem", width: 48, height: 48, color: "#94a3b8" }} />
             <p style={{ fontWeight: 600, color: "var(--navy)", marginBottom: "0.35rem" }}>
               No results found
             </p>

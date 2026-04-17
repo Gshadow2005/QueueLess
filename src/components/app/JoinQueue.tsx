@@ -1,9 +1,10 @@
 import { useState } from "react";
+import { Ticket, Hash, Bell, MapPin } from "lucide-react";
 import { type Institution, TYPE_LABELS } from "../../data/institutions";
 
 interface JoinQueueProps {
   institution: Institution;
-  onBack: () => void;
+  onBack?: () => void;
   onJoin: (phone: string, notifyEnabled: boolean) => void;
 }
 
@@ -71,15 +72,15 @@ export default function JoinQueue({ institution, onJoin }: JoinQueueProps) {
                 alignItems: "center",
               }}
             >
-              {[
+              {[ 
                 { label: "Now Serving", value: `#${String(institution.serving).padStart(2, "0")}` },
                 null,
                 { label: "In Queue", value: institution.inQueue.toString() },
                 null,
-                {
+                { 
                   label: "Est. Wait. min",
                   value: `~${institution.inQueue * institution.waitPer}`,
-
+                  sub: undefined
                 },
               ].map((item, i) =>
                 item === null ? (
@@ -131,10 +132,10 @@ export default function JoinQueue({ institution, onJoin }: JoinQueueProps) {
               What to expect
             </h3>
             {[
-              { icon: "🎫", text: "Get a physical ticket at the counter first" },
-              { icon: "🔢", text: "Then enter your number here to start tracking" },
-              { icon: "🔔", text: "We'll notify you when your turn is near" },
-              { icon: "📍", text: "You can track from anywhere" },
+              { icon: <Ticket size={20} strokeWidth={2} />, text: "Get a physical ticket at the counter first" },
+              { icon: <Hash size={20} strokeWidth={2} />, text: "Then enter your number here to start tracking" },
+              { icon: <Bell size={20} strokeWidth={2} />, text: "We'll notify you when your turn is near" },
+              { icon: <MapPin size={20} strokeWidth={2} />, text: "You can track from anywhere" },
             ].map((item) => (
               <div
                 key={item.text}

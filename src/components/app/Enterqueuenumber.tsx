@@ -1,11 +1,12 @@
 import { useState } from "react";
+import { AlertCircle } from "lucide-react";
 import { type Institution, TYPE_LABELS } from "../../data/institutions";
 import { formatQueueNumber } from "../../utils/queueHelpers";
 
 interface EnterQueueNumberProps {
   institution: Institution;
   onSubmit: (queueNumber: number) => void;
-  onBack: () => void;
+  onBack?: () => void;
 }
 
 export default function EnterQueueNumber({ institution, onSubmit }: EnterQueueNumberProps) {
@@ -214,7 +215,7 @@ export default function EnterQueueNumber({ institution, onSubmit }: EnterQueueNu
         {/* Error message */}
         {error && (
           <p style={{ fontSize: "0.8rem", color: "#dc2626", marginBottom: "1rem", fontWeight: 500 }}>
-            ⚠ {error}
+            <AlertCircle style={{ width: 16, height: 16, verticalAlign: "middle", marginRight: 4 }} /> {error}
           </p>
         )}
 
