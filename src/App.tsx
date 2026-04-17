@@ -6,7 +6,7 @@ import AppPage from "./pages/AppPage";
 export default function App() {
   const { route, navigate } = useRouter();
 
-  if (route === "/app") {
+  if (route === "/queue") {
     return (
       <>
         <AppPage onBack={() => navigate("/")} />
@@ -17,7 +17,7 @@ export default function App() {
 
   return (
     <>
-      <LandingPage onLaunchApp={() => navigate("/app")} />
+      <LandingPage onLaunchApp={() => navigate("/queue")} />
       <Analytics />
     </>
   );

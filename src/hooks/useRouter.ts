@@ -1,11 +1,11 @@
 import { useState, useEffect } from "react";
 
-export type Route = "/" | "/app";
+export type Route = "/" | "/queue";
 
 export function useRouter() {
   const getRoute = (): Route => {
     const hash = window.location.hash;
-    if (hash === "#/app") return "/app";
+    if (hash === "#/queue") return "/queue";
     return "/";
   };
 
