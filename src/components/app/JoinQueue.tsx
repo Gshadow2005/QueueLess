@@ -77,9 +77,9 @@ export default function JoinQueue({ institution, onJoin }: JoinQueueProps) {
                 { label: "In Queue", value: institution.inQueue.toString() },
                 null,
                 {
-                  label: "Est. Wait",
+                  label: "Est. Wait. min",
                   value: `~${institution.inQueue * institution.waitPer}`,
-                  sub: "min",
+
                 },
               ].map((item, i) =>
                 item === null ? (
