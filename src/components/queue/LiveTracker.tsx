@@ -286,7 +286,7 @@ export default function LiveTracker({
           <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 10 }}>
             <button
               onClick={handleRefresh}
-              style={{ ...btnBase, color: "var(--navy)", borderColor: "rgba(13,43,110,0.12)", display: "flex", alignItems: "center", gap: 6, paddingLeft: 12 }}
+              style={{ ...btnBase, color: "var(--navy)", borderColor: "rgba(13,43,110,0.12)", display: "flex", alignItems: "center", gap: 6, justifyContent: "center" }}
               onMouseEnter={(e) => {
                 e.currentTarget.style.background = "var(--sky-pale)";
                 e.currentTarget.style.borderColor = "var(--sky)";
@@ -300,7 +300,7 @@ export default function LiveTracker({
             </button>
             <button
               onClick={handleShare}
-              style={{ ...btnBase, color: "var(--navy)", borderColor: "rgba(13,43,110,0.12)", display: "flex", alignItems: "center", gap: 6, paddingLeft: 12 }}
+              style={{ ...btnBase, color: "var(--navy)", borderColor: "rgba(13,43,110,0.12)", display: "flex", alignItems: "center", gap: 6, justifyContent: "center" }}
               onMouseEnter={(e) => {
                 e.currentTarget.style.background = "var(--sky-pale)";
                 e.currentTarget.style.borderColor = "var(--sky)";
@@ -314,7 +314,7 @@ export default function LiveTracker({
             </button>
             <button
               onClick={handleCancel}
-              style={{ ...btnBase, color: "#dc2626", borderColor: "rgba(220,38,38,0.2)", display: "flex", alignItems: "center", gap: 6, paddingLeft: 12 }}
+              style={{ ...btnBase, color: "#dc2626", borderColor: "rgba(220,38,38,0.2)", display: "flex", alignItems: "center", gap: 6, justifyContent: "center" }}
               onMouseEnter={(e) => {
                 e.currentTarget.style.background = "#fff5f5";
                 e.currentTarget.style.borderColor = "#dc2626";

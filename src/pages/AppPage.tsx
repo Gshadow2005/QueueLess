@@ -1,10 +1,10 @@
 import { useState, useCallback } from "react";
 import { type Institution } from "../data/institutions";
-import InstitutionList from "../components/app/InstitutionList";
-import JoinQueue from "../components/app/JoinQueue";
-import EnterQueueNumber from "../components/app/Enterqueuenumber";
-import LiveTracker from "../components/app/LiveTracker";
-import DoneScreen from "../components/app/DoneScreen";
+import InstitutionList from "../components/queue/InstitutionList";
+import JoinQueue from "../components/queue/JoinQueue";
+import EnterQueueNumber from "../components/queue/Enterqueuenumber";
+import LiveTracker from "../components/queue/LiveTracker";
+import DoneScreen from "../components/queue/DoneScreen";
 
 type Screen = "list" | "join" | "enter-number" | "tracker" | "done";
 

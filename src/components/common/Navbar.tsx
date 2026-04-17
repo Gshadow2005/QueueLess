@@ -10,19 +10,29 @@ export default function Navbar({ onLaunchApp }: NavbarProps) {
 
   return (
     <nav
-      className="sticky top-0 z-50 border-b"
+      className="fixed top-0 left-0 right-0 z-50 border-b"
       style={{
         background: "rgba(255,255,255,0.92)",
         backdropFilter: "blur(12px)",
         borderColor: "rgba(13,43,110,0.12)",
       }}
     >
-      <div className="max-w-6xl mx-auto px-8 h-16 flex items-center gap-8">
+      <div
+        style={{
+          maxWidth: 1160,
+          margin: "0 auto",
+          padding: "0 1.25rem",
+          height: 64,
+          display: "flex",
+          alignItems: "center",
+          gap: "1rem",
+        }}
+      >
         {/* Logo */}
-        <div className="flex items-center gap-2">
-          <span className="text-2xl">⏱</span>
-          <span className="font-head text-xl" style={{ color: "var(--navy)" }}>
-            Queue<strong className="font-extrabold">Less</strong>
+        <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+          <span style={{ fontSize: "1.375rem" }}>⏱</span>
+          <span className="font-head" style={{ fontSize: "1.25rem", color: "var(--navy)" }}>
+            Queue<strong style={{ fontWeight: 800 }}>Less</strong>
           </span>
         </div>
 
