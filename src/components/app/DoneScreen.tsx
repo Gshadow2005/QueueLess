@@ -77,7 +77,9 @@ export default function DoneScreen({
             >
               Session summary
             </h3>
-            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10 }}>
+
+            {/* Stats grid — 2 columns, each stat in its own row pair */}
+            <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
               {[
                 { label: "Institution", value: institution.name.split("–")[0].trim() },
                 { label: "Your number", value: formatQueueNumber(yourNumber) },
@@ -89,33 +91,39 @@ export default function DoneScreen({
                   style={{
                     background: "var(--off)",
                     borderRadius: 12,
-                    padding: "1rem",
-                    textAlign: "center",
+                    padding: "0.875rem 1rem",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "space-between",
+                    gap: 12,
                   }}
                 >
+                  <p
+                    style={{
+                      fontSize: "0.75rem",
+                      textTransform: "uppercase",
+                      letterSpacing: "0.06em",
+                      color: "#6B82A8",
+                      fontWeight: 500,
+                      flexShrink: 0,
+                    }}
+                  >
+                    {stat.label}
+                  </p>
                   <p
                     className="font-head"
                     style={{
                       fontWeight: 800,
-                      fontSize: "1.2rem",
+                      fontSize: "1rem",
                       color: "var(--navy)",
-                      marginBottom: 4,
+                      textAlign: "right",
                       overflow: "hidden",
                       textOverflow: "ellipsis",
                       whiteSpace: "nowrap",
+                      maxWidth: "60%",
                     }}
                   >
                     {stat.value}
-                  </p>
-                  <p
-                    style={{
-                      fontSize: "0.68rem",
-                      textTransform: "uppercase",
-                      letterSpacing: "0.06em",
-                      color: "#6B82A8",
-                    }}
-                  >
-                    {stat.label}
                   </p>
                 </div>
               ))}

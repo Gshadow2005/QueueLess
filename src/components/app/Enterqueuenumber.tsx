@@ -37,7 +37,6 @@ export default function EnterQueueNumber({ institution, onSubmit }: EnterQueueNu
     if (e.key === "Enter") handleSubmit();
   };
 
-  // Preview: how many spots away from now serving
   const spotsAway = isValid ? Math.max(0, parsed - institution.serving - 1) : null;
   const estWait = spotsAway !== null ? spotsAway * institution.waitPer : null;
 
@@ -81,52 +80,56 @@ export default function EnterQueueNumber({ institution, onSubmit }: EnterQueueNu
           borderRadius: 16,
           padding: "1.25rem 1.5rem",
           marginBottom: "1.5rem",
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "space-between",
-          gap: 16,
-          flexWrap: "wrap",
         }}
       >
-        <div>
-          <p
-            style={{
-              fontSize: "0.65rem",
-              textTransform: "uppercase",
-              letterSpacing: "0.08em",
-              color: "var(--sky-light)",
-              marginBottom: 4,
-              fontWeight: 500,
-            }}
-          >
-            Now serving at {institution.name.split("–")[0].trim()}
-          </p>
-          <p
-            className="font-head"
-            style={{ fontWeight: 800, fontSize: "2.25rem", color: "white", lineHeight: 1 }}
-          >
-            {formatQueueNumber(institution.serving)}
-          </p>
-        </div>
-        <div style={{ textAlign: "right" }}>
-          <p
-            style={{
-              fontSize: "0.65rem",
-              textTransform: "uppercase",
-              letterSpacing: "0.08em",
-              color: "var(--sky-light)",
-              marginBottom: 4,
-              fontWeight: 500,
-            }}
-          >
-            People in queue
-          </p>
-          <p
-            className="font-head"
-            style={{ fontWeight: 800, fontSize: "2.25rem", color: "white", lineHeight: 1 }}
-          >
-            {institution.inQueue}
-          </p>
+        {/* Two stat blocks stacked */}
+        <div style={{ display: "flex", gap: 0, alignItems: "stretch" }}>
+          {/* Now Serving */}
+          <div style={{ flex: 1 }}>
+            <p
+              style={{
+                fontSize: "0.65rem",
+                textTransform: "uppercase",
+                letterSpacing: "0.08em",
+                color: "var(--sky-light)",
+                marginBottom: 6,
+                fontWeight: 500,
+              }}
+            >
+              Now serving at {institution.name.split("–")[0].trim()}
+            </p>
+            <p
+              className="font-head"
+              style={{ fontWeight: 800, fontSize: "2.25rem", color: "white", lineHeight: 1 }}
+            >
+              {formatQueueNumber(institution.serving)}
+            </p>
+          </div>
+
+          {/* Divider */}
+          <div style={{ width: 1, background: "rgba(255,255,255,0.15)", margin: "0 1.25rem", flexShrink: 0 }} />
+
+          {/* People in queue */}
+          <div style={{ flex: 1 }}>
+            <p
+              style={{
+                fontSize: "0.65rem",
+                textTransform: "uppercase",
+                letterSpacing: "0.08em",
+                color: "var(--sky-light)",
+                marginBottom: 6,
+                fontWeight: 500,
+              }}
+            >
+              People in queue
+            </p>
+            <p
+              className="font-head"
+              style={{ fontWeight: 800, fontSize: "2.25rem", color: "white", lineHeight: 1 }}
+            >
+              {institution.inQueue}
+            </p>
+          </div>
         </div>
       </div>
 

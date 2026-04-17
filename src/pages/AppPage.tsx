@@ -36,15 +36,12 @@ export default function AppPage({ onBack }: AppPageProps) {
     setScreen("join");
   };
 
-  // After filling in optional details, move to manual number entry
   const handleJoin = (phone: string, notifyEnabled: boolean) => {
     if (!state.institution) return;
-    // Store optional fields in state if needed later (e.g. for SMS)
     console.log("Optional details:", { phone, notifyEnabled });
     setScreen("enter-number");
   };
 
-  // Called when user manually submits their queue number
   const handleNumberSubmit = (queueNumber: number) => {
     setState((s) => ({ ...s, yourNumber: queueNumber, joinedAt: new Date() }));
     setTrackerBadge("Waiting");
@@ -69,6 +66,7 @@ export default function AppPage({ onBack }: AppPageProps) {
   };
 
   const showBack = screen === "join" || screen === "list" || screen === "enter-number";
+
   const title =
     screen === "list" ? null :
     screen === "join" ? (state.institution?.name.split("–")[0].trim() ?? "Join Queue") :
@@ -78,7 +76,7 @@ export default function AppPage({ onBack }: AppPageProps) {
 
   return (
     <div style={{ minHeight: "100vh", background: "var(--off)", color: "var(--navy)" }}>
-      {/* ── Top bar ── */}
+      {/* ── Top bar — logo + badge only, no back button ── */}
       <nav
         style={{
           position: "sticky",
@@ -100,33 +98,6 @@ export default function AppPage({ onBack }: AppPageProps) {
             gap: "1rem",
           }}
         >
-          {/* Back button */}
-          {showBack && (
-            <button
-              onClick={handleBack}
-              style={{
-                display: "flex",
-                alignItems: "center",
-                gap: 6,
-                fontSize: "0.875rem",
-                color: "#6B82A8",
-                background: "none",
-                border: "none",
-                cursor: "pointer",
-                fontFamily: "var(--font-body)",
-                padding: 0,
-                flexShrink: 0,
-              }}
-              onMouseEnter={(e) => (e.currentTarget.style.color = "var(--navy)")}
-              onMouseLeave={(e) => (e.currentTarget.style.color = "#6B82A8")}
-            >
-              <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="2">
-                <path d="M10 3L5 8l5 5" />
-              </svg>
-              {screen === "list" ? "Home" : "Back"}
-            </button>
-          )}
-
           {/* Logo / title */}
           {screen === "list" ? (
             <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
@@ -173,7 +144,7 @@ export default function AppPage({ onBack }: AppPageProps) {
             </span>
           )}
 
-          {/* Nav links on desktop (list screen only) */}
+          {/* Nav label on desktop (list screen only) */}
           {screen === "list" && (
             <div className="app-nav-links">
               <span style={{ fontSize: "0.85rem", color: "#6B82A8" }}>Queue management</span>
@@ -190,6 +161,34 @@ export default function AppPage({ onBack }: AppPageProps) {
           padding: "1.5rem 1.25rem",
         }}
       >
+        {/* ── Back button — below navbar, above content ── */}
+        {showBack && (
+          <div style={{ marginBottom: "1.25rem" }}>
+            <button
+              onClick={handleBack}
+              style={{
+                display: "inline-flex",
+                alignItems: "center",
+                gap: 6,
+                fontSize: "0.875rem",
+                color: "#6B82A8",
+                background: "none",
+                border: "none",
+                cursor: "pointer",
+                fontFamily: "var(--font-body)",
+                padding: 0,
+              }}
+              onMouseEnter={(e) => (e.currentTarget.style.color = "var(--navy)")}
+              onMouseLeave={(e) => (e.currentTarget.style.color = "#6B82A8")}
+            >
+              <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="2">
+                <path d="M10 3L5 8l5 5" />
+              </svg>
+              {screen === "list" ? "Home" : "Back"}
+            </button>
+          </div>
+        )}
+
         {screen === "list" && <InstitutionList onSelect={handleSelectInst} />}
 
         {screen === "join" && state.institution && (

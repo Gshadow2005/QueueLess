@@ -79,7 +79,6 @@ export default function InstitutionList({ onSelect }: InstitutionListProps) {
 
       {/* ── Search + filters ── */}
       <div style={{ marginBottom: "1.25rem" }}>
-        {/* Search */}
         <div style={{ position: "relative", marginBottom: "0.75rem" }}>
           <span
             style={{
@@ -120,7 +119,6 @@ export default function InstitutionList({ onSelect }: InstitutionListProps) {
           />
         </div>
 
-        {/* Filter tabs — scrollable on small screens */}
         <div
           style={{
             display: "flex",
@@ -285,14 +283,29 @@ export default function InstitutionList({ onSelect }: InstitutionListProps) {
                     <div key={i} style={{ height: 24, background: "rgba(13,43,110,0.07)" }} />
                   ) : (
                     <div key={item.label} style={{ textAlign: "center" }}>
+                      {/* Label first, lighter */}
+                      <p
+                        style={{
+                          fontSize: "0.62rem",
+                          textTransform: "uppercase",
+                          letterSpacing: "0.06em",
+                          color: "#b0bfd4",
+                          fontWeight: 500,
+                          marginBottom: 3,
+                        }}
+                      >
+                        {item.label}
+                      </p>
+                      {/* Value — medium weight, muted navy */}
                       <p
                         className="font-head"
-                        style={{ fontWeight: 700, fontSize: "0.95rem", color: "var(--navy)" }}
+                        style={{
+                          fontWeight: 600,
+                          fontSize: "0.9rem",
+                          color: "#4a6080",
+                        }}
                       >
                         {item.value}
-                      </p>
-                      <p style={{ fontSize: "0.65rem", color: "#94a3b8", marginTop: 1, fontWeight: 400 }}>
-                        {item.label}
                       </p>
                     </div>
                   )
