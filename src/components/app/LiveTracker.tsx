@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import { type Institution } from "../../data/institutions";
 import { formatQueueNumber } from "../../utils/queueHelpers";
 
@@ -17,10 +17,9 @@ export default function LiveTracker({
 }: LiveTrackerProps) {
   const [serving, setServing] = useState(institution.serving);
   const [isFlashing, setIsFlashing] = useState(false);
-  const [notified, setNotified] = useState(false);
   const [showBanner, setShowBanner] = useState(false);
-  const [notifText, setNotifText] = useState({ title: "", body: "" });
   const tickerRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const notifiedRef = useRef(false);
 
   const spotsAway = Math.max(0, yourNumber - serving - 1);
   const pct = Math.max(0, Math.min(100, 100 - (spotsAway / 15) * 100));
@@ -28,12 +27,26 @@ export default function LiveTracker({
   const isTurn = serving >= yourNumber;
   const isAlmost = spotsAway <= 3 && spotsAway > 0;
 
+  // Banner text derived directly from state — no extra state needed
+  const bannerBody = `You're ${formatQueueNumber(yourNumber)}, currently serving ${formatQueueNumber(serving)}. Head back now!`;
+
   useEffect(() => {
     tickerRef.current = setInterval(() => {
       setServing((prev) => {
         const next = prev + 1;
+
+        // Flash animation
         setIsFlashing(true);
         setTimeout(() => setIsFlashing(false), 400);
+
+        // Trigger "almost" banner inside the interval callback (external system),
+        // not synchronously in an effect body — this satisfies react-hooks/set-state-in-effect
+        if (!notifiedRef.current && next >= yourNumber - 3 && next < yourNumber) {
+          notifiedRef.current = true;
+          setShowBanner(true);
+        }
+
+        // Queue complete
         if (next >= yourNumber) {
           if (tickerRef.current) clearInterval(tickerRef.current);
           setTimeout(() => {
@@ -41,6 +54,7 @@ export default function LiveTracker({
             onDone(mins, false);
           }, 900);
         }
+
         return next;
       });
     }, 2000);
@@ -49,37 +63,26 @@ export default function LiveTracker({
     };
   }, [yourNumber, joinedAt, onDone]);
 
-  useEffect(() => {
-    if (isAlmost && !notified) {
-      setNotified(true);
-      setNotifText({
-        title: "Almost your turn!",
-        body: `You're ${formatQueueNumber(yourNumber)}, currently serving ${formatQueueNumber(serving)}. Head back now!`,
-      });
-      setShowBanner(true);
-    }
-  }, [isAlmost, notified, serving, yourNumber]);
-
-  const handleCancel = () => {
+  const handleCancel = useCallback(() => {
     if (!window.confirm("Cancel your spot in the queue?")) return;
     if (tickerRef.current) clearInterval(tickerRef.current);
     const mins = Math.round((Date.now() - joinedAt.getTime()) / 60000) || 0;
     onDone(mins, true);
-  };
+  }, [joinedAt, onDone]);
 
-  const handleRefresh = () => {
+  const handleRefresh = useCallback(() => {
     setIsFlashing(true);
     setTimeout(() => setIsFlashing(false), 400);
-  };
+  }, []);
 
-  const handleShare = () => {
+  const handleShare = useCallback(() => {
     const txt = `I'm ${formatQueueNumber(yourNumber)} in the queue at ${institution.name}. Track with QueueLess!`;
     if (navigator.share) {
       navigator.share({ text: txt });
     } else {
       navigator.clipboard?.writeText(txt).then(() => alert("Copied to clipboard!"));
     }
-  };
+  }, [yourNumber, institution.name]);
 
   const awayLabel = isTurn
     ? "It's your turn!"
@@ -90,12 +93,17 @@ export default function LiveTracker({
   const statusColor = isTurn ? "#22c55e" : isAlmost || isNext ? "#22c55e" : "#6B82A8";
   const statusBadge = isTurn ? "Your Turn!" : isAlmost ? "Almost!" : "Waiting";
 
-  // Defined outside JSX map to avoid refs-during-render lint error
-  const actionButtons = [
-    { label: "↻ Refresh", action: handleRefresh, danger: false },
-    { label: "↑ Share", action: handleShare, danger: false },
-    { label: "✕ Cancel", action: handleCancel, danger: true },
-  ];
+  const btnBase: React.CSSProperties = {
+    padding: "10px",
+    borderRadius: 12,
+    fontSize: "0.85rem",
+    fontWeight: 500,
+    border: "1.5px solid",
+    fontFamily: "var(--font-body)",
+    cursor: "pointer",
+    background: "white",
+    transition: "all 0.15s",
+  };
 
   return (
     <div>
@@ -115,10 +123,10 @@ export default function LiveTracker({
           <span style={{ fontSize: "1.2rem", flexShrink: 0 }}>🔔</span>
           <div style={{ flex: 1 }}>
             <strong style={{ display: "block", color: "white", fontSize: "0.9rem", marginBottom: 2 }}>
-              {notifText.title}
+              Almost your turn!
             </strong>
             <p style={{ fontSize: "0.8rem", color: "var(--sky-light)", lineHeight: 1.5 }}>
-              {notifText.body}
+              {bannerBody}
             </p>
           </div>
           <button
@@ -278,39 +286,50 @@ export default function LiveTracker({
             </p>
           </div>
 
-          {/* Action buttons — defined outside map to avoid refs-during-render */}
+          {/* Action buttons */}
           <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 10 }}>
-            {actionButtons.map((btn) => (
-              <button
-                key={btn.label}
-                onClick={btn.action}
-                style={{
-                  padding: "10px",
-                  borderRadius: 12,
-                  fontSize: "0.85rem",
-                  fontWeight: 500,
-                  border: "1.5px solid",
-                  fontFamily: "var(--font-body)",
-                  cursor: "pointer",
-                  background: "white",
-                  color: btn.danger ? "#dc2626" : "var(--navy)",
-                  borderColor: btn.danger ? "rgba(220,38,38,0.2)" : "rgba(13,43,110,0.12)",
-                  transition: "all 0.15s",
-                }}
-                onMouseEnter={(e) => {
-                  e.currentTarget.style.background = btn.danger ? "#fff5f5" : "var(--sky-pale)";
-                  e.currentTarget.style.borderColor = btn.danger ? "#dc2626" : "var(--sky)";
-                }}
-                onMouseLeave={(e) => {
-                  e.currentTarget.style.background = "white";
-                  e.currentTarget.style.borderColor = btn.danger
-                    ? "rgba(220,38,38,0.2)"
-                    : "rgba(13,43,110,0.12)";
-                }}
-              >
-                {btn.label}
-              </button>
-            ))}
+            <button
+              onClick={handleRefresh}
+              style={{ ...btnBase, color: "var(--navy)", borderColor: "rgba(13,43,110,0.12)" }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.background = "var(--sky-pale)";
+                e.currentTarget.style.borderColor = "var(--sky)";
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.background = "white";
+                e.currentTarget.style.borderColor = "rgba(13,43,110,0.12)";
+              }}
+            >
+              ↻ Refresh
+            </button>
+            <button
+              onClick={handleShare}
+              style={{ ...btnBase, color: "var(--navy)", borderColor: "rgba(13,43,110,0.12)" }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.background = "var(--sky-pale)";
+                e.currentTarget.style.borderColor = "var(--sky)";
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.background = "white";
+                e.currentTarget.style.borderColor = "rgba(13,43,110,0.12)";
+              }}
+            >
+              ↑ Share
+            </button>
+            <button
+              onClick={handleCancel}
+              style={{ ...btnBase, color: "#dc2626", borderColor: "rgba(220,38,38,0.2)" }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.background = "#fff5f5";
+                e.currentTarget.style.borderColor = "#dc2626";
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.background = "white";
+                e.currentTarget.style.borderColor = "rgba(220,38,38,0.2)";
+              }}
+            >
+              ✕ Cancel
+            </button>
           </div>
         </div>
 
