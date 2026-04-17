@@ -19,8 +19,6 @@ interface AppPageProps {
   onBack: () => void;
 }
 
-
-
 export default function AppPage({ onBack }: AppPageProps) {
   const [screen, setScreen] = useState<Screen>("list");
   const [trackerBadge, setTrackerBadge] = useState("Waiting");
@@ -32,24 +30,6 @@ export default function AppPage({ onBack }: AppPageProps) {
     cancelled: false,
   });
 
-  const topBarConfig: Record<Screen, { showBack: boolean; title: string; badge?: string }> = {
-    list: { showBack: false, title: "" },
-    join: {
-      showBack: true,
-      title: state.institution
-        ? `Join – ${state.institution.name.split("–")[0].trim()}`
-        : "Join Queue",
-    },
-    tracker: {
-      showBack: false,
-      title: state.institution?.name.split("–")[0].trim() || "Live Tracker",
-      badge: trackerBadge,
-    },
-    done: { showBack: false, title: "All done!" },
-  };
-
-  const config = topBarConfig[screen];
-
   const handleSelectInst = (inst: Institution) => {
     setState((s) => ({ ...s, institution: inst }));
     setScreen("join");
@@ -59,11 +39,7 @@ export default function AppPage({ onBack }: AppPageProps) {
     if (!state.institution) return;
     const inst = state.institution;
     const yourNum = inst.serving + inst.inQueue + 1;
-    setState((s) => ({
-      ...s,
-      yourNumber: yourNum,
-      joinedAt: new Date(),
-    }));
+    setState((s) => ({ ...s, yourNumber: yourNum, joinedAt: new Date() }));
     setTrackerBadge("Waiting");
     setScreen("tracker");
   };
@@ -74,13 +50,7 @@ export default function AppPage({ onBack }: AppPageProps) {
   }, []);
 
   const handleReset = () => {
-    setState({
-      institution: null,
-      yourNumber: 0,
-      joinedAt: null,
-      waitMinutes: 0,
-      cancelled: false,
-    });
+    setState({ institution: null, yourNumber: 0, joinedAt: null, waitMinutes: 0, cancelled: false });
     setTrackerBadge("Waiting");
     setScreen("list");
   };
@@ -90,99 +60,153 @@ export default function AppPage({ onBack }: AppPageProps) {
     else onBack();
   };
 
+  const showBack = screen === "join" || screen === "list";
+  const title =
+    screen === "list" ? null :
+    screen === "join" ? (state.institution?.name.split("–")[0].trim() ?? "Join Queue") :
+    screen === "tracker" ? (state.institution?.name.split("–")[0].trim() ?? "Live Tracker") :
+    "All done!";
+
   return (
-    <div
-      className="min-h-screen flex flex-col"
-      style={{ background: "var(--off)", color: "var(--navy)" }}
-    >
-      {/* Top bar */}
-      <div
-        className="sticky top-0 z-50 flex items-center gap-3 px-5 h-14"
+    <div style={{ minHeight: "100vh", background: "var(--off)", color: "var(--navy)" }}>
+      {/* ── Top bar ── */}
+      <nav
         style={{
+          position: "sticky",
+          top: 0,
+          zIndex: 50,
           background: "rgba(255,255,255,0.92)",
           backdropFilter: "blur(12px)",
           borderBottom: "1px solid rgba(13,43,110,0.12)",
         }}
       >
-        {/* Back button */}
-        {(screen === "join" || screen === "list") && (
-          <button
-            onClick={handleBack}
-            className="flex items-center gap-1.5 text-sm transition-colors duration-150 mr-1"
-            style={{ color: "#6B82A8", background: "none", border: "none", cursor: "pointer", fontFamily: "var(--font-body)" }}
-            onMouseEnter={(e) => (e.currentTarget.style.color = "var(--navy)")}
-            onMouseLeave={(e) => (e.currentTarget.style.color = "#6B82A8")}
-          >
-            <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="2">
-              <path d="M10 3L5 8l5 5" />
-            </svg>
-            {screen === "list" ? "Home" : "Back"}
-          </button>
-        )}
+        <div
+          style={{
+            maxWidth: 1160,
+            margin: "0 auto",
+            padding: "0 2rem",
+            height: 64,
+            display: "flex",
+            alignItems: "center",
+            gap: "1.5rem",
+          }}
+        >
+          {/* Back button */}
+          {showBack && (
+            <button
+              onClick={handleBack}
+              style={{
+                display: "flex",
+                alignItems: "center",
+                gap: 6,
+                fontSize: "0.875rem",
+                color: "#6B82A8",
+                background: "none",
+                border: "none",
+                cursor: "pointer",
+                fontFamily: "var(--font-body)",
+                padding: 0,
+              }}
+              onMouseEnter={(e) => (e.currentTarget.style.color = "var(--navy)")}
+              onMouseLeave={(e) => (e.currentTarget.style.color = "#6B82A8")}
+            >
+              <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="2">
+                <path d="M10 3L5 8l5 5" />
+              </svg>
+              {screen === "list" ? "Home" : "Back"}
+            </button>
+          )}
 
-        {/* Logo or title */}
-        {screen === "list" ? (
-          <>
-            <span className="text-xl">⏱</span>
-            <span className="font-head text-lg" style={{ color: "var(--navy)" }}>
-              Queue<strong className="font-extrabold">Less</strong>
+          {/* Logo / title */}
+          {screen === "list" ? (
+            <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+              <span style={{ fontSize: "1.375rem" }}>⏱</span>
+              <span className="font-head" style={{ fontSize: "1.25rem", color: "var(--navy)" }}>
+                Queue<strong style={{ fontWeight: 800 }}>Less</strong>
+              </span>
+            </div>
+          ) : (
+            <span className="font-head" style={{ fontSize: "1rem", fontWeight: 700, color: "var(--navy)" }}>
+              {title}
             </span>
-          </>
-        ) : (
-          <span className="font-head text-base font-bold" style={{ color: "var(--navy)" }}>
-            {config.title}
-          </span>
+          )}
+
+          <div style={{ flex: 1 }} />
+
+          {/* Tracker badge */}
+          {screen === "tracker" && (
+            <span
+              style={{
+                fontSize: "0.72rem",
+                fontWeight: 700,
+                padding: "4px 12px",
+                borderRadius: 999,
+                background: "var(--sky-pale)",
+                color: "var(--navy-light)",
+                border: "1px solid var(--sky-light)",
+                letterSpacing: "0.04em",
+                textTransform: "uppercase",
+              }}
+            >
+              {trackerBadge}
+            </span>
+          )}
+
+          {/* Nav links on desktop (list screen only) */}
+          {screen === "list" && (
+            <div className="app-nav-links">
+              <span style={{ fontSize: "0.85rem", color: "#6B82A8" }}>Queue management</span>
+            </div>
+          )}
+        </div>
+      </nav>
+
+      {/* ── Page layout ── */}
+      <div
+        style={{
+          maxWidth: 1160,
+          margin: "0 auto",
+          padding: "2rem",
+          display: "grid",
+          gridTemplateColumns: screen === "list" ? "1fr" : "minmax(0,1fr)",
+          gap: "2rem",
+        }}
+      >
+        {screen === "list" && <InstitutionList onSelect={handleSelectInst} />}
+
+        {screen === "join" && state.institution && (
+          <JoinQueue
+            institution={state.institution}
+            onBack={() => setScreen("list")}
+            onJoin={handleJoin}
+          />
         )}
 
-        <div className="flex-1" />
+        {screen === "tracker" && state.institution && state.joinedAt && (
+          <LiveTracker
+            institution={state.institution}
+            yourNumber={state.yourNumber}
+            joinedAt={state.joinedAt}
+            onDone={handleDone}
+          />
+        )}
 
-        {/* Badge */}
-        {screen === "tracker" && (
-          <span
-            className="text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wider"
-            style={{
-              background: "var(--sky-pale)",
-              color: "var(--navy-light)",
-              border: "1px solid var(--sky-light)",
-              letterSpacing: "0.04em",
-            }}
-          >
-            {trackerBadge}
-          </span>
+        {screen === "done" && state.institution && (
+          <DoneScreen
+            institution={state.institution}
+            yourNumber={state.yourNumber}
+            waitMinutes={state.waitMinutes}
+            cancelled={state.cancelled}
+            onReset={handleReset}
+          />
         )}
       </div>
 
-      {/* Screens */}
-      {screen === "list" && (
-        <InstitutionList onSelect={handleSelectInst} />
-      )}
-
-      {screen === "join" && state.institution && (
-        <JoinQueue
-          institution={state.institution}
-          onBack={() => setScreen("list")}
-          onJoin={handleJoin}
-        />
-      )}
-
-      {screen === "tracker" && state.institution && state.joinedAt && (
-        <LiveTracker
-          institution={state.institution}
-          yourNumber={state.yourNumber}
-          joinedAt={state.joinedAt}
-          onDone={handleDone}
-        />
-      )}
-
-      {screen === "done" && state.institution && (
-        <DoneScreen
-          institution={state.institution}
-          yourNumber={state.yourNumber}
-          waitMinutes={state.waitMinutes}
-          cancelled={state.cancelled}
-          onReset={handleReset}
-        />
-      )}
+      <style>{`
+        @media (max-width: 768px) {
+          .app-nav-links { display: none; }
+        }
+      `}</style>
     </div>
   );
 }

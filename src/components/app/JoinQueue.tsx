@@ -12,148 +12,275 @@ export default function JoinQueue({ institution, onJoin }: JoinQueueProps) {
   const [phone, setPhone] = useState("");
   const [notify, setNotify] = useState(true);
 
-
-
   return (
-    <div className="flex flex-col flex-1 overflow-y-auto">
-      <div className="px-5 pt-5 pb-6 flex flex-col gap-4">
-        {/* Hero card */}
-        <div
-          className="rounded-2xl p-5"
-          style={{ background: "var(--navy)" }}
-        >
-          <p
-            className="text-xs font-bold uppercase tracking-widest mb-1"
-            style={{ color: "var(--sky-light)", letterSpacing: "0.08em" }}
-          >
-            {TYPE_LABELS[institution.type]}
-          </p>
-          <p
-            className="font-head text-lg font-extrabold text-white mb-1"
-          >
-            {institution.name}
-          </p>
-          <p className="text-sm" style={{ color: "var(--sky-light)" }}>
-            {institution.address}
-          </p>
-        </div>
-
-        {/* Status row */}
-        <div className="grid grid-cols-3 gap-3">
-          {[
-            { label: "Serving", value: formatQueueNumber(institution.serving), sub: "current" },
-            { label: "In Queue", value: institution.inQueue.toString(), sub: "waiting" },
-            { label: "Est. Wait", value: `~${institution.inQueue * institution.waitPer}`, sub: "minutes" },
-          ].map((box) => (
-            <div
-              key={box.label}
-              className="rounded-2xl p-3 text-center"
-              style={{
-                background: "white",
-                border: "1.5px solid rgba(13,43,110,0.12)",
-              }}
-            >
-              <p
-                className="text-xs font-semibold uppercase tracking-wider mb-1"
-                style={{ color: "#6B82A8", fontSize: "0.68rem" }}
-              >
-                {box.label}
-              </p>
-              <p
-                className="font-head text-2xl font-extrabold"
-                style={{ color: "var(--navy)" }}
-              >
-                {box.value}
-              </p>
-              <p className="text-xs mt-0.5" style={{ color: "#6B82A8" }}>
-                {box.sub}
-              </p>
-            </div>
-          ))}
-        </div>
-
-        {/* Form card */}
-        <div
-          className="rounded-2xl p-5"
+    <div>
+      {/* ── Page header ── */}
+      <div style={{ marginBottom: "2rem" }}>
+        <p
           style={{
-            background: "white",
-            border: "1.5px solid rgba(13,43,110,0.12)",
+            fontSize: "0.72rem",
+            fontWeight: 700,
+            textTransform: "uppercase",
+            letterSpacing: "0.1em",
+            color: "var(--sky)",
+            marginBottom: "0.5rem",
           }}
         >
-          <h3
-            className="font-head text-base font-bold mb-4"
-            style={{ color: "var(--navy)" }}
-          >
-            Your details{" "}
-            <span className="font-normal text-sm" style={{ color: "#6B82A8" }}>
-              (optional)
-            </span>
-          </h3>
+          {TYPE_LABELS[institution.type]}
+        </p>
+        <h1
+          className="font-head"
+          style={{
+            fontSize: "clamp(1.5rem, 2.5vw, 2rem)",
+            fontWeight: 800,
+            color: "var(--navy)",
+            marginBottom: "0.25rem",
+          }}
+        >
+          {institution.name}
+        </h1>
+        <p style={{ color: "#6B82A8", fontSize: "0.95rem" }}>{institution.address}</p>
+      </div>
 
-          <div className="mb-4">
-            <label
-              className="block text-xs font-semibold mb-1.5"
-              style={{ color: "#6B82A8" }}
-            >
-              Phone number
-            </label>
-            <input
-              type="tel"
-              placeholder="+63 9XX XXX XXXX"
-              value={phone}
-              onChange={(e) => setPhone(e.target.value)}
-              className="w-full px-3.5 py-2.5 rounded-xl text-sm outline-none"
+      {/* ── Two-column layout on desktop ── */}
+      <div
+        style={{
+          display: "grid",
+          gridTemplateColumns: "repeat(auto-fit, minmax(300px, 1fr))",
+          gap: "1.5rem",
+          alignItems: "start",
+        }}
+      >
+        {/* Left: Queue status */}
+        <div style={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
+          {/* Hero card */}
+          <div
+            style={{
+              background: "var(--navy)",
+              borderRadius: 16,
+              padding: "1.5rem",
+            }}
+          >
+            <div
               style={{
-                border: "1.5px solid rgba(13,43,110,0.14)",
-                background: "var(--off)",
-                color: "var(--navy)",
-                fontFamily: "var(--font-body)",
+                display: "grid",
+                gridTemplateColumns: "1fr 1px 1fr 1px 1fr",
+                gap: 0,
+                alignItems: "center",
               }}
-              onFocus={(e) =>
-                (e.currentTarget.style.borderColor = "var(--sky)")
-              }
-              onBlur={(e) =>
-                (e.currentTarget.style.borderColor = "rgba(13,43,110,0.14)")
-              }
-            />
+            >
+              {[
+                { label: "Now Serving", value: formatQueueNumber(institution.serving), highlight: false },
+                null,
+                { label: "In Queue", value: institution.inQueue.toString(), highlight: false },
+                null,
+                {
+                  label: "Est. Wait",
+                  value: `~${institution.inQueue * institution.waitPer}`,
+                  sub: "min",
+                  highlight: false,
+                },
+              ].map((item, i) =>
+                item === null ? (
+                  <div key={i} style={{ height: 40, background: "rgba(255,255,255,0.12)" }} />
+                ) : (
+                  <div key={item.label} style={{ textAlign: "center", padding: "0 0.5rem" }}>
+                    <p
+                      style={{
+                        fontSize: "0.65rem",
+                        textTransform: "uppercase",
+                        letterSpacing: "0.08em",
+                        color: "var(--sky-light)",
+                        marginBottom: 4,
+                      }}
+                    >
+                      {item.label}
+                    </p>
+                    <p
+                      className="font-head"
+                      style={{ fontWeight: 800, fontSize: "1.6rem", color: "white", lineHeight: 1 }}
+                    >
+                      {item.value}
+                    </p>
+                    {"sub" in item && item.sub && (
+                      <p style={{ fontSize: "0.7rem", color: "var(--sky-light)", marginTop: 2 }}>
+                        {item.sub}
+                      </p>
+                    )}
+                  </div>
+                )
+              )}
+            </div>
           </div>
 
-          <div className="flex items-center gap-3">
-            <span className="flex-1 text-sm" style={{ color: "var(--navy)" }}>
-              Notify me when my turn is near
-            </span>
-            {/* Toggle */}
-            <button
-              onClick={() => setNotify((n) => !n)}
-              className="relative shrink-0 w-11 h-6 rounded-full transition-colors duration-200"
-              style={{
-                background: notify ? "var(--sky)" : "#cbd5e1",
-              }}
-              role="switch"
-              aria-checked={notify}
+          {/* What to expect */}
+          <div
+            style={{
+              background: "white",
+              border: "1.5px solid rgba(13,43,110,0.12)",
+              borderRadius: 16,
+              padding: "1.25rem",
+            }}
+          >
+            <h3
+              className="font-head"
+              style={{ fontWeight: 700, fontSize: "0.95rem", color: "var(--navy)", marginBottom: "0.75rem" }}
             >
-              <span
-                className="absolute top-1 w-4 h-4 rounded-full bg-white transition-transform duration-200 shadow"
+              What to expect
+            </h3>
+            {[
+              { icon: "🔢", text: `Your number will be #${String(institution.serving + institution.inQueue + 1).padStart(2, "0")}` },
+              { icon: "⏱", text: `Estimated wait: ~${institution.inQueue * institution.waitPer} minutes` },
+              { icon: "🔔", text: "We'll notify you when your turn is near" },
+              { icon: "📍", text: "You can track from anywhere" },
+            ].map((item) => (
+              <div
+                key={item.text}
                 style={{
-                  left: notify ? "calc(100% - 1.25rem)" : "0.25rem",
+                  display: "flex",
+                  alignItems: "flex-start",
+                  gap: 10,
+                  padding: "8px 0",
+                  borderBottom: "1px solid rgba(13,43,110,0.06)",
                 }}
-              />
-            </button>
+              >
+                <span style={{ fontSize: "0.95rem", flexShrink: 0 }}>{item.icon}</span>
+                <span style={{ fontSize: "0.875rem", color: "#6B82A8" }}>{item.text}</span>
+              </div>
+            ))}
           </div>
         </div>
 
-        {/* Join button */}
-        <button
-          onClick={() => onJoin(phone, notify)}
-          className="w-full py-3.5 rounded-full font-head font-bold text-base text-white transition-all duration-200 hover:-translate-y-px"
-          style={{ background: "var(--navy)", fontFamily: "var(--font-body)" }}
-        >
-          Get My Queue Number
-        </button>
+        {/* Right: Form */}
+        <div style={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
+          <div
+            style={{
+              background: "white",
+              border: "1.5px solid rgba(13,43,110,0.12)",
+              borderRadius: 16,
+              padding: "1.5rem",
+            }}
+          >
+            <h3
+              className="font-head"
+              style={{ fontWeight: 700, fontSize: "1rem", color: "var(--navy)", marginBottom: "1.25rem" }}
+            >
+              Your details{" "}
+              <span style={{ fontWeight: 400, fontSize: "0.875rem", color: "#6B82A8" }}>(optional)</span>
+            </h3>
 
-        <p className="text-xs text-center" style={{ color: "#6B82A8" }}>
-          No account needed. Your session is private and temporary.
-        </p>
+            <div style={{ marginBottom: "1.25rem" }}>
+              <label
+                style={{
+                  display: "block",
+                  fontSize: "0.78rem",
+                  fontWeight: 600,
+                  color: "#6B82A8",
+                  marginBottom: 6,
+                }}
+              >
+                Phone number
+              </label>
+              <input
+                type="tel"
+                placeholder="+63 9XX XXX XXXX"
+                value={phone}
+                onChange={(e) => setPhone(e.target.value)}
+                style={{
+                  width: "100%",
+                  padding: "10px 14px",
+                  borderRadius: 12,
+                  border: "1.5px solid rgba(13,43,110,0.14)",
+                  background: "var(--off)",
+                  color: "var(--navy)",
+                  fontFamily: "var(--font-body)",
+                  fontSize: "0.875rem",
+                  outline: "none",
+                  boxSizing: "border-box",
+                }}
+                onFocus={(e) => (e.currentTarget.style.borderColor = "var(--sky)")}
+                onBlur={(e) => (e.currentTarget.style.borderColor = "rgba(13,43,110,0.14)")}
+              />
+            </div>
+
+            {/* Toggle */}
+            <div
+              style={{
+                display: "flex",
+                alignItems: "center",
+                gap: 12,
+                padding: "12px 0",
+                borderTop: "1px solid rgba(13,43,110,0.08)",
+              }}
+            >
+              <span style={{ flex: 1, fontSize: "0.875rem", color: "var(--navy)" }}>
+                Notify me when my turn is near
+              </span>
+              <button
+                onClick={() => setNotify((n) => !n)}
+                style={{
+                  position: "relative",
+                  width: 44,
+                  height: 24,
+                  borderRadius: 999,
+                  border: "none",
+                  cursor: "pointer",
+                  background: notify ? "var(--sky)" : "#cbd5e1",
+                  transition: "background 0.2s",
+                  flexShrink: 0,
+                }}
+                role="switch"
+                aria-checked={notify}
+              >
+                <span
+                  style={{
+                    position: "absolute",
+                    top: 4,
+                    width: 16,
+                    height: 16,
+                    borderRadius: "50%",
+                    background: "white",
+                    transition: "left 0.2s",
+                    left: notify ? "calc(100% - 20px)" : 4,
+                    boxShadow: "0 1px 3px rgba(0,0,0,0.2)",
+                  }}
+                />
+              </button>
+            </div>
+          </div>
+
+          {/* CTA */}
+          <button
+            onClick={() => onJoin(phone, notify)}
+            style={{
+              width: "100%",
+              padding: "14px",
+              borderRadius: 999,
+              border: "none",
+              background: "var(--navy)",
+              color: "white",
+              fontFamily: "var(--font-body)",
+              fontWeight: 700,
+              fontSize: "1rem",
+              cursor: "pointer",
+              transition: "transform 0.15s, background 0.15s",
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.transform = "translateY(-1px)";
+              e.currentTarget.style.background = "var(--navy-mid)";
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.transform = "translateY(0)";
+              e.currentTarget.style.background = "var(--navy)";
+            }}
+          >
+            Get My Queue Number →
+          </button>
+
+          <p style={{ fontSize: "0.78rem", textAlign: "center", color: "#6B82A8" }}>
+            No account needed. Your session is private and temporary.
+          </p>
+        </div>
       </div>
     </div>
   );

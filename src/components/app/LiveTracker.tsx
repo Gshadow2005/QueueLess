@@ -44,10 +44,7 @@ export default function LiveTracker({
         return next;
       });
     }, 2000);
-
-    return () => {
-      if (tickerRef.current) clearInterval(tickerRef.current);
-    };
+    return () => { if (tickerRef.current) clearInterval(tickerRef.current); };
   }, [yourNumber, joinedAt, onDone]);
 
   useEffect(() => {
@@ -88,182 +85,306 @@ export default function LiveTracker({
     ? "Next up!"
     : `${spotsAway} spot${spotsAway !== 1 ? "s" : ""} away · ~${Math.ceil(spotsAway * institution.waitPer)} min`;
 
+  const statusColor = isTurn ? "#22c55e" : isAlmost || isNext ? "#22c55e" : "#6B82A8";
   const statusBadge = isTurn ? "Your Turn!" : isAlmost ? "Almost!" : "Waiting";
 
   return (
-    <div className="flex flex-col flex-1 overflow-y-auto">
-      <div className="px-5 pt-5 pb-6 flex flex-col gap-4">
-        {/* Tracker card */}
+    <div>
+      {/* ── Notification banner ── */}
+      {showBanner && (
         <div
-          className="rounded-2xl p-5"
           style={{
-            background: "white",
-            border: "1.5px solid rgba(13,43,110,0.12)",
+            background: "var(--navy)",
+            borderRadius: 16,
+            padding: "1rem 1.25rem",
+            display: "flex",
+            gap: 12,
+            alignItems: "flex-start",
+            marginBottom: "1.5rem",
           }}
         >
-          {/* Live header */}
-          <div className="flex items-center gap-2 mb-5">
-            <span
-              className="w-2 h-2 rounded-full shrink-0 animate-pulse-ring"
-              style={{ background: "#22c55e" }}
-            />
-            <span className="text-sm font-semibold" style={{ color: "#6B82A8" }}>
-              Live updates
-            </span>
-            <span className="ml-auto text-xs" style={{ color: "#6B82A8" }}>
-              {institution.name.split("–")[1]?.trim() || "Main Branch"}
-            </span>
+          <span style={{ fontSize: "1.2rem", flexShrink: 0 }}>🔔</span>
+          <div style={{ flex: 1 }}>
+            <strong style={{ display: "block", color: "white", fontSize: "0.9rem", marginBottom: 2 }}>
+              {notifText.title}
+            </strong>
+            <p style={{ fontSize: "0.8rem", color: "var(--sky-light)", lineHeight: 1.5 }}>
+              {notifText.body}
+            </p>
           </div>
-
-          {/* Numbers */}
-          <div className="flex justify-around items-center mb-5">
-            <div className="text-center">
-              <p
-                className="text-xs uppercase tracking-widest mb-1"
-                style={{ color: "#6B82A8", fontSize: "0.68rem" }}
-              >
-                Serving
-              </p>
-              <p
-                className={`font-head font-extrabold transition-all duration-200 ${isFlashing ? "queue-flash" : ""}`}
-                style={{ fontSize: "clamp(2.75rem,8vw,3.5rem)", color: "var(--navy)", lineHeight: 1 }}
-              >
-                {formatQueueNumber(serving)}
-              </p>
-            </div>
-            <div style={{ width: 1, height: 60, background: "rgba(13,43,110,0.12)" }} />
-            <div className="text-center">
-              <p
-                className="text-xs uppercase tracking-widest mb-1"
-                style={{ color: "#6B82A8", fontSize: "0.68rem" }}
-              >
-                Yours
-              </p>
-              <p
-                className="font-head font-extrabold"
-                style={{ fontSize: "clamp(2.75rem,8vw,3.5rem)", color: "var(--sky)", lineHeight: 1 }}
-              >
-                {formatQueueNumber(yourNumber)}
-              </p>
-            </div>
-          </div>
-
-          {/* Progress */}
-          <div
-            className="h-1.5 rounded-full overflow-hidden mb-2"
-            style={{ background: "var(--sky-pale)" }}
-          >
-            <div
-              className="h-full rounded-full transition-all duration-700"
-              style={{
-                width: `${pct}%`,
-                background: "linear-gradient(90deg, var(--sky), var(--navy-light))",
-              }}
-            />
-          </div>
-          <p
-            className="text-sm text-center font-medium"
+          <button
+            onClick={() => setShowBanner(false)}
             style={{
-              color: isTurn ? "var(--navy)" : isAlmost || isNext ? "#22c55e" : "#6B82A8",
-              fontWeight: isTurn || isAlmost || isNext ? 700 : 500,
+              color: "var(--sky-light)",
+              background: "none",
+              border: "none",
+              cursor: "pointer",
+              fontSize: "0.8rem",
+              opacity: 0.7,
+              flexShrink: 0,
             }}
           >
-            {awayLabel}
-          </p>
+            ✕
+          </button>
         </div>
+      )}
 
-        {/* Notification banner */}
-        {showBanner && (
+      {/* ── Two-column desktop layout ── */}
+      <div
+        style={{
+          display: "grid",
+          gridTemplateColumns: "repeat(auto-fit, minmax(300px, 1fr))",
+          gap: "1.5rem",
+          alignItems: "start",
+        }}
+      >
+        {/* Left: Main tracker card */}
+        <div style={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
+          {/* Live indicator */}
           <div
-            className="rounded-2xl p-4 flex gap-3 items-start"
-            style={{ background: "var(--navy)" }}
+            style={{
+              background: "white",
+              border: "1.5px solid rgba(13,43,110,0.12)",
+              borderRadius: 16,
+              padding: "1.5rem",
+            }}
           >
-            <span className="text-xl shrink-0 mt-0.5">🔔</span>
-            <div>
-              <strong className="block text-white text-sm mb-1">{notifText.title}</strong>
-              <p className="text-xs leading-relaxed" style={{ color: "var(--sky-light)" }}>
-                {notifText.body}
-              </p>
+            <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: "1.5rem" }}>
+              <span
+                className="animate-pulse-ring"
+                style={{ width: 8, height: 8, borderRadius: "50%", background: "#22c55e", flexShrink: 0 }}
+              />
+              <span style={{ fontSize: "0.875rem", fontWeight: 600, color: "#6B82A8" }}>
+                Live updates · {institution.name}
+              </span>
+              <span
+                style={{
+                  marginLeft: "auto",
+                  fontSize: "0.72rem",
+                  fontWeight: 700,
+                  padding: "3px 10px",
+                  borderRadius: 999,
+                  background: isAlmost || isTurn ? "rgba(34,197,94,0.1)" : "var(--sky-pale)",
+                  color: isAlmost || isTurn ? "#16a34a" : "var(--navy-light)",
+                  border: `1px solid ${isAlmost || isTurn ? "rgba(34,197,94,0.3)" : "var(--sky-light)"}`,
+                }}
+              >
+                {statusBadge}
+              </span>
             </div>
-            <button
-              onClick={() => setShowBanner(false)}
-              className="ml-auto text-xs shrink-0"
-              style={{ color: "var(--sky-light)", opacity: 0.7 }}
-            >
-              ✕
-            </button>
-          </div>
-        )}
 
-        {/* Action row */}
-        <div className="grid grid-cols-3 gap-3">
-          {[
-            { label: "↻ Refresh", action: handleRefresh, danger: false },
-            { label: "↑ Share", action: handleShare, danger: false },
-            { label: "✕ Cancel", action: handleCancel, danger: true },
-          ].map((btn) => (
-            <button
-              key={btn.label}
-              onClick={btn.action}
-              className="py-2.5 rounded-xl text-sm font-semibold border transition-all duration-150"
+            {/* Big numbers */}
+            <div
               style={{
-                fontFamily: "var(--font-body)",
-                background: "white",
-                color: btn.danger ? "#dc2626" : "var(--navy)",
-                borderColor: btn.danger ? "rgba(220,38,38,0.2)" : "rgba(13,43,110,0.12)",
-              }}
-              onMouseEnter={(e) => {
-                e.currentTarget.style.background = btn.danger ? "#fff5f5" : "var(--sky-pale)";
-                e.currentTarget.style.borderColor = btn.danger ? "#dc2626" : "var(--sky)";
-              }}
-              onMouseLeave={(e) => {
-                e.currentTarget.style.background = "white";
-                e.currentTarget.style.borderColor = btn.danger
-                  ? "rgba(220,38,38,0.2)"
-                  : "rgba(13,43,110,0.12)";
+                display: "grid",
+                gridTemplateColumns: "1fr auto 1fr",
+                gap: 16,
+                alignItems: "center",
+                marginBottom: "1.5rem",
               }}
             >
-              {btn.label}
-            </button>
-          ))}
+              <div style={{ textAlign: "center" }}>
+                <p
+                  style={{
+                    fontSize: "0.65rem",
+                    textTransform: "uppercase",
+                    letterSpacing: "0.08em",
+                    color: "#6B82A8",
+                    marginBottom: 6,
+                  }}
+                >
+                  Now serving
+                </p>
+                <p
+                  className={`font-head ${isFlashing ? "queue-flash" : ""}`}
+                  style={{
+                    fontWeight: 800,
+                    fontSize: "clamp(2.5rem, 5vw, 4rem)",
+                    color: "var(--navy)",
+                    lineHeight: 1,
+                    transition: "color 0.2s, transform 0.2s",
+                  }}
+                >
+                  {formatQueueNumber(serving)}
+                </p>
+              </div>
+              <div style={{ width: 1, height: 60, background: "rgba(13,43,110,0.12)" }} />
+              <div style={{ textAlign: "center" }}>
+                <p
+                  style={{
+                    fontSize: "0.65rem",
+                    textTransform: "uppercase",
+                    letterSpacing: "0.08em",
+                    color: "#6B82A8",
+                    marginBottom: 6,
+                  }}
+                >
+                  Your number
+                </p>
+                <p
+                  className="font-head"
+                  style={{
+                    fontWeight: 800,
+                    fontSize: "clamp(2.5rem, 5vw, 4rem)",
+                    color: "var(--sky)",
+                    lineHeight: 1,
+                  }}
+                >
+                  {formatQueueNumber(yourNumber)}
+                </p>
+              </div>
+            </div>
+
+            {/* Progress bar */}
+            <div
+              style={{
+                height: 6,
+                borderRadius: 999,
+                overflow: "hidden",
+                background: "var(--sky-pale)",
+                marginBottom: 8,
+              }}
+            >
+              <div
+                style={{
+                  height: "100%",
+                  borderRadius: 999,
+                  width: `${pct}%`,
+                  background: "linear-gradient(90deg, var(--sky), var(--navy-light))",
+                  transition: "width 0.7s ease",
+                }}
+              />
+            </div>
+            <p
+              style={{
+                textAlign: "center",
+                fontSize: "0.9rem",
+                fontWeight: isTurn || isAlmost || isNext ? 700 : 500,
+                color: statusColor,
+              }}
+            >
+              {awayLabel}
+            </p>
+          </div>
+
+          {/* Action buttons */}
+          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 10 }}>
+            {[
+              { label: "↻ Refresh", action: handleRefresh, danger: false },
+              { label: "↑ Share", action: handleShare, danger: false },
+              { label: "✕ Cancel", action: handleCancel, danger: true },
+            ].map((btn) => (
+              <button
+                key={btn.label}
+                onClick={btn.action}
+                style={{
+                  padding: "10px",
+                  borderRadius: 12,
+                  fontSize: "0.85rem",
+                  fontWeight: 600,
+                  border: "1.5px solid",
+                  fontFamily: "var(--font-body)",
+                  cursor: "pointer",
+                  background: "white",
+                  color: btn.danger ? "#dc2626" : "var(--navy)",
+                  borderColor: btn.danger ? "rgba(220,38,38,0.2)" : "rgba(13,43,110,0.12)",
+                  transition: "all 0.15s",
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.background = btn.danger ? "#fff5f5" : "var(--sky-pale)";
+                  e.currentTarget.style.borderColor = btn.danger ? "#dc2626" : "var(--sky)";
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.background = "white";
+                  e.currentTarget.style.borderColor = btn.danger ? "rgba(220,38,38,0.2)" : "rgba(13,43,110,0.12)";
+                }}
+              >
+                {btn.label}
+              </button>
+            ))}
+          </div>
         </div>
 
-        {/* Session info */}
-        <div
-          className="rounded-2xl p-5"
-          style={{
-            background: "white",
-            border: "1.5px solid rgba(13,43,110,0.12)",
-          }}
-        >
-          <h4 className="font-head text-sm font-bold mb-4" style={{ color: "var(--navy)" }}>
-            Session info
-          </h4>
-          {[
-            { label: "Institution", value: institution.name.split("–")[0].trim() },
-            { label: "Queue #", value: formatQueueNumber(yourNumber) },
-            {
-              label: "Joined at",
-              value: joinedAt.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
-            },
-            { label: "Threshold", value: "3 spots" },
-            { label: "Status", value: statusBadge },
-          ].map((row, i, arr) => (
-            <div
-              key={row.label}
-              className="flex justify-between items-center py-2"
-              style={{
-                borderBottom: i < arr.length - 1 ? "1px solid rgba(13,43,110,0.08)" : "none",
-              }}
+        {/* Right: Session info */}
+        <div style={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
+          <div
+            style={{
+              background: "white",
+              border: "1.5px solid rgba(13,43,110,0.12)",
+              borderRadius: 16,
+              padding: "1.5rem",
+            }}
+          >
+            <h4
+              className="font-head"
+              style={{ fontWeight: 700, fontSize: "0.95rem", color: "var(--navy)", marginBottom: "1rem" }}
             >
-              <span className="text-sm" style={{ color: "#6B82A8" }}>
-                {row.label}
-              </span>
-              <span className="text-sm font-semibold" style={{ color: "var(--navy)" }}>
-                {row.value}
-              </span>
-            </div>
-          ))}
+              Session info
+            </h4>
+            {[
+              { label: "Institution", value: institution.name.split("–")[0].trim() },
+              { label: "Queue #", value: formatQueueNumber(yourNumber) },
+              {
+                label: "Joined at",
+                value: joinedAt.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
+              },
+              { label: "Notify threshold", value: "3 spots" },
+              { label: "Status", value: statusBadge },
+            ].map((row, i, arr) => (
+              <div
+                key={row.label}
+                style={{
+                  display: "flex",
+                  justifyContent: "space-between",
+                  alignItems: "center",
+                  padding: "10px 0",
+                  borderBottom: i < arr.length - 1 ? "1px solid rgba(13,43,110,0.08)" : "none",
+                }}
+              >
+                <span style={{ fontSize: "0.875rem", color: "#6B82A8" }}>{row.label}</span>
+                <span style={{ fontSize: "0.875rem", fontWeight: 600, color: "var(--navy)" }}>
+                  {row.value}
+                </span>
+              </div>
+            ))}
+          </div>
+
+          {/* Tips card */}
+          <div
+            style={{
+              background: "var(--sky-pale)",
+              border: "1.5px solid var(--sky-light)",
+              borderRadius: 16,
+              padding: "1.25rem",
+            }}
+          >
+            <p
+              className="font-head"
+              style={{ fontWeight: 700, fontSize: "0.85rem", color: "var(--navy)", marginBottom: "0.75rem" }}
+            >
+              While you wait
+            </p>
+            {[
+              "You can safely leave the building",
+              "Return when you get the notification",
+              "Have your ID and documents ready",
+            ].map((tip) => (
+              <p
+                key={tip}
+                style={{
+                  fontSize: "0.8rem",
+                  color: "var(--navy-light)",
+                  display: "flex",
+                  gap: 8,
+                  alignItems: "flex-start",
+                  marginBottom: 6,
+                }}
+              >
+                <span style={{ color: "var(--sky)", flexShrink: 0 }}>→</span>
+                {tip}
+              </p>
+            ))}
+          </div>
         </div>
       </div>
     </div>

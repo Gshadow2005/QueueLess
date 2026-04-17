@@ -45,13 +45,58 @@ export default function InstitutionList({ onSelect }: InstitutionListProps) {
   };
 
   return (
-    <div className="flex flex-col flex-1 overflow-hidden">
-      {/* Search */}
-      <div className="px-5 pt-5 pb-3">
-        <div className="relative">
+    <div>
+      {/* ── Page header ── */}
+      <div style={{ marginBottom: "2rem" }}>
+        <p
+          style={{
+            fontSize: "0.72rem",
+            fontWeight: 700,
+            textTransform: "uppercase",
+            letterSpacing: "0.1em",
+            color: "var(--sky)",
+            marginBottom: "0.5rem",
+          }}
+        >
+          Select location
+        </p>
+        <h1
+          className="font-head"
+          style={{
+            fontSize: "clamp(1.5rem, 2.5vw, 2rem)",
+            fontWeight: 800,
+            color: "var(--navy)",
+            marginBottom: "0.5rem",
+          }}
+        >
+          Where do you need to queue?
+        </h1>
+        <p style={{ color: "#6B82A8", fontSize: "0.95rem" }}>
+          Pick an institution to check live queue status and get your number.
+        </p>
+      </div>
+
+      {/* ── Search + filters row ── */}
+      <div
+        style={{
+          display: "flex",
+          flexWrap: "wrap",
+          gap: "0.75rem",
+          alignItems: "center",
+          marginBottom: "1.5rem",
+        }}
+      >
+        {/* Search */}
+        <div style={{ position: "relative", flex: "1 1 260px", minWidth: 220 }}>
           <span
-            className="absolute left-3.5 top-1/2 -translate-y-1/2 text-sm"
-            style={{ color: "#6B82A8" }}
+            style={{
+              position: "absolute",
+              left: 14,
+              top: "50%",
+              transform: "translateY(-50%)",
+              fontSize: "0.9rem",
+              color: "#6B82A8",
+            }}
           >
             🔍
           </span>
@@ -60,120 +105,195 @@ export default function InstitutionList({ onSelect }: InstitutionListProps) {
             placeholder="Search institutions…"
             value={query}
             onChange={(e) => setQuery(e.target.value)}
-            className="w-full pl-9 pr-4 py-2.5 rounded-full text-sm outline-none"
             style={{
+              width: "100%",
+              paddingLeft: 38,
+              paddingRight: 16,
+              paddingTop: 10,
+              paddingBottom: 10,
+              borderRadius: 999,
               border: "1.5px solid rgba(13,43,110,0.14)",
               background: "white",
               color: "var(--navy)",
               fontFamily: "var(--font-body)",
+              fontSize: "0.875rem",
+              outline: "none",
+              boxSizing: "border-box",
             }}
             onFocus={(e) => (e.currentTarget.style.borderColor = "var(--sky)")}
-            onBlur={(e) =>
-              (e.currentTarget.style.borderColor = "rgba(13,43,110,0.14)")
-            }
+            onBlur={(e) => (e.currentTarget.style.borderColor = "rgba(13,43,110,0.14)")}
           />
+        </div>
+
+        {/* Filter tabs */}
+        <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
+          {filters.map((f) => (
+            <button
+              key={f.value}
+              onClick={() => setFilter(f.value)}
+              style={{
+                padding: "8px 18px",
+                borderRadius: 999,
+                fontSize: "0.8rem",
+                fontWeight: 600,
+                border: "1.5px solid",
+                fontFamily: "var(--font-body)",
+                cursor: "pointer",
+                transition: "all 0.15s",
+                background: filter === f.value ? "var(--navy)" : "white",
+                color: filter === f.value ? "white" : "#6B82A8",
+                borderColor: filter === f.value ? "var(--navy)" : "rgba(13,43,110,0.14)",
+              }}
+            >
+              {f.label}
+            </button>
+          ))}
         </div>
       </div>
 
-      {/* Filter tabs */}
-      <div
-        className="flex gap-2 px-5 pb-4 overflow-x-auto"
-        style={{ scrollbarWidth: "none" }}
+      {/* ── Results label ── */}
+      <p
+        style={{
+          fontSize: "0.72rem",
+          fontWeight: 700,
+          textTransform: "uppercase",
+          letterSpacing: "0.08em",
+          color: "#6B82A8",
+          marginBottom: "1rem",
+        }}
       >
-        {filters.map((f) => (
-          <button
-            key={f.value}
-            onClick={() => setFilter(f.value)}
-            className="px-4 py-1.5 rounded-full text-xs font-semibold whitespace-nowrap border transition-all duration-150"
-            style={{
-              fontFamily: "var(--font-body)",
-              background: filter === f.value ? "var(--navy)" : "white",
-              color: filter === f.value ? "white" : "#6B82A8",
-              borderColor:
-                filter === f.value ? "var(--navy)" : "rgba(13,43,110,0.14)",
-            }}
-          >
-            {f.label}
-          </button>
-        ))}
-      </div>
+        {filtered.length} location{filtered.length !== 1 ? "s" : ""} available
+      </p>
 
-      {/* List */}
-      <div className="flex-1 overflow-y-auto px-5 pb-6">
-        <p
-          className="text-xs font-bold uppercase tracking-widest mb-3"
-          style={{ color: "#6B82A8", letterSpacing: "0.08em" }}
-        >
-          Available now
-        </p>
-        <div className="flex flex-col gap-3">
-          {filtered.map((inst) => {
-            const s = statusColors[inst.status];
-            const disabled = inst.status === "closed";
-            return (
-              <div
-                key={inst.id}
-                onClick={() => !disabled && onSelect(inst)}
-                className="flex items-center gap-3 rounded-2xl p-4 transition-all duration-150"
-                style={{
-                  background: "white",
-                  border: "1.5px solid rgba(13,43,110,0.12)",
-                  opacity: disabled ? 0.55 : 1,
-                  cursor: disabled ? "not-allowed" : "pointer",
-                  boxShadow: "none",
-                }}
-                onMouseEnter={(e) => {
-                  if (!disabled) {
-                    e.currentTarget.style.borderColor = "var(--sky)";
-                    e.currentTarget.style.boxShadow =
-                      "0 4px 16px rgba(91,163,224,0.12)";
-                  }
-                }}
-                onMouseLeave={(e) => {
-                  e.currentTarget.style.borderColor = "rgba(13,43,110,0.12)";
-                  e.currentTarget.style.boxShadow = "none";
-                }}
-              >
-                {/* Icon */}
+      {/* ── Grid of cards ── */}
+      <div
+        style={{
+          display: "grid",
+          gridTemplateColumns: "repeat(auto-fill, minmax(300px, 1fr))",
+          gap: "1rem",
+        }}
+      >
+        {filtered.map((inst) => {
+          const s = statusColors[inst.status];
+          const disabled = inst.status === "closed";
+          return (
+            <div
+              key={inst.id}
+              onClick={() => !disabled && onSelect(inst)}
+              style={{
+                background: "white",
+                border: "1.5px solid rgba(13,43,110,0.12)",
+                borderRadius: 16,
+                padding: "1.25rem",
+                opacity: disabled ? 0.55 : 1,
+                cursor: disabled ? "not-allowed" : "pointer",
+                transition: "border-color 0.15s, box-shadow 0.15s, transform 0.15s",
+                display: "flex",
+                flexDirection: "column",
+                gap: 12,
+              }}
+              onMouseEnter={(e) => {
+                if (!disabled) {
+                  const el = e.currentTarget;
+                  el.style.borderColor = "var(--sky)";
+                  el.style.boxShadow = "0 4px 20px rgba(91,163,224,0.15)";
+                  el.style.transform = "translateY(-2px)";
+                }
+              }}
+              onMouseLeave={(e) => {
+                const el = e.currentTarget;
+                el.style.borderColor = "rgba(13,43,110,0.12)";
+                el.style.boxShadow = "none";
+                el.style.transform = "translateY(0)";
+              }}
+            >
+              {/* Card top row */}
+              <div style={{ display: "flex", alignItems: "flex-start", gap: 12 }}>
                 <div
-                  className="w-11 h-11 rounded-xl flex items-center justify-center text-lg shrink-0"
-                  style={{ background: iconBg[inst.type] }}
+                  style={{
+                    width: 44,
+                    height: 44,
+                    borderRadius: 12,
+                    background: iconBg[inst.type],
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    fontSize: "1.2rem",
+                    flexShrink: 0,
+                  }}
                 >
                   {INSTITUTION_ICONS[inst.type]}
                 </div>
-
-                {/* Info */}
-                <div className="flex-1 min-w-0">
+                <div style={{ flex: 1, minWidth: 0 }}>
                   <p
-                    className="font-head font-bold text-sm truncate"
-                    style={{ color: "var(--navy)" }}
+                    className="font-head"
+                    style={{
+                      fontWeight: 700,
+                      fontSize: "0.95rem",
+                      color: "var(--navy)",
+                      marginBottom: 2,
+                      overflow: "hidden",
+                      textOverflow: "ellipsis",
+                      whiteSpace: "nowrap",
+                    }}
                   >
                     {inst.name}
                   </p>
-                  <p className="text-xs mt-0.5" style={{ color: "#6B82A8" }}>
-                    {inst.address}
-                  </p>
+                  <p style={{ fontSize: "0.8rem", color: "#6B82A8" }}>{inst.address}</p>
                 </div>
-
-                {/* Right */}
-                <div className="text-right shrink-0">
-                  <span
-                    className="text-xs font-bold px-2.5 py-1 rounded-full"
-                    style={{ background: s.bg, color: s.text }}
-                  >
-                    {s.label}
-                  </span>
-                  <p
-                    className="text-xs mt-1"
-                    style={{ color: "#6B82A8" }}
-                  >
-                    {inst.inQueue} in queue
-                  </p>
-                </div>
+                <span
+                  style={{
+                    fontSize: "0.75rem",
+                    fontWeight: 700,
+                    padding: "4px 10px",
+                    borderRadius: 999,
+                    background: s.bg,
+                    color: s.text,
+                    flexShrink: 0,
+                  }}
+                >
+                  {s.label}
+                </span>
               </div>
-            );
-          })}
-        </div>
+
+              {/* Stats row */}
+              <div
+                style={{
+                  display: "grid",
+                  gridTemplateColumns: "1fr 1px 1fr 1px 1fr",
+                  borderTop: "1px solid rgba(13,43,110,0.08)",
+                  paddingTop: 12,
+                  gap: 0,
+                  alignItems: "center",
+                }}
+              >
+                {[
+                  { label: "Serving", value: `#${String(inst.serving).padStart(2, "0")}` },
+                  null,
+                  { label: "In queue", value: inst.inQueue.toString() },
+                  null,
+                  { label: "Est. wait", value: `~${inst.inQueue * inst.waitPer}m` },
+                ].map((item, i) =>
+                  item === null ? (
+                    <div key={i} style={{ height: 28, background: "rgba(13,43,110,0.08)" }} />
+                  ) : (
+                    <div key={item.label} style={{ textAlign: "center" }}>
+                      <p
+                        className="font-head"
+                        style={{ fontWeight: 700, fontSize: "1rem", color: "var(--navy)" }}
+                      >
+                        {item.value}
+                      </p>
+                      <p style={{ fontSize: "0.7rem", color: "#6B82A8", marginTop: 1 }}>
+                        {item.label}
+                      </p>
+                    </div>
+                  )
+                )}
+              </div>
+            </div>
+          );
+        })}
       </div>
     </div>
   );
