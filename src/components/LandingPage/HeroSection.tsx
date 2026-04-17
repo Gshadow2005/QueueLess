@@ -6,7 +6,11 @@ const STATS = [
   { value: "30 min", label: "average patience threshold" },
 ];
 
-export default function HeroSection() {
+interface HeroSectionProps {
+  onLaunchApp: () => void;
+}
+
+export default function HeroSection({ onLaunchApp }: HeroSectionProps) {
   const handleScroll = (e: React.MouseEvent<HTMLAnchorElement>, id: string) => {
     e.preventDefault();
     document.getElementById(id)?.scrollIntoView({ behavior: "smooth" });
@@ -66,7 +70,7 @@ export default function HeroSection() {
           <span style={{ color: "var(--sky)" }}>wherever you go.</span>
         </h1>
 
-        {/* Subtitle — matches original text-muted color #6B82A8, no extra opacity */}
+        {/* Subtitle */}
         <p
           className="text-lg leading-relaxed max-w-lg mb-8"
           style={{ color: "#6B82A8" }}
@@ -78,14 +82,13 @@ export default function HeroSection() {
 
         {/* CTA buttons */}
         <div className="flex flex-wrap gap-4 items-center mb-12">
-          <a
-            href="#join"
-            onClick={(e) => handleScroll(e, "join")}
+          <button
+            onClick={onLaunchApp}
             className="text-base font-semibold px-8 py-3 rounded-full text-white transition-all duration-200 hover:-translate-y-px"
-            style={{ background: "var(--navy)", border: "2px solid var(--navy)" }}
+            style={{ background: "var(--navy)", border: "2px solid var(--navy)", fontFamily: "var(--font-body)", cursor: "pointer" }}
           >
             Join a Queue →
-          </a>
+          </button>
           <a
             href="#how"
             onClick={(e) => handleScroll(e, "how")}

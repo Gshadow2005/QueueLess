@@ -1,4 +1,8 @@
-export default function Navbar() {
+interface NavbarProps {
+  onLaunchApp: () => void;
+}
+
+export default function Navbar({ onLaunchApp }: NavbarProps) {
   const handleSmoothScroll = (e: React.MouseEvent<HTMLAnchorElement>, id: string) => {
     e.preventDefault();
     document.getElementById(id)?.scrollIntoView({ behavior: "smooth" });
@@ -44,14 +48,13 @@ export default function Navbar() {
         </div>
 
         {/* CTA */}
-        <a
-          href="#join"
-          onClick={(e) => handleSmoothScroll(e, "join")}
+        <button
+          onClick={onLaunchApp}
           className="text-sm font-semibold px-5 py-2 rounded-full text-white transition-all duration-200 hover:-translate-y-px"
-          style={{ background: "var(--navy)", border: "2px solid var(--navy)" }}
+          style={{ background: "var(--navy)", border: "2px solid var(--navy)", fontFamily: "var(--font-body)", cursor: "pointer" }}
         >
           Get Started
-        </a>
+        </button>
       </div>
     </nav>
   );

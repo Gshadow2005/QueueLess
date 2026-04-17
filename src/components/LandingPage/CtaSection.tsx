@@ -1,4 +1,8 @@
-export default function CtaSection() {
+interface CtaSectionProps {
+  onLaunchApp: () => void;
+}
+
+export default function CtaSection({ onLaunchApp }: CtaSectionProps) {
   return (
     <section id="join" className="py-24 px-8 text-center" style={{ background: "var(--navy)" }}>
       <div className="max-w-xl mx-auto">
@@ -11,13 +15,15 @@ export default function CtaSection() {
         <p className="text-lg mb-8" style={{ color: "var(--sky-light)" }}>
           Join a queue the smart way — track your spot, get notified, arrive on time.
         </p>
-        <a
-          href="#"
+        <button
+          onClick={onLaunchApp}
           className="inline-block text-base font-semibold px-8 py-3 rounded-full transition-all duration-200 hover:-translate-y-px"
           style={{
             background: "white",
             color: "var(--navy)",
             border: "2px solid white",
+            fontFamily: "var(--font-body)",
+            cursor: "pointer",
           }}
           onMouseEnter={(e) =>
             (e.currentTarget.style.background = "var(--sky-pale)")
@@ -27,7 +33,7 @@ export default function CtaSection() {
           }
         >
           Get Started Free →
-        </a>
+        </button>
       </div>
     </section>
   );

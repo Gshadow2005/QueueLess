@@ -1,5 +1,5 @@
-import { useQueueTracker } from "../hooks/useQueueTracker";
-import { formatQueueNumber } from "../utils/queueHelpers";
+import { useQueueTracker } from "../../hooks/useQueueTracker";
+import { formatQueueNumber } from "../../utils/queueHelpers";
 
 export default function LiveDemoCard() {
   const { currentServing, yourNumber, spotsAway, progressPct, isFlashing } =
