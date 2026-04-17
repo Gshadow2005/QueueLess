@@ -8,11 +8,20 @@ interface UseQueueTrackerOptions {
   intervalMs?: number;
 }
 
+interface QueueTrackerResult {
+  currentServing: number;
+  yourNumber: number;
+  spotsAway: number;
+  status: QueueStatus;
+  progressPct: number;
+  isFlashing: boolean;
+}
+
 export function useQueueTracker({
   initialCurrent = 20,
   yourNumber = 35,
   intervalMs = 1800,
-}: UseQueueTrackerOptions = {}) {
+}: UseQueueTrackerOptions = {}): QueueTrackerResult {
   const [currentServing, setCurrentServing] = useState(initialCurrent);
   const [isFlashing, setIsFlashing] = useState(false);
 
