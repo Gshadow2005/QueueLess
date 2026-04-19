@@ -3,6 +3,8 @@ import { Bell, RefreshCw, Share2, X, ArrowRight } from "lucide-react";
 import { type Institution } from "../../data/institutions";
 import { formatQueueNumber } from "../../utils/queueHelpers";
 import { useLiveQueue } from "../../hooks/useLiveQueue";
+import { useNotifications } from "../../hooks/useNotifications";
+import type { APINotification } from "../../api/notifications";
 
 interface LiveTrackerProps {
   institution: Institution;
@@ -25,6 +27,7 @@ export default function LiveTracker({
     status,
     nearTurnNotified,
     isFlashing,
+    loading: queueLoading,
     error,
   } = useLiveQueue({
     sessionId,
@@ -35,10 +38,48 @@ export default function LiveTracker({
     },
   });
 
+  // ── Notifications ──────────────────────────────────────────────────────
+  const handleNearTurn = useCallback((_notif: APINotification) => {
+    if (
+      typeof Notification !== "undefined" &&
+      Notification.permission === "granted"
+    ) {
+      new Notification("Almost your turn!", {
+        body: `Queue ${formatQueueNumber(yourNumber)} — head back now!`,
+        icon: "/favicon.svg",
+      });
+    }
+  }, [yourNumber]);
+
+  const handleTurnCalled = useCallback((_notif: APINotification) => {
+    if (
+      typeof Notification !== "undefined" &&
+      Notification.permission === "granted"
+    ) {
+      new Notification("It's your turn!", {
+        body: `Queue ${formatQueueNumber(yourNumber)} is now being served.`,
+        icon: "/favicon.svg",
+      });
+    }
+  }, [yourNumber]);
+
+  const {
+    latestNearTurn,
+    latestTurnCalled,
+  } = useNotifications({
+    sessionId,
+    onNearTurn: handleNearTurn,
+    onTurnCalled: handleTurnCalled,
+  });
+
+  // ── Derived state ──────────────────────────────────────────────────────
   const spotsAway = peopleAhead;
   const pct = Math.max(0, Math.min(100, 100 - (spotsAway / 15) * 100));
   const isTurn = status === "served" || spotsAway === 0;
-  const isAlmost = nearTurnNotified || (spotsAway <= 3 && spotsAway > 0);
+  const isAlmost =
+    nearTurnNotified ||
+    !!latestNearTurn ||
+    (spotsAway <= 3 && spotsAway > 0);
   const isNext = spotsAway === 0 && status !== "served";
 
   const handleCancel = useCallback(() => {
@@ -77,8 +118,31 @@ export default function LiveTracker({
     transition: "all 0.15s",
   };
 
+  // ── Notification banner logic (merged) ─────────────────────────────────
+  // Priority: turn called > near turn
+  // Note: don't gate showNearTurn on isTurn — isTurn can be true just from
+  // spotsAway===0 before status flips to "served", swallowing the near-turn banner.
+  const showTurnCalled = !!(latestTurnCalled || status === "served");
+  const showNearTurn = !!(nearTurnNotified || latestNearTurn || (spotsAway <= 3 && spotsAway > 0)) && !showTurnCalled;
+
+  const notifTitle = showTurnCalled ? "It's your turn!" : "Almost your turn!";
+  const notifMessage = showTurnCalled
+    ? latestTurnCalled?.message ?? `Queue ${formatQueueNumber(yourNumber)} is now being served. Head to the counter now!`
+    : latestNearTurn
+    ? latestNearTurn.message
+    : `You're ${formatQueueNumber(yourNumber)}, currently serving ${formatQueueNumber(currentServing)}. Head back now!`;
+  const notifStyle: React.CSSProperties = showTurnCalled
+    ? { background: "#f0fdf4", border: "1.5px solid #86efac", borderRadius: 16, padding: "1rem 1.25rem", display: "flex", gap: 12, alignItems: "flex-start", marginBottom: "1.5rem" }
+    : { background: "var(--navy)", borderRadius: 16, padding: "1rem 1.25rem", display: "flex", gap: 12, alignItems: "flex-start", marginBottom: "1.5rem" };
+  const notifIconColor = showTurnCalled ? "#16a34a" : "white";
+  const notifTitleColor = showTurnCalled ? "#15803d" : "white";
+  const notifBodyColor = showTurnCalled ? "#166534" : "var(--sky-light)";
+
   return (
     <div>
+      {/* ── Spin keyframe ── */}
+      <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
+
       {/* ── Error banner ── */}
       {error && (
         <div style={{ background: "#fff5f5", border: "1.5px solid #fecaca", borderRadius: 12, padding: "0.875rem 1.25rem", marginBottom: "1.25rem", fontSize: "0.85rem", color: "#dc2626" }}>
@@ -86,15 +150,13 @@ export default function LiveTracker({
         </div>
       )}
 
-      {/* ── Near-turn notification banner ── */}
-      {nearTurnNotified && !isTurn && (
-        <div style={{ background: "var(--navy)", borderRadius: 16, padding: "1rem 1.25rem", display: "flex", gap: 12, alignItems: "flex-start", marginBottom: "1.5rem" }}>
-          <Bell style={{ fontSize: "1.2rem", flexShrink: 0, width: 24, height: 24, color: "white" }} />
+      {/* ── Unified notification banner ── */}
+      {!queueLoading && (showTurnCalled || showNearTurn) && (
+        <div style={notifStyle}>
+          <Bell style={{ flexShrink: 0, width: 24, height: 24, color: notifIconColor }} />
           <div style={{ flex: 1 }}>
-            <strong style={{ display: "block", color: "white", fontSize: "0.9rem", marginBottom: 2 }}>Almost your turn!</strong>
-            <p style={{ fontSize: "0.8rem", color: "var(--sky-light)", lineHeight: 1.5 }}>
-              You're {formatQueueNumber(yourNumber)}, currently serving {formatQueueNumber(currentServing)}. Head back now!
-            </p>
+            <strong style={{ display: "block", color: notifTitleColor, fontSize: "0.9rem", marginBottom: 2 }}>{notifTitle}</strong>
+            <p style={{ fontSize: "0.8rem", color: notifBodyColor, lineHeight: 1.5 }}>{notifMessage}</p>
           </div>
         </div>
       )}
@@ -111,8 +173,8 @@ export default function LiveTracker({
               <span style={{ fontSize: "0.875rem", fontWeight: 500, color: "#6B82A8" }}>
                 Live updates · {institution.name}
               </span>
-              <span style={{ marginLeft: "auto", fontSize: "0.72rem", fontWeight: 600, padding: "3px 10px", borderRadius: 999, background: isAlmost || isTurn ? "rgba(34,197,94,0.1)" : "var(--sky-pale)", color: isAlmost || isTurn ? "#16a34a" : "var(--navy-light)", border: `1px solid ${isAlmost || isTurn ? "rgba(34,197,94,0.3)" : "var(--sky-light)"}` }}>
-                {statusBadge}
+              <span style={{ marginLeft: "auto", fontSize: "0.72rem", fontWeight: 600, padding: "3px 10px", borderRadius: 999, background: !queueLoading && (isAlmost || isTurn) ? "rgba(34,197,94,0.1)" : "var(--sky-pale)", color: !queueLoading && (isAlmost || isTurn) ? "#16a34a" : "var(--navy-light)", border: `1px solid ${!queueLoading && (isAlmost || isTurn) ? "rgba(34,197,94,0.3)" : "var(--sky-light)"}` }}>
+                {queueLoading ? "Loading…" : statusBadge}
               </span>
             </div>
 
@@ -120,28 +182,36 @@ export default function LiveTracker({
             <div style={{ display: "grid", gridTemplateColumns: "1fr auto 1fr", gap: 16, alignItems: "center", marginBottom: "1.5rem" }}>
               <div style={{ textAlign: "center" }}>
                 <p style={{ fontSize: "0.65rem", textTransform: "uppercase", letterSpacing: "0.08em", color: "#6B82A8", marginBottom: 6, fontWeight: 500 }}>Now serving</p>
-                <p
-                  className={`font-head ${isFlashing ? "queue-flash" : ""}`}
-                  style={{ fontWeight: 800, fontSize: "clamp(2rem, 5vw, 4rem)", color: "var(--navy)", lineHeight: 1, transition: "color 0.2s, transform 0.2s" }}
-                >
-                  {formatQueueNumber(currentServing)}
-                </p>
+                {queueLoading ? (
+                  <div style={{ width: 32, height: 32, border: "3px solid var(--sky-pale)", borderTopColor: "var(--sky)", borderRadius: "50%", animation: "spin 0.8s linear infinite", margin: "0 auto" }} />
+                ) : (
+                  <p
+                    className={`font-head ${isFlashing ? "queue-flash" : ""}`}
+                    style={{ fontWeight: 800, fontSize: "clamp(2rem, 5vw, 4rem)", color: "var(--navy)", lineHeight: 1, transition: "color 0.2s, transform 0.2s" }}
+                  >
+                    {formatQueueNumber(currentServing)}
+                  </p>
+                )}
               </div>
               <div style={{ width: 1, height: 60, background: "rgba(13,43,110,0.12)" }} />
               <div style={{ textAlign: "center" }}>
                 <p style={{ fontSize: "0.65rem", textTransform: "uppercase", letterSpacing: "0.08em", color: "#6B82A8", marginBottom: 6, fontWeight: 500 }}>Your number</p>
-                <p className="font-head" style={{ fontWeight: 800, fontSize: "clamp(2rem, 5vw, 4rem)", color: "var(--sky)", lineHeight: 1 }}>
-                  {formatQueueNumber(yourNumber)}
-                </p>
+                {queueLoading ? (
+                  <div style={{ width: 32, height: 32, border: "3px solid var(--sky-pale)", borderTopColor: "var(--sky)", borderRadius: "50%", animation: "spin 0.8s linear infinite", margin: "0 auto" }} />
+                ) : (
+                  <p className="font-head" style={{ fontWeight: 800, fontSize: "clamp(2rem, 5vw, 4rem)", color: "var(--sky)", lineHeight: 1 }}>
+                    {formatQueueNumber(yourNumber)}
+                  </p>
+                )}
               </div>
             </div>
 
             {/* Progress bar */}
             <div style={{ height: 6, borderRadius: 999, overflow: "hidden", background: "var(--sky-pale)", marginBottom: 8 }}>
-              <div style={{ height: "100%", borderRadius: 999, width: `${pct}%`, background: "linear-gradient(90deg, var(--sky), var(--navy-light))", transition: "width 0.7s ease" }} />
+              <div style={{ height: "100%", borderRadius: 999, width: queueLoading ? "0%" : `${pct}%`, background: "linear-gradient(90deg, var(--sky), var(--navy-light))", transition: "width 0.7s ease" }} />
             </div>
-            <p style={{ textAlign: "center", fontSize: "0.9rem", fontWeight: isTurn || isAlmost || isNext ? 600 : 400, color: statusColor }}>
-              {awayLabel}
+            <p style={{ textAlign: "center", fontSize: "0.9rem", fontWeight: !queueLoading && (isTurn || isAlmost || isNext) ? 600 : 400, color: queueLoading ? "#6B82A8" : statusColor }}>
+              {queueLoading ? "Loading status…" : awayLabel}
             </p>
           </div>
 
@@ -150,7 +220,7 @@ export default function LiveTracker({
             <button
               style={{ ...btnBase, color: "var(--navy)", borderColor: "rgba(13,43,110,0.12)", display: "flex", alignItems: "center", gap: 6, justifyContent: "center" }}
               disabled
-              title="Auto-updating every 5s"
+              title="Auto-updating every 10s"
               onMouseEnter={(e) => { e.currentTarget.style.background = "var(--sky-pale)"; e.currentTarget.style.borderColor = "var(--sky)"; }}
               onMouseLeave={(e) => { e.currentTarget.style.background = "white"; e.currentTarget.style.borderColor = "rgba(13,43,110,0.12)"; }}
             >
@@ -184,7 +254,7 @@ export default function LiveTracker({
               { label: "Queue #", value: formatQueueNumber(yourNumber) },
               { label: "Joined at", value: joinedAt.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }) },
               { label: "Notify threshold", value: "3 spots" },
-              { label: "Status", value: statusBadge },
+              { label: "Status", value: queueLoading ? "Loading…" : statusBadge },
             ].map((row, i, arr) => (
               <div key={row.label} style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "10px 0", borderBottom: i < arr.length - 1 ? "1px solid rgba(13,43,110,0.08)" : "none", gap: 8 }}>
                 <span style={{ fontSize: "0.85rem", color: "#6B82A8", fontWeight: 400 }}>{row.label}</span>
