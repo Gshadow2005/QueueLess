@@ -1,4 +1,4 @@
-import { type Institution, TYPE_LABELS } from "../../data/institutions";
+import { type Institution, TYPE_LABELS } from "../../types/institution";
 import { formatQueueNumber } from "../../utils/queueHelpers";
 
 interface EnterQueueNumberProps {
@@ -87,13 +87,11 @@ export default function EnterQueueNumber({
             #
           </span>
           {String(queueNumber).padStart(2, "0")}
-          {/* Lock badge */}
           <span style={{ position: "absolute", right: 16, top: "50%", transform: "translateY(-50%)", fontSize: "0.7rem", fontWeight: 600, padding: "3px 8px", borderRadius: 999, background: "var(--sky-light)", color: "var(--navy-light)", fontFamily: "var(--font-body)" }}>
             Assigned
           </span>
         </div>
 
-        {/* Spots & estimated wait */}
         {queueNumber > 0 && (
           <div style={{ background: "var(--sky-pale)", border: "1px solid var(--sky-light)", borderRadius: 12, padding: "0.875rem 1rem", margin: "1.25rem 0 1.5rem", display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
             <div>

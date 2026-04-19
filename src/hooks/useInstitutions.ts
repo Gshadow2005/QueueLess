@@ -1,6 +1,6 @@
 import { useReducer, useEffect } from "react";
 import { fetchInstitutions, type APIInstitution } from "../api/queue";
-import type { Institution } from "../data/institutions";
+import type { Institution } from "../types/institution";
 
 function mapAPIInstitution(api: APIInstitution): Institution {
   const typeMap: Record<string, Institution["type"]> = {

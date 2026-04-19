@@ -59,13 +59,10 @@ export function useLiveQueue({
       if (stopped) return;
 
       if (ADMIN_USER && ADMIN_PASS) {
-        try {
-          await simulateTick(institutionId, {
-            username: ADMIN_USER,
-            password: ADMIN_PASS,
-          });
-        } catch {
-        }
+        await simulateTick(institutionId, {
+          username: ADMIN_USER,
+          password: ADMIN_PASS,
+        }).catch(() => undefined);
       }
 
       try {

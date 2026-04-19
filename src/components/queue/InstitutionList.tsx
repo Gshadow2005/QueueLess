@@ -3,7 +3,7 @@ import {
   INSTITUTION_ICONS,
   type Institution,
   type InstitutionType,
-} from "../../data/institutions";
+} from "../../types/institution";
 import { useInstitutions } from "../../hooks/useInstitutions";
 import { Building2, Landmark, Zap, Search, RefreshCw } from "lucide-react";
 
@@ -195,7 +195,7 @@ export default function InstitutionList({ onSelect }: InstitutionListProps) {
               );
             })}
 
-            {!loading && filtered.length === 0 && (
+            {filtered.length === 0 && (
               <div style={{ textAlign: "center", padding: "3rem 1rem", color: "#94a3b8" }}>
                 <Search style={{ fontSize: "2rem", marginBottom: "0.75rem", width: 48, height: 48, color: "#94a3b8" }} />
                 <p style={{ fontWeight: 600, color: "var(--navy)", marginBottom: "0.35rem" }}>No results found</p>

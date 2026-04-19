@@ -9,9 +9,8 @@ const POLL_INTERVAL_MS = 15000;
 
 interface UseNotificationsOptions {
   sessionId: string | null;
-
-  onNearTurn?: (notification: APINotification) => void;
-  onTurnCalled?: (notification: APINotification) => void;
+  onNearTurn?: () => void;
+  onTurnCalled?: () => void;
 }
 
 interface NotificationsState {
@@ -74,16 +73,15 @@ export function useNotifications({
           firedCallbacksRef.current.add(notification.id);
 
           if (notification.event_type === "near_turn") {
-            onNearTurnRef.current?.(notification);
-
+            onNearTurnRef.current?.();
             acknowledgeNotification(sessionId, notification.id, {
               delivered: true,
-            }).catch(() => {/* non-fatal */});
+            }).catch(() => { /* non-fatal */ });
           } else if (notification.event_type === "turn_called") {
-            onTurnCalledRef.current?.(notification);
+            onTurnCalledRef.current?.();
             acknowledgeNotification(sessionId, notification.id, {
               delivered: true,
-            }).catch(() => {/* non-fatal */});
+            }).catch(() => { /* non-fatal */ });
           }
         }
 

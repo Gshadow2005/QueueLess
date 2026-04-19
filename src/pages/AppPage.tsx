@@ -1,5 +1,5 @@
 import { useState, useCallback } from "react";
-import { type Institution } from "../data/institutions";
+import { type Institution } from "../types/institution";
 import { joinQueue } from "../api/queue";
 import InstitutionList from "../components/queue/InstitutionList";
 import JoinQueue from "../components/queue/JoinQueue";
