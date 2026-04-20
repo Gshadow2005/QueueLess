@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Check, X, Star } from "lucide-react";
-import { type Institution } from "../../data/institutions";
+import { type Institution } from "../../types/institution";
 import { formatQueueNumber } from "../../utils/queueHelpers";
 
 interface DoneScreenProps {
@@ -79,7 +79,6 @@ export default function DoneScreen({
               Session summary
             </h3>
 
-            {/* Stats grid — 2 columns, each stat in its own row pair */}
             <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
               {[
                 { label: "Institution", value: institution.name.split("–")[0].trim() },
@@ -131,7 +130,6 @@ export default function DoneScreen({
             </div>
           </div>
 
-          {/* CTA */}
           <button
             onClick={onReset}
             style={{
@@ -202,7 +200,7 @@ export default function DoneScreen({
                     onMouseEnter={(e) => (e.currentTarget.style.transform = "scale(1.15)")}
                     onMouseLeave={(e) => (e.currentTarget.style.transform = "scale(1)")}
                   >
-{n <= rating ? <Star size={20} strokeWidth={1.5} fill="currentColor" /> : <Star size={20} strokeWidth={2.5} />}
+                    {n <= rating ? <Star size={20} strokeWidth={1.5} fill="currentColor" /> : <Star size={20} strokeWidth={2.5} />}
                   </button>
                 ))}
               </div>
@@ -214,7 +212,6 @@ export default function DoneScreen({
             </div>
           )}
 
-          {/* Share card */}
           <div
             style={{
               background: "var(--sky-pale)",
