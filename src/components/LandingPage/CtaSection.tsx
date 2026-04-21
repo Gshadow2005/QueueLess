@@ -32,7 +32,7 @@ export default function CtaSection({ onLaunchApp }: CtaSectionProps) {
             (e.currentTarget.style.background = "white")
           }
         >
-          Get Started Free →
+          Get Started Free
         </button>
       </div>
     </section>
