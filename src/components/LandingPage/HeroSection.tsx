@@ -87,7 +87,7 @@ export default function HeroSection({ onLaunchApp }: HeroSectionProps) {
             className="text-base font-semibold px-8 py-3 rounded-full text-white transition-all duration-200 hover:-translate-y-px"
             style={{ background: "var(--navy)", border: "2px solid var(--navy)", fontFamily: "var(--font-body)", cursor: "pointer" }}
           >
-            Join a Queue →
+            Join a Queue
           </button>
           <a
             href="#how"

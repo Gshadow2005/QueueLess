@@ -3,15 +3,12 @@ import { fetchQueueStatus, simulateTick, type QueueStatusResponse } from "../api
 
 const POLL_INTERVAL_MS = 10000;
 
-// These come from your Vite env — set VITE_ADMIN_USER and VITE_ADMIN_PASS
-// in your Vercel project settings (or .env.local for local dev).
 const ADMIN_USER = import.meta.env.VITE_ADMIN_USER ?? "";
 const ADMIN_PASS = import.meta.env.VITE_ADMIN_PASS ?? "";
 
 interface UseLiveQueueOptions {
   sessionId: string;
   institutionId: number;
-  /** Called once when status becomes "served" */
   onServed: () => void;
 }
 
@@ -22,6 +19,7 @@ interface LiveQueueState {
   status: QueueStatusResponse["status"];
   nearTurnNotified: boolean;
   isFlashing: boolean;
+  loading: boolean;
   error: string | null;
 }
 
@@ -37,6 +35,7 @@ export function useLiveQueue({
     status: "waiting",
     nearTurnNotified: false,
     isFlashing: false,
+    loading: true,
     error: null,
   });
 
@@ -59,19 +58,13 @@ export function useLiveQueue({
     const tick = async () => {
       if (stopped) return;
 
-      // 1. Simulate a queue tick (advances the queue on the backend)
       if (ADMIN_USER && ADMIN_PASS) {
-        try {
-          await simulateTick(institutionId, {
-            username: ADMIN_USER,
-            password: ADMIN_PASS,
-          });
-        } catch {
-          // Simulate-tick failing is non-fatal — we still poll status
-        }
+        await simulateTick(institutionId, {
+          username: ADMIN_USER,
+          password: ADMIN_PASS,
+        }).catch(() => undefined);
       }
 
-      // 2. Poll the real status for this session
       try {
         const data = await fetchQueueStatus(sessionId);
         if (stopped) return;
@@ -87,14 +80,12 @@ export function useLiveQueue({
             status: data.status,
             nearTurnNotified: data.near_turn_notified,
             isFlashing: prev.isFlashing,
+            loading: false,
             error: null,
           };
         });
 
-        if (
-          data.status === "served" &&
-          !servedCalledRef.current
-        ) {
+        if (data.status === "served" && !servedCalledRef.current) {
           servedCalledRef.current = true;
           setTimeout(() => onServedRef.current(), 900);
         }
@@ -102,13 +93,13 @@ export function useLiveQueue({
         if (!stopped) {
           setState((s) => ({
             ...s,
+            loading: false,
             error: err instanceof Error ? err.message : "Failed to fetch status",
           }));
         }
       }
     };
 
-    // Run immediately, then on interval
     tick();
     const id = setInterval(tick, POLL_INTERVAL_MS);
 

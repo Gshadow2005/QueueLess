@@ -1,5 +1,5 @@
 import { useState, useCallback } from "react";
-import { type Institution } from "../data/institutions";
+import { type Institution } from "../types/institution";
 import { joinQueue } from "../api/queue";
 import InstitutionList from "../components/queue/InstitutionList";
 import JoinQueue from "../components/queue/JoinQueue";
@@ -77,6 +77,8 @@ export default function AppPage({ onBack }: AppPageProps) {
     setState((s) => ({ ...s, waitMinutes, cancelled }));
     setScreen("done");
   }, []);
+
+  const handleGoHome = () => onBack();
 
   const handleReset = () => {
     setState({ institution: null, sessionId: null, yourNumber: 0, joinedAt: null, waitMinutes: 0, cancelled: false });
@@ -188,6 +190,7 @@ export default function AppPage({ onBack }: AppPageProps) {
             waitMinutes={state.waitMinutes}
             cancelled={state.cancelled}
             onReset={handleReset}
+            onGoHome={handleGoHome}
           />
         )}
       </div>

@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Ticket, Hash, Bell, MapPin } from "lucide-react";
-import { type Institution, TYPE_LABELS } from "../../data/institutions";
+import { type Institution, TYPE_LABELS } from "../../types/institution";
 
 interface JoinQueueProps {
   institution: Institution;
@@ -135,7 +135,7 @@ export default function JoinQueue({ institution, onJoin, joining = false, joinEr
                 Joining queue…
               </>
             ) : (
-              "Continue →"
+              "Continue"
             )}
           </button>
 
