@@ -136,7 +136,7 @@ export default function EnterQueueNumber({
             e.currentTarget.style.background = queueNumber > 0 ? "var(--navy)" : "#e2e8f0";
           }}
         >
-          Start Tracking →
+          Start Tracking
         </button>
       </div>
 
