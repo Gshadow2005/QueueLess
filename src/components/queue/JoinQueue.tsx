@@ -135,7 +135,7 @@ export default function JoinQueue({ institution, onJoin, joining = false, joinEr
                 Joining queue…
               </>
             ) : (
-              "Continue →"
+              "Continue"
             )}
           </button>
 
