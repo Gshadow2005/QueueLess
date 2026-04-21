@@ -8,6 +8,7 @@ interface DoneScreenProps {
   yourNumber: number;
   waitMinutes: number;
   cancelled: boolean;
+  onGoHome: () => void;
   onReset: () => void;
 }
 
@@ -16,6 +17,7 @@ export default function DoneScreen({
   yourNumber,
   waitMinutes,
   cancelled,
+  onGoHome,
   onReset,
 }: DoneScreenProps) {
   const [rating, setRating] = useState(0);
@@ -38,15 +40,31 @@ export default function DoneScreen({
             border: `3px solid ${cancelled ? "#f97316" : "#22c55e"}`,
           }}
         >
-          {cancelled ? <X size={32} strokeWidth={3} /> : <Check size={32} strokeWidth={3} />}
+          {cancelled ? (
+            <X size={32} strokeWidth={3} color="#f97316" />
+          ) : (
+            <Check size={32} strokeWidth={3} color="#22c55e" />
+          )}
         </div>
         <h1
           className="font-head"
-          style={{ fontWeight: 800, fontSize: "clamp(1.5rem, 3vw, 2rem)", color: "var(--navy)", marginBottom: "0.5rem" }}
+          style={{
+            fontWeight: 800,
+            fontSize: "clamp(1.5rem, 3vw, 2rem)",
+            color: "var(--navy)",
+            marginBottom: "0.5rem",
+          }}
         >
           {cancelled ? "Queue cancelled" : "You've been served!"}
         </h1>
-        <p style={{ color: "#6B82A8", fontSize: "0.95rem", maxWidth: 480, margin: "0 auto" }}>
+        <p
+          style={{
+            color: "#6B82A8",
+            fontSize: "0.95rem",
+            maxWidth: 480,
+            margin: "0 auto",
+          }}
+        >
           {cancelled
             ? "You've left the queue. No worries — you can join again anytime."
             : `Queue ${formatQueueNumber(yourNumber)} at ${institution.name} — all done!`}
@@ -74,17 +92,28 @@ export default function DoneScreen({
           >
             <h3
               className="font-head"
-              style={{ fontWeight: 700, fontSize: "0.95rem", color: "var(--navy)", marginBottom: "1rem" }}
+              style={{
+                fontWeight: 700,
+                fontSize: "0.95rem",
+                color: "var(--navy)",
+                marginBottom: "1rem",
+              }}
             >
               Session summary
             </h3>
 
             <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
               {[
-                { label: "Institution", value: institution.name.split("–")[0].trim() },
+                {
+                  label: "Institution",
+                  value: institution.name.split("–")[0].trim(),
+                },
                 { label: "Your number", value: formatQueueNumber(yourNumber) },
                 { label: "Wait time", value: `${waitMinutes} min` },
-                { label: "Status", value: cancelled ? "Cancelled" : "Served" },
+                {
+                  label: "Status",
+                  value: cancelled ? "Cancelled" : "Served",
+                },
               ].map((stat) => (
                 <div
                   key={stat.label}
@@ -130,32 +159,64 @@ export default function DoneScreen({
             </div>
           </div>
 
-          <button
-            onClick={onReset}
-            style={{
-              width: "100%",
-              padding: "14px",
-              borderRadius: 999,
-              border: "none",
-              background: "var(--navy)",
-              color: "white",
-              fontFamily: "var(--font-body)",
-              fontWeight: 700,
-              fontSize: "1rem",
-              cursor: "pointer",
-              transition: "transform 0.15s, background 0.15s",
-            }}
-            onMouseEnter={(e) => {
-              e.currentTarget.style.transform = "translateY(-1px)";
-              e.currentTarget.style.background = "var(--navy-mid)";
-            }}
-            onMouseLeave={(e) => {
-              e.currentTarget.style.transform = "translateY(0)";
-              e.currentTarget.style.background = "var(--navy)";
-            }}
-          >
-            Join Another Queue →
-          </button>
+          {/* ── Action buttons ── */}
+          <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+            {/* Primary: Go Home */}
+            <button
+              onClick={onGoHome}
+              style={{
+                width: "100%",
+                padding: "14px",
+                borderRadius: 999,
+                border: "none",
+                background: "var(--navy)",
+                color: "white",
+                fontFamily: "var(--font-body)",
+                fontWeight: 700,
+                fontSize: "1rem",
+                cursor: "pointer",
+                transition: "transform 0.15s, background 0.15s",
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.transform = "translateY(-1px)";
+                e.currentTarget.style.background = "var(--navy-mid)";
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.transform = "translateY(0)";
+                e.currentTarget.style.background = "var(--navy)";
+              }}
+            >
+              Go Home
+            </button>
+
+            {/* Secondary: Find Another Queue */}
+            <button
+              onClick={onReset}
+              style={{
+                width: "100%",
+                padding: "13px",
+                borderRadius: 999,
+                border: "1.5px solid rgba(13,43,110,0.2)",
+                background: "white",
+                color: "var(--navy-light)",
+                fontFamily: "var(--font-body)",
+                fontWeight: 600,
+                fontSize: "0.95rem",
+                cursor: "pointer",
+                transition: "transform 0.15s, border-color 0.15s",
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.transform = "translateY(-1px)";
+                e.currentTarget.style.borderColor = "var(--sky)";
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.transform = "translateY(0)";
+                e.currentTarget.style.borderColor = "rgba(13,43,110,0.2)";
+              }}
+            >
+              Find Another Queue
+            </button>
+          </div>
         </div>
 
         {/* Right: Rating + tips */}
@@ -172,14 +233,27 @@ export default function DoneScreen({
             >
               <h3
                 className="font-head"
-                style={{ fontWeight: 700, fontSize: "0.95rem", color: "var(--navy)", marginBottom: "0.5rem" }}
+                style={{
+                  fontWeight: 700,
+                  fontSize: "0.95rem",
+                  color: "var(--navy)",
+                  marginBottom: "0.5rem",
+                }}
               >
                 How was your experience?
               </h3>
-              <p style={{ fontSize: "0.85rem", color: "#6B82A8", marginBottom: "1rem" }}>
+              <p
+                style={{
+                  fontSize: "0.85rem",
+                  color: "#6B82A8",
+                  marginBottom: "1rem",
+                }}
+              >
                 Tap a star to rate
               </p>
-              <div style={{ display: "flex", justifyContent: "center", gap: 8 }}>
+              <div
+                style={{ display: "flex", justifyContent: "center", gap: 8 }}
+              >
                 {[1, 2, 3, 4, 5].map((n) => (
                   <button
                     key={n}
@@ -197,15 +271,35 @@ export default function DoneScreen({
                       alignItems: "center",
                       justifyContent: "center",
                     }}
-                    onMouseEnter={(e) => (e.currentTarget.style.transform = "scale(1.15)")}
-                    onMouseLeave={(e) => (e.currentTarget.style.transform = "scale(1)")}
+                    onMouseEnter={(e) =>
+                      (e.currentTarget.style.transform = "scale(1.15)")
+                    }
+                    onMouseLeave={(e) =>
+                      (e.currentTarget.style.transform = "scale(1)")
+                    }
                   >
-                    {n <= rating ? <Star size={20} strokeWidth={1.5} fill="currentColor" /> : <Star size={20} strokeWidth={2.5} />}
+                    {n <= rating ? (
+                      <Star
+                        size={20}
+                        strokeWidth={1.5}
+                        fill="currentColor"
+                        color="#f59e0b"
+                      />
+                    ) : (
+                      <Star size={20} strokeWidth={2.5} />
+                    )}
                   </button>
                 ))}
               </div>
               {rating > 0 && (
-                <p style={{ fontSize: "0.85rem", color: "var(--sky)", marginTop: "0.75rem", fontWeight: 600 }}>
+                <p
+                  style={{
+                    fontSize: "0.85rem",
+                    color: "var(--sky)",
+                    marginTop: "0.75rem",
+                    fontWeight: 600,
+                  }}
+                >
                   Thanks for the {rating}-star rating!
                 </p>
               )}
@@ -222,12 +316,25 @@ export default function DoneScreen({
           >
             <p
               className="font-head"
-              style={{ fontWeight: 700, fontSize: "0.875rem", color: "var(--navy)", marginBottom: "0.5rem" }}
+              style={{
+                fontWeight: 700,
+                fontSize: "0.875rem",
+                color: "var(--navy)",
+                marginBottom: "0.5rem",
+              }}
             >
               Skip the wait next time
             </p>
-            <p style={{ fontSize: "0.8rem", color: "var(--navy-light)", marginBottom: "1rem", lineHeight: 1.5 }}>
-              Share QueueLess with friends and family so they can track their queues too.
+            <p
+              style={{
+                fontSize: "0.8rem",
+                color: "var(--navy-light)",
+                marginBottom: "1rem",
+                lineHeight: 1.5,
+              }}
+            >
+              Share QueueLess with friends and family so they can track their
+              queues too.
             </p>
             <button
               style={{
@@ -242,11 +349,14 @@ export default function DoneScreen({
                 fontFamily: "var(--font-body)",
               }}
               onClick={() => {
-                const txt = "I just skipped the wait with QueueLess! Check it out.";
-                navigator.clipboard?.writeText(txt).then(() => alert("Copied!"));
+                const txt =
+                  "I just skipped the wait with QueueLess! Check it out.";
+                navigator.clipboard
+                  ?.writeText(txt)
+                  .then(() => alert("Copied!"));
               }}
             >
-              Share QueueLess ↑
+              Share QueueLess
             </button>
           </div>
         </div>

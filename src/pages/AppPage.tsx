@@ -78,6 +78,8 @@ export default function AppPage({ onBack }: AppPageProps) {
     setScreen("done");
   }, []);
 
+  const handleGoHome = () => onBack();
+
   const handleReset = () => {
     setState({ institution: null, sessionId: null, yourNumber: 0, joinedAt: null, waitMinutes: 0, cancelled: false });
     setScreen("list");
@@ -188,6 +190,7 @@ export default function AppPage({ onBack }: AppPageProps) {
             waitMinutes={state.waitMinutes}
             cancelled={state.cancelled}
             onReset={handleReset}
+            onGoHome={handleGoHome}
           />
         )}
       </div>
