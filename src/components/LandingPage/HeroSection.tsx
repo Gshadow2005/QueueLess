@@ -18,7 +18,7 @@ export default function HeroSection({ onLaunchApp }: HeroSectionProps) {
 
   return (
     <section
-      className="relative min-h-screen grid md:grid-cols-[1fr_590px] gap-0 items-center w-full px-24 pl-28 py-20 overflow-hidden"
+      className="relative min-h-screen grid md:grid-cols-[1fr_590px] gap-0 items-center w-full px-25 py-20 overflow-hidden"
     >
       {/* Background blobs */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none z-0">
@@ -74,11 +74,11 @@ export default function HeroSection({ onLaunchApp }: HeroSectionProps) {
         />
       </div>
 
-      {/* Left content */}
-      <div className="relative z-10">
+     {/* Left content */}
+      <div className="relative z-25 pl-4 md:pl-8 lg:pl-12">
         {/* Badge */}
         <div
-          className="inline-block text-xs font-semibold uppercase tracking-widest px-4 py-1.5 rounded-full mb-6 border"
+          className="inline-block text-sm font-semibold uppercase tracking-widest px-5 py-2 rounded-full mb-8 border"
           style={{
             background: "var(--sky-pale)",
             color: "var(--navy-light)",
@@ -90,8 +90,8 @@ export default function HeroSection({ onLaunchApp }: HeroSectionProps) {
 
         {/* Title */}
         <h1
-          className="font-head font-extrabold leading-tight mb-6"
-          style={{ fontSize: "clamp(2.6rem, 4.5vw, 4rem)", color: "var(--navy)" }}
+          className="font-head font-extrabold leading-tight mb-8"
+          style={{ fontSize: "clamp(3rem, 5.5vw, 5rem)", color: "var(--navy)" }}
         >
           Your place in line,
           <br />
@@ -100,7 +100,7 @@ export default function HeroSection({ onLaunchApp }: HeroSectionProps) {
 
         {/* Subtitle */}
         <p
-          className="text-lg leading-relaxed max-w-xl mb-10"
+          className="text-xl leading-relaxed max-w-2xl mb-12"
           style={{ color: "#5a718e" }}
         >
           Stop standing in line. QueueLess lets you track your queue position
@@ -109,10 +109,10 @@ export default function HeroSection({ onLaunchApp }: HeroSectionProps) {
         </p>
 
         {/* CTA buttons */}
-        <div className="flex flex-wrap gap-4 items-center mb-14">
+        <div className="flex flex-wrap gap-4 items-center mb-16">
           <button
             onClick={onLaunchApp}
-            className="text-base font-semibold px-9 py-3.5 rounded-full text-white transition-all duration-200 hover:-translate-y-0.5"
+            className="text-lg font-semibold px-10 py-4 rounded-full text-white transition-all duration-200 hover:-translate-y-0.5"
             style={{
               background: "var(--navy)",
               border: "2px solid var(--navy)",
@@ -126,7 +126,7 @@ export default function HeroSection({ onLaunchApp }: HeroSectionProps) {
           <a
             href="#how"
             onClick={(e) => handleScroll(e, "how")}
-            className="text-base font-medium px-7 py-3.5 rounded-full transition-all duration-200"
+            className="text-lg font-medium px-8 py-4 rounded-full transition-all duration-200"
             style={{
               color: "#6B82A8",
               border: "2px solid rgba(13,43,110,0.18)",
@@ -145,17 +145,17 @@ export default function HeroSection({ onLaunchApp }: HeroSectionProps) {
         </div>
 
         {/* Stats */}
-        <div className="flex flex-wrap items-center gap-8">
+        <div className="flex flex-wrap items-center gap-10">
           {STATS.map((stat, i) => (
-            <div key={stat.value} className="flex items-center gap-8">
+            <div key={stat.value} className="flex items-center gap-10">
               <div>
                 <strong
-                  className="block font-head text-3xl font-extrabold"
+                  className="block font-head text-4xl font-extrabold"
                   style={{ color: "var(--navy)" }}
                 >
                   {stat.value}
                 </strong>
-                <span className="text-xs" style={{ color: "#7a90ad" }}>
+                <span className="text-sm" style={{ color: "#7a90ad" }}>
                   {stat.label}
                 </span>
               </div>
