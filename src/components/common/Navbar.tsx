@@ -19,9 +19,8 @@ export default function Navbar({ onLaunchApp }: NavbarProps) {
     >
       <div
         style={{
-          maxWidth: 1160,
-          margin: "0 auto",
-          padding: "0 1.25rem",
+          width: "100%",
+          padding: "0 9rem",
           height: 64,
           display: "flex",
           alignItems: "center",
