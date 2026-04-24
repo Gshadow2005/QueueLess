@@ -7,66 +7,66 @@ export default function LiveDemoCard() {
 
   return (
     <div
-      className="relative z-10 rounded-2xl p-7 animate-float"
+      className="relative z-10 rounded-3xl p-10 animate-float w-full max-w-130"
       style={{
         background: "white",
         border: "1.5px solid rgba(13,43,110,0.12)",
         boxShadow:
-          "0 20px 60px rgba(13,43,110,0.12), 0 4px 16px rgba(13,43,110,0.06)",
+          "0 24px 80px rgba(13,43,110,0.14), 0 6px 24px rgba(13,43,110,0.07)",
       }}
     >
       {/* Header */}
-      <div className="flex items-center gap-2 mb-6">
+      <div className="flex items-center gap-2.5 mb-8">
         <span
-          className="w-2 h-2 rounded-full animate-pulse-ring"
+          className="w-2.5 h-2.5 rounded-full animate-pulse-ring shrink-0"
           style={{ background: "#22c55e" }}
         />
-        <span className="text-sm font-semibold" style={{ color: "#6B82A8" }}>
+        <span className="text-base font-semibold" style={{ color: "#6B82A8" }}>
           City Bank – Main Branch
         </span>
       </div>
 
       {/* Now Serving */}
-      <div className="text-center mb-4">
+      <div className="text-center mb-6">
         <p
-          className="text-xs uppercase tracking-widest mb-1"
-          style={{ color: "#6B82A8", letterSpacing: "0.08em" }}
+          className="text-xs uppercase tracking-widest mb-2"
+          style={{ color: "#6B82A8", letterSpacing: "0.1em" }}
         >
           Now Serving
         </p>
         <div
-          className={`font-head text-7xl font-extrabold leading-none transition-all duration-200 ${
+          className={`font-head font-extrabold leading-none transition-all duration-200 ${
             isFlashing ? "queue-flash" : ""
           }`}
-          style={{ color: "var(--navy)" }}
+          style={{ color: "var(--navy)", fontSize: "7rem" }}
         >
           {formatQueueNumber(currentServing)}
         </div>
       </div>
 
       {/* Divider */}
-      <div className="my-4" style={{ height: 1, background: "rgba(13,43,110,0.12)" }} />
+      <div className="my-6" style={{ height: 1, background: "rgba(13,43,110,0.10)" }} />
 
       {/* Your Number */}
-      <div className="text-center mb-4">
+      <div className="text-center mb-6">
         <p
-          className="text-xs uppercase tracking-widest mb-1"
-          style={{ color: "#6B82A8", letterSpacing: "0.08em" }}
+          className="text-xs uppercase tracking-widest mb-2"
+          style={{ color: "#6B82A8", letterSpacing: "0.1em" }}
         >
           Your Number
         </p>
         <div
-          className="font-head text-4xl font-bold"
-          style={{ color: "var(--sky)" }}
+          className="font-head font-bold"
+          style={{ color: "var(--sky)", fontSize: "4rem" }}
         >
           {formatQueueNumber(yourNumber)}
         </div>
       </div>
 
       {/* Progress */}
-      <div className="mb-5">
+      <div className="mb-7">
         <div
-          className="h-1.5 rounded-full overflow-hidden mb-2"
+          className="h-2 rounded-full overflow-hidden mb-3"
           style={{ background: "var(--sky-pale)" }}
         >
           <div
@@ -78,7 +78,7 @@ export default function LiveDemoCard() {
           />
         </div>
         <span
-          className={`block text-center text-sm font-medium`}
+          className="block text-center text-sm"
           style={{
             color: spotsAway <= 3 ? "#22c55e" : "#6B82A8",
             fontWeight: spotsAway <= 3 ? 700 : 500,
@@ -93,7 +93,7 @@ export default function LiveDemoCard() {
       {/* Notify button */}
       <div className="text-center">
         <button
-          className="text-sm font-semibold px-4 py-2 rounded-full border transition-colors duration-200 hover:opacity-80"
+          className="text-sm font-semibold px-6 py-3 rounded-full border transition-colors duration-200 hover:opacity-80 w-full"
           style={{
             color: "var(--navy-light)",
             background: "var(--sky-pale)",
