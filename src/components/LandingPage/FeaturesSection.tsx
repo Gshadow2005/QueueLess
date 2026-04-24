@@ -21,10 +21,10 @@ export default function FeaturesSection() {
   return (
     <section
       id="features"
-      className="py-24 px-8"
+      className="py-24 px-24 pl-28"
       style={{ background: "var(--off)" }}
     >
-      <div className="max-w-6xl mx-auto">
+      <div className="w-full">
         <p className="text-xs font-bold uppercase tracking-widest mb-3" style={{ color: "var(--sky)" }}>
           What you get
         </p>
@@ -35,11 +35,11 @@ export default function FeaturesSection() {
           Built for real waiting
         </h2>
 
-        <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
+        <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-8">
           {FEATURES.map((f) => (
             <div
               key={f.title}
-              className="rounded-2xl p-7 transition-all duration-200 hover:-translate-y-1 cursor-default"
+              className="rounded-2xl p-8 transition-all duration-200 hover:-translate-y-1 cursor-default"
               style={{
                 background: "white",
                 border: "1px solid rgba(13,43,110,0.12)",
