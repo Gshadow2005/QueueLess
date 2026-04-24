@@ -21,7 +21,7 @@ export default function FeaturesSection() {
   return (
     <section
       id="features"
-      className="py-24 px-24 pl-28"
+      className="py-24 px-36"
       style={{ background: "var(--off)" }}
     >
       <div className="w-full">

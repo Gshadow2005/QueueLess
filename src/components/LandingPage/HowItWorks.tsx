@@ -23,7 +23,7 @@ const STEPS = [
 
 export default function HowItWorks() {
   return (
-    <section id="how" className="py-24 px-24 pl-28">
+    <section id="how" className="py-24 px-36">
       <div className="w-full">
         <p className="text-xs font-bold uppercase tracking-widest mb-3" style={{ color: "var(--sky)" }}>
           Simple process
