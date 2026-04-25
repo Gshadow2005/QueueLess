@@ -29,7 +29,6 @@ export default function JoinQueue({ institution, onJoin, joining = false, joinEr
         <Toast key={t.id} message={t.message} variant={t.variant} onClose={() => removeToast(t.id)} />
       ))}
 
-      {/* ── Page header ── */}
       <div style={{ marginBottom: "1.75rem" }}>
         <p style={{ fontSize: "0.7rem", fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.1em", color: "var(--sky)", marginBottom: "0.5rem" }}>
           {TYPE_LABELS[institution.type]}
@@ -42,10 +41,8 @@ export default function JoinQueue({ institution, onJoin, joining = false, joinEr
         </p>
       </div>
 
-      {/* ── Two-column layout ── */}
       <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(min(100%, 280px), 1fr))", gap: "1.25rem", alignItems: "start" }}>
 
-        {/* Left: Queue status */}
         <div style={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
           <div style={{ background: "var(--navy)", borderRadius: 14, padding: "1.25rem 1.5rem" }}>
             <div style={{ display: "grid", gridTemplateColumns: "1fr 1px 1fr 1px 1fr", gap: 0, alignItems: "center" }}>
@@ -76,7 +73,7 @@ export default function JoinQueue({ institution, onJoin, joining = false, joinEr
             <h3 className="font-head" style={{ fontWeight: 700, fontSize: "0.875rem", color: "var(--navy)", marginBottom: "0.75rem" }}>What to expect</h3>
             {[
               { icon: <Ticket size={20} strokeWidth={2} />, text: "Get a physical ticket at the counter first" },
-              { icon: <Hash size={20} strokeWidth={2} />, text: "Then enter your number here to start tracking" },
+              { icon: <Hash size={20} strokeWidth={2} />, text: "Enter your ticket number on the next screen" },
               { icon: <Bell size={20} strokeWidth={2} />, text: "We'll notify you when your turn is near" },
               { icon: <MapPin size={20} strokeWidth={2} />, text: "You can track from anywhere" },
             ].map((item) => (
@@ -88,7 +85,6 @@ export default function JoinQueue({ institution, onJoin, joining = false, joinEr
           </div>
         </div>
 
-        {/* Right: Form */}
         <div style={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
           <div style={{ background: "white", border: "1.5px solid rgba(13,43,110,0.10)", borderRadius: 14, padding: "1.5rem" }}>
             <h3 className="font-head" style={{ fontWeight: 700, fontSize: "0.95rem", color: "var(--navy)", marginBottom: "1.125rem" }}>
@@ -106,7 +102,7 @@ export default function JoinQueue({ institution, onJoin, joining = false, joinEr
                 value={phone}
                 onChange={(e) => setPhone(e.target.value)}
                 disabled={joining}
-                style={{ width: "100%", padding: "10px 14px", borderRadius: 10, border: "1.5px solid rgba(13,43,110,0.14)", background: "var(--off)", color: "var(--navy)", fontFamily: "var(--font-body)", fontSize: "0.875rem", fontWeight: 400, outline: "none", boxSizing: "border-box", transition: "border-color 0.15s", opacity: joining ? 0.6 : 1 }}
+                style={{ width: "100%", padding: "10px 14px", borderRadius: 10, border: "1.5px solid rgba(13,43,110,0.14)", background: "var(--off)", color: "var(--navy)", fontFamily: "var(--font-body)", fontSize: "0.875rem", fontWeight: 400, outline: "none", boxSizing: "border-box" as const, transition: "border-color 0.15s", opacity: joining ? 0.6 : 1 }}
                 onFocus={(e) => (e.currentTarget.style.borderColor = "var(--sky)")}
                 onBlur={(e) => (e.currentTarget.style.borderColor = "rgba(13,43,110,0.14)")}
               />
@@ -138,7 +134,7 @@ export default function JoinQueue({ institution, onJoin, joining = false, joinEr
             {joining ? (
               <>
                 <span style={{ width: 16, height: 16, border: "2px solid rgba(255,255,255,0.4)", borderTopColor: "white", borderRadius: "50%", animation: "spin 0.8s linear infinite", display: "inline-block" }} />
-                Joining queue…
+                Saving…
               </>
             ) : (
               "Continue"
@@ -146,7 +142,7 @@ export default function JoinQueue({ institution, onJoin, joining = false, joinEr
           </button>
 
           <p style={{ fontSize: "0.78rem", textAlign: "center", color: "#94a3b8", lineHeight: 1.5 }}>
-            You'll confirm your ticket number on the next screen.
+            You'll enter your ticket number on the next screen.
           </p>
         </div>
       </div>

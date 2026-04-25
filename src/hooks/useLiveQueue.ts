@@ -70,8 +70,7 @@ export function useLiveQueue({
         if (stopped) return;
 
         setState((prev) => {
-          const didAdvance =
-            data.current_serving_number !== prev.currentServing;
+          const didAdvance = data.current_serving_number !== prev.currentServing;
           if (didAdvance) flash();
           return {
             queueNumber: data.queue_number,
@@ -85,9 +84,12 @@ export function useLiveQueue({
           };
         });
 
-        if (data.status === "served" && !servedCalledRef.current) {
+        if (
+          (data.status === "serving" || data.status === "served") &&
+          !servedCalledRef.current
+        ) {
           servedCalledRef.current = true;
-          setTimeout(() => onServedRef.current(), 900);
+          setTimeout(() => onServedRef.current(), 4000);
         }
       } catch (err: unknown) {
         if (!stopped) {
