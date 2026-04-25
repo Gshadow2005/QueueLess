@@ -33,6 +33,10 @@ export default function EnterQueueNumber({
       setInputError("Please enter a valid queue number from your physical ticket.");
       return;
     }
+    if (parsedNumber <= institution.serving) {
+      setInputError("This queue number has already been served. Please check your ticket.");
+      return;
+    }
     setInputError("");
     onSubmit(parsedNumber);
   };
