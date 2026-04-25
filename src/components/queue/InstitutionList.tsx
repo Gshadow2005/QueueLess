@@ -112,7 +112,7 @@ export default function InstitutionList({ onSelect }: InstitutionListProps) {
       {/* ── Loading state ── */}
       {loading && (
         <div style={{ display: "flex", flexDirection: "column", gap: "0.625rem", margin: "0 auto" }}>
-          {[...Array(4)].map((_, idx) => (
+          {[...Array(6)].map((_, idx) => (
             <div
               key={idx}
               style={{ background: "white", border: "1.5px solid rgba(13,43,110,0.10)", borderRadius: 14, padding: "1rem 1.125rem", display: "flex", flexDirection: "row", alignItems: "center", gap: 12 }}
