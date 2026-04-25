@@ -20,8 +20,21 @@ async function requestNotificationPermission(): Promise<boolean> {
   if (typeof Notification === "undefined") return false;
   if (Notification.permission === "granted") return true;
   if (Notification.permission === "denied") return false;
-  const result = await Notification.requestPermission();
-  return result === "granted";
+  try {
+    const result = await Notification.requestPermission();
+    return result === "granted";
+  } catch {
+    return false;
+  }
+}
+
+function getSafeNotifPermission(): NotificationPermission {
+  try {
+    if (typeof Notification === "undefined") return "denied";
+    return Notification.permission;
+  } catch {
+    return "denied";
+  }
 }
 
 export default function LiveTracker({
@@ -32,10 +45,12 @@ export default function LiveTracker({
   onDone,
 }: LiveTrackerProps) {
   const [notifPermission, setNotifPermission] = useState<NotificationPermission>(
-    typeof Notification !== "undefined" ? Notification.permission : "denied"
+    getSafeNotifPermission()
   );
 
+  // Only request permission on mount — guarded so iOS doesn't crash
   useEffect(() => {
+    if (typeof Notification === "undefined") return;
     requestNotificationPermission().then((granted) => {
       setNotifPermission(granted ? "granted" : "denied");
     });
@@ -90,6 +105,18 @@ export default function LiveTracker({
     !!latestNearTurn ||
     (spotsAway <= 5 && spotsAway > 0);
 
+  // ── Scroll to top on mobile when alert fires ───────────────────────────
+  const showTurnCalled = !!(latestTurnCalled || status === "served" || status === "serving");
+  const showNearTurn =
+    !!(nearTurnNotified || latestNearTurn || (spotsAway <= 5 && spotsAway > 0)) &&
+    !showTurnCalled;
+
+  useEffect(() => {
+    if (showNearTurn || showTurnCalled || isServing) {
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+  }, [showNearTurn, showTurnCalled, isServing]);
+
   const handleCancel = useCallback(() => {
     if (!window.confirm("Cancel your spot in the queue?")) return;
     const mins = Math.round((Date.now() - joinedAt.getTime()) / 60000) || 0;
@@ -140,12 +167,6 @@ export default function LiveTracker({
     background: "white",
     transition: "all 0.15s",
   };
-
-  // ── Notification banner logic ──────────────────────────────────────────
-  const showTurnCalled = !!(latestTurnCalled || status === "served" || status === "serving");
-  const showNearTurn =
-    !!(nearTurnNotified || latestNearTurn || (spotsAway <= 5 && spotsAway > 0)) &&
-    !showTurnCalled;
 
   const notifTitle = isServing
     ? "Head to the counter!"
@@ -204,29 +225,33 @@ export default function LiveTracker({
     >
       <Bell size={18} style={{ color: "var(--sky)", flexShrink: 0 }} />
       <p style={{ fontSize: "0.84rem", color: "var(--navy-light)", fontWeight: 500, lineHeight: 1.5, margin: 0, flex: 1 }}>
-        Enable notifications to get alerted at 5 and 3 spots away.
+        {typeof Notification === "undefined"
+          ? "Add this page to your home screen to enable push notifications."
+          : "Enable notifications to get alerted at 5 and 3 spots away."}
       </p>
-      <button
-        onClick={() =>
-          requestNotificationPermission().then((granted) =>
-            setNotifPermission(granted ? "granted" : "denied")
-          )
-        }
-        style={{
-          padding: "6px 14px",
-          borderRadius: 999,
-          border: "1.5px solid var(--sky)",
-          background: "white",
-          color: "var(--navy-light)",
-          fontSize: "0.78rem",
-          fontWeight: 600,
-          cursor: "pointer",
-          fontFamily: "var(--font-body)",
-          flexShrink: 0,
-        }}
-      >
-        Allow
-      </button>
+      {typeof Notification !== "undefined" && (
+        <button
+          onClick={() =>
+            requestNotificationPermission().then((granted) =>
+              setNotifPermission(granted ? "granted" : "denied")
+            )
+          }
+          style={{
+            padding: "6px 14px",
+            borderRadius: 999,
+            border: "1.5px solid var(--sky)",
+            background: "white",
+            color: "var(--navy-light)",
+            fontSize: "0.78rem",
+            fontWeight: 600,
+            cursor: "pointer",
+            fontFamily: "var(--font-body)",
+            flexShrink: 0,
+          }}
+        >
+          Allow
+        </button>
+      )}
     </div>
   );
 
