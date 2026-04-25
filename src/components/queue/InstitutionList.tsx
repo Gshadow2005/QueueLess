@@ -6,6 +6,7 @@ import {
 } from "../../types/institution";
 import { useInstitutions } from "../../hooks/useInstitutions";
 import { Building2, Landmark, Zap, Search, RefreshCw } from "lucide-react";
+import Skeleton from "../common/Skeleton";
 
 const renderIcon = (iconName: string) => {
   const icons = { Building2, Landmark, Zap };
@@ -97,10 +98,25 @@ export default function InstitutionList({ onSelect }: InstitutionListProps) {
 
       {/* ── Loading state ── */}
       {loading && (
-        <div style={{ textAlign: "center", padding: "3rem 1rem", color: "#94a3b8" }}>
-          <div style={{ width: 32, height: 32, border: "3px solid var(--sky-pale)", borderTopColor: "var(--sky)", borderRadius: "50%", animation: "spin 0.8s linear infinite", margin: "0 auto 1rem" }} />
-          <p style={{ fontSize: "0.875rem" }}>Loading institutions…</p>
-          <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
+        <div style={{ display: "flex", flexDirection: "column", gap: "0.625rem", margin: "0 auto" }}>
+          {[...Array(4)].map((_, idx) => (
+            <div
+              key={idx}
+              style={{ background: "white", border: "1.5px solid rgba(13,43,110,0.10)", borderRadius: 14, padding: "1rem 1.125rem", display: "flex", flexDirection: "row", alignItems: "center", gap: 12 }}
+            >
+              <Skeleton width={40} height={40} borderRadius={10} />
+              <div style={{ flex: 1, minWidth: 0, display: "flex", flexDirection: "column", gap: 6 }}>
+                <Skeleton width="70%" height={16} borderRadius={6} />
+                <Skeleton width="50%" height={14} borderRadius={6} />
+              </div>
+              <Skeleton width={56} height={22} borderRadius={999} />
+              <div className="inst-stats" style={{ display: "flex", borderLeft: "1px solid rgba(13,43,110,0.08)", marginLeft: 4, flexShrink: 0, gap: 12 }}>
+                <Skeleton width={40} height={32} borderRadius={6} />
+                <Skeleton width={40} height={32} borderRadius={6} />
+                <Skeleton width={40} height={32} borderRadius={6} />
+              </div>
+            </div>
+          ))}
         </div>
       )}
 
