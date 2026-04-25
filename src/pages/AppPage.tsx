@@ -104,7 +104,7 @@ export default function AppPage({ onBack }: AppPageProps) {
     <div style={{ minHeight: "100vh", background: "var(--off)", color: "var(--navy)" }}>
       {/* ── Top bar ── */}
       <nav style={{ position: "sticky", top: 0, zIndex: 50, background: "rgba(255,255,255,0.92)", backdropFilter: "blur(12px)", borderBottom: "1px solid rgba(13,43,110,0.12)" }}>
-        <div style={{ maxWidth: 1160, margin: "0 auto", padding: "0 1.25rem", height: 64, display: "flex", alignItems: "center", gap: "1rem" }}>
+        <div className="app-nav-inner">
           {screen === "list" ? (
             <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
               <span style={{ fontSize: "1.375rem" }}>⏱</span>
@@ -135,7 +135,7 @@ export default function AppPage({ onBack }: AppPageProps) {
       </nav>
 
       {/* ── Page layout ── */}
-      <div style={{ maxWidth: 1160, margin: "0 auto", padding: "1.5rem 1.25rem" }}>
+      <div className="app-page-container">
         {showBack && (
           <div style={{ marginBottom: "1.25rem" }}>
             <button
@@ -195,7 +195,35 @@ export default function AppPage({ onBack }: AppPageProps) {
         )}
       </div>
 
-      <style>{`@media (max-width: 768px) { .app-nav-links { display: none; } }`}</style>
+      <style>{`
+          @media (max-width: 768px) { .app-nav-links { display: none; } }
+          .app-page-container {
+            max-width: 96rem;
+            margin: 0 auto;
+            padding: 1.5rem 1.5rem;
+          }
+          @media (min-width: 640px) {
+            .app-page-container { padding: 1.5rem 2.5rem; }
+          }
+          @media (min-width: 1280px) {
+            .app-page-container { padding: 1.5rem 4rem; }
+          }
+          .app-nav-inner {
+            max-width: 96rem;
+            margin: 0 auto;
+            padding: 0 1.5rem;
+            height: 64px;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+          }
+          @media (min-width: 640px) {
+            .app-nav-inner { padding: 0 2.5rem; }
+          }
+          @media (min-width: 1280px) {
+            .app-nav-inner { padding: 0 4rem; }
+          }
+        `}</style>
     </div>
   );
 }

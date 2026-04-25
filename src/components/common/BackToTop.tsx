@@ -5,7 +5,7 @@ export default function BackToTop() {
 
   useEffect(() => {
     const handleScroll = () => {
-      setVisible(window.scrollY > 400);
+      setVisible(window.scrollY > 800);
     };
 
     window.addEventListener('scroll', handleScroll);

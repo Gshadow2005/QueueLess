@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
   INSTITUTION_ICONS,
   type Institution,
@@ -6,6 +6,9 @@ import {
 } from "../../types/institution";
 import { useInstitutions } from "../../hooks/useInstitutions";
 import { Building2, Landmark, Zap, Search, RefreshCw } from "lucide-react";
+import { useToast } from "../../hooks/useToast";
+import Skeleton from "../common/Skeleton";
+import Toast from "../common/Toast";
 
 const renderIcon = (iconName: string) => {
   const icons = { Building2, Landmark, Zap };
@@ -23,6 +26,13 @@ export default function InstitutionList({ onSelect }: InstitutionListProps) {
   const [query, setQuery] = useState("");
   const [filter, setFilter] = useState<FilterType>("all");
   const { institutions, loading, error, refetch } = useInstitutions();
+  const { toasts, showToast, removeToast } = useToast();
+
+  useEffect(() => {
+    if (error) {
+      showToast(error);
+    }
+  }, [error, showToast]);
 
   const filtered = institutions.filter((i) => {
     const matchFilter = filter === "all" || i.type === filter;
@@ -54,6 +64,10 @@ export default function InstitutionList({ onSelect }: InstitutionListProps) {
 
   return (
     <div>
+      {toasts.map((t) => (
+        <Toast key={t.id} message={t.message} variant={t.variant} onClose={() => removeToast(t.id)} />
+      ))}
+
       {/* ── Page header ── */}
       <div style={{ marginBottom: "1.75rem" }}>
         <p style={{ fontSize: "0.7rem", fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.1em", color: "var(--sky)", marginBottom: "0.5rem" }}>
@@ -97,18 +111,32 @@ export default function InstitutionList({ onSelect }: InstitutionListProps) {
 
       {/* ── Loading state ── */}
       {loading && (
-        <div style={{ textAlign: "center", padding: "3rem 1rem", color: "#94a3b8" }}>
-          <div style={{ width: 32, height: 32, border: "3px solid var(--sky-pale)", borderTopColor: "var(--sky)", borderRadius: "50%", animation: "spin 0.8s linear infinite", margin: "0 auto 1rem" }} />
-          <p style={{ fontSize: "0.875rem" }}>Loading institutions…</p>
-          <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
+        <div style={{ display: "flex", flexDirection: "column", gap: "0.625rem", margin: "0 auto" }}>
+          {[...Array(6)].map((_, idx) => (
+            <div
+              key={idx}
+              style={{ background: "white", border: "1.5px solid rgba(13,43,110,0.10)", borderRadius: 14, padding: "1rem 1.125rem", display: "flex", flexDirection: "row", alignItems: "center", gap: 12 }}
+            >
+              <Skeleton width={40} height={40} borderRadius={10} />
+              <div style={{ flex: 1, minWidth: 0, display: "flex", flexDirection: "column", gap: 6 }}>
+                <Skeleton width="70%" height={16} borderRadius={6} />
+                <Skeleton width="50%" height={14} borderRadius={6} />
+              </div>
+              <Skeleton width={56} height={22} borderRadius={999} />
+              <div className="inst-stats" style={{ display: "flex", borderLeft: "1px solid rgba(13,43,110,0.08)", marginLeft: 4, flexShrink: 0, gap: 12 }}>
+                <Skeleton width={40} height={32} borderRadius={6} />
+                <Skeleton width={40} height={32} borderRadius={6} />
+                <Skeleton width={40} height={32} borderRadius={6} />
+              </div>
+            </div>
+          ))}
         </div>
       )}
 
       {/* ── Error state ── */}
       {!loading && error && (
         <div style={{ textAlign: "center", padding: "3rem 1rem" }}>
-          <p style={{ fontWeight: 600, color: "var(--navy)", marginBottom: "0.5rem" }}>Could not load institutions</p>
-          <p style={{ fontSize: "0.875rem", color: "#94a3b8", marginBottom: "1rem" }}>{error}</p>
+          <p style={{ fontWeight: 600, color: "var(--navy)", marginBottom: "0.75rem" }}>Could not load institutions</p>
           <button
             onClick={refetch}
             style={{ display: "inline-flex", alignItems: "center", gap: 6, padding: "8px 20px", borderRadius: 999, border: "1.5px solid var(--sky)", background: "white", color: "var(--navy-light)", fontFamily: "var(--font-body)", fontWeight: 600, fontSize: "0.875rem", cursor: "pointer" }}

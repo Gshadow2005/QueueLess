@@ -18,9 +18,8 @@ export default function Navbar({ onLaunchApp }: NavbarProps) {
       }}
     >
       <div
+        className="max-w-384 mx-auto px-6 sm:px-10 xl:px-16"
         style={{
-          width: "100%",
-          padding: "0 9rem",
           height: 64,
           display: "flex",
           alignItems: "center",
@@ -59,7 +58,7 @@ export default function Navbar({ onLaunchApp }: NavbarProps) {
         {/* CTA */}
         <button
           onClick={onLaunchApp}
-          className="text-sm font-semibold px-5 py-2 rounded-full text-white transition-all duration-200 hover:-translate-y-px"
+          className="ml-auto md:ml-2 text-xs md:text-sm font-semibold px-3 md:px-5 py-1.5 md:py-2 rounded-full text-white transition-all duration-200 hover:-translate-y-px"
           style={{ background: "var(--navy)", border: "2px solid var(--navy)", fontFamily: "var(--font-body)", cursor: "pointer" }}
         >
           Get Started
