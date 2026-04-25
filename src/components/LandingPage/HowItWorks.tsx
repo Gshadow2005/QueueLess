@@ -23,14 +23,14 @@ const STEPS = [
 
 export default function HowItWorks() {
   return (
-    <section id="how" className="py-24 px-36">
-      <div className="w-full">
+    <section id="how" className="py-24">
+      <div className="max-w-384 mx-auto px-6 sm:px-10 xl:px-16">
         <p className="text-xs font-bold uppercase tracking-widest mb-3" style={{ color: "var(--sky)" }}>
           Simple process
         </p>
         <h2
           className="font-head font-extrabold mb-3"
-          style={{ fontSize: "clamp(1.75rem, 3vw, 2.5rem)", color: "var(--navy)" }}
+          style={{ fontSize: "clamp(1.75rem, 2.5vw, 2.75rem)", color: "var(--navy)" }}
         >
           How QueueLess works
         </h2>
@@ -38,12 +38,12 @@ export default function HowItWorks() {
           Four steps between you and a stress-free wait.
         </p>
 
-        <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-12 mt-12">
+        <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-8 mt-12">
           {STEPS.map((step) => (
             <div key={step.num} className="flex gap-4 items-start">
               <div
-                className="font-head text-5xl font-extrabold leading-none shrink-0 min-w-14"
-                style={{ color: "var(--sky-light)" }}
+                className="font-head font-extrabold leading-none shrink-0 min-w-14"
+                style={{ fontSize: "clamp(2.5rem, 3.5vw, 4rem)", color: "var(--sky-light)" }}
               >
                 {step.num}
               </div>
