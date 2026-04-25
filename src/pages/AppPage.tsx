@@ -16,6 +16,8 @@ interface AppState {
   joinedAt: Date | null;
   waitMinutes: number;
   cancelled: boolean;
+  pendingPhone: string;
+  pendingNotify: boolean;
 }
 
 interface AppPageProps {
@@ -33,6 +35,8 @@ export default function AppPage({ onBack }: AppPageProps) {
     joinedAt: null,
     waitMinutes: 0,
     cancelled: false,
+    pendingPhone: "",
+    pendingNotify: true,
   });
 
   const handleSelectInst = (inst: Institution) => {
@@ -41,7 +45,14 @@ export default function AppPage({ onBack }: AppPageProps) {
     setScreen("join");
   };
 
-  const handleJoin = async (phone: string, notifyEnabled: boolean) => {
+  // Step 1: just store phone/notify, navigate to enter-number
+  const handleJoin = (phone: string, notifyEnabled: boolean) => {
+    setState((s) => ({ ...s, pendingPhone: phone, pendingNotify: notifyEnabled }));
+    setScreen("enter-number");
+  };
+
+  // Step 2: user entered ticket number — now call the API
+  const handleNumberSubmit = async (queueNumber: number) => {
     if (!state.institution) return;
     setJoining(true);
     setJoinError(null);
@@ -49,8 +60,9 @@ export default function AppPage({ onBack }: AppPageProps) {
     try {
       const res = await joinQueue({
         institution_id: state.institution.id,
-        phone_number: phone || undefined,
-        browser_push_opt_in: notifyEnabled,
+        queue_number: queueNumber,
+        phone_number: state.pendingPhone || undefined,
+        browser_push_opt_in: state.pendingNotify,
         near_turn_threshold: 3,
       });
 
@@ -58,19 +70,15 @@ export default function AppPage({ onBack }: AppPageProps) {
         ...s,
         sessionId: res.session_id,
         yourNumber: res.queue_number,
+        joinedAt: new Date(),
       }));
 
-      setScreen("enter-number");
+      setScreen("tracker");
     } catch (err: unknown) {
       setJoinError(err instanceof Error ? err.message : "Failed to join queue.");
     } finally {
       setJoining(false);
     }
-  };
-
-  const handleNumberSubmit = (queueNumber: number) => {
-    setState((s) => ({ ...s, yourNumber: queueNumber, joinedAt: new Date() }));
-    setScreen("tracker");
   };
 
   const handleDone = useCallback((waitMinutes: number, cancelled: boolean) => {
@@ -81,7 +89,16 @@ export default function AppPage({ onBack }: AppPageProps) {
   const handleGoHome = () => onBack();
 
   const handleReset = () => {
-    setState({ institution: null, sessionId: null, yourNumber: 0, joinedAt: null, waitMinutes: 0, cancelled: false });
+    setState({
+      institution: null,
+      sessionId: null,
+      yourNumber: 0,
+      joinedAt: null,
+      waitMinutes: 0,
+      cancelled: false,
+      pendingPhone: "",
+      pendingNotify: true,
+    });
     setScreen("list");
   };
 
@@ -96,15 +113,14 @@ export default function AppPage({ onBack }: AppPageProps) {
   const title =
     screen === "list" ? null :
     screen === "join" ? (state.institution?.name.split("–")[0].trim() ?? "Join Queue") :
-    screen === "enter-number" ? "Your Queue Number" :
+    screen === "enter-number" ? "Enter Queue Number" :
     screen === "tracker" ? (state.institution?.name.split("–")[0].trim() ?? "Live Tracker") :
     "All done!";
 
   return (
     <div style={{ minHeight: "100vh", background: "var(--off)", color: "var(--navy)" }}>
-      {/* ── Top bar ── */}
       <nav style={{ position: "sticky", top: 0, zIndex: 50, background: "rgba(255,255,255,0.92)", backdropFilter: "blur(12px)", borderBottom: "1px solid rgba(13,43,110,0.12)" }}>
-        <div style={{ maxWidth: 1160, margin: "0 auto", padding: "0 1.25rem", height: 64, display: "flex", alignItems: "center", gap: "1rem" }}>
+        <div className="app-nav-inner">
           {screen === "list" ? (
             <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
               <span style={{ fontSize: "1.375rem" }}>⏱</span>
@@ -134,8 +150,7 @@ export default function AppPage({ onBack }: AppPageProps) {
         </div>
       </nav>
 
-      {/* ── Page layout ── */}
-      <div style={{ maxWidth: 1160, margin: "0 auto", padding: "1.5rem 1.25rem" }}>
+      <div className="app-page-container">
         {showBack && (
           <div style={{ marginBottom: "1.25rem" }}>
             <button
@@ -159,8 +174,8 @@ export default function AppPage({ onBack }: AppPageProps) {
             institution={state.institution}
             onBack={() => setScreen("list")}
             onJoin={handleJoin}
-            joining={joining}
-            joinError={joinError}
+            joining={false}
+            joinError={null}
           />
         )}
 
@@ -169,7 +184,8 @@ export default function AppPage({ onBack }: AppPageProps) {
             institution={state.institution}
             onSubmit={handleNumberSubmit}
             onBack={() => setScreen("join")}
-            suggestedNumber={state.yourNumber}
+            joining={joining}
+            joinError={joinError}
           />
         )}
 
@@ -195,7 +211,15 @@ export default function AppPage({ onBack }: AppPageProps) {
         )}
       </div>
 
-      <style>{`@media (max-width: 768px) { .app-nav-links { display: none; } }`}</style>
+      <style>{`
+          @media (max-width: 768px) { .app-nav-links { display: none; } }
+          .app-page-container { max-width: 96rem; margin: 0 auto; padding: 1.5rem 1.5rem; }
+          @media (min-width: 640px) { .app-page-container { padding: 1.5rem 2.5rem; } }
+          @media (min-width: 1280px) { .app-page-container { padding: 1.5rem 4rem; } }
+          .app-nav-inner { max-width: 96rem; margin: 0 auto; padding: 0 1.5rem; height: 64px; display: flex; align-items: center; gap: 1rem; }
+          @media (min-width: 640px) { .app-nav-inner { padding: 0 2.5rem; } }
+          @media (min-width: 1280px) { .app-nav-inner { padding: 0 4rem; } }
+        `}</style>
     </div>
   );
 }

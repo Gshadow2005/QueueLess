@@ -4,7 +4,7 @@ interface CtaSectionProps {
 
 export default function CtaSection({ onLaunchApp }: CtaSectionProps) {
   return (
-    <section id="join" className="py-24 px-8 text-center" style={{ background: "var(--navy)" }}>
+    <section id="join" className="py-24 px-6 sm:px-10 xl:px-16 text-center" style={{ background: "var(--navy)" }}>
       <div className="max-w-xl mx-auto">
         <h2
           className="font-head font-extrabold text-white mb-4"

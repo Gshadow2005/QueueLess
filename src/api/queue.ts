@@ -20,6 +20,7 @@ export interface APIInstitution {
 
 export interface QueueJoinPayload {
   institution_id: number;
+  queue_number: number;
   phone_number?: string;
   browser_push_opt_in?: boolean;
   near_turn_threshold?: number;
@@ -30,7 +31,7 @@ export interface QueueJoinResponse {
   institution_id: number;
   queue_number: number;
   current_serving_number: number;
-  status: "waiting" | "notified" | "served" | "expired" | "cancelled";
+  status: "waiting" | "notified" | "serving" | "served" | "expired" | "cancelled";
   near_turn_threshold: number;
   near_turn_notified: boolean;
   issued_at: string;
@@ -43,11 +44,13 @@ export interface QueueStatusResponse {
   institution_id: number;
   queue_number: number;
   current_serving_number: number;
-  status: "waiting" | "notified" | "served" | "expired" | "cancelled";
+  status: "waiting" | "notified" | "serving" | "served" | "expired" | "cancelled";
   near_turn_threshold: number;
   near_turn_notified: boolean;
   issued_at: string;
   updated_at: string;
+  turn_called_at: string | null;
+  checked_in_at: string | null;
   people_ahead: number;
 }
 
@@ -58,7 +61,7 @@ export interface SimulateTickResponse {
   current_serving_number: number;
   served_count: number;
   notified_count: number;
-  message?: string; // present when no active entries
+  message?: string;
 }
 
 // ── API calls ──────────────────────────────────────────────────────────────
@@ -78,7 +81,6 @@ export const joinQueue = (payload: QueueJoinPayload) =>
 export const fetchQueueStatus = (sessionId: string) =>
   apiFetch<QueueStatusResponse>(`/api/queue/entries/${sessionId}/status/`);
 
-/** Calls simulate-tick  */
 export const simulateTick = (
   institutionId: number,
   adminCredentials: { username: string; password: string }
