@@ -13,9 +13,16 @@
   --font-body: 'DM Sans', sans-serif;
 }
 
-body {
+html, body {
   font-family: var(--font-body);
   overflow-x: hidden;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+html::-webkit-scrollbar,
+body::-webkit-scrollbar {
+  display: none;
 }
 
 .font-head {
