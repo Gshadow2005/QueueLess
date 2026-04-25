@@ -36,6 +36,8 @@ export default function EnterQueueNumber({
   const [queueNumberInput, setQueueNumberInput] = useState("");
   const [inputError, setInputError] = useState("");
   const { toasts, showToast, removeToast } = useToast();
+  const prevInstitutionRef = useRef<Institution | null>(null);
+  const [dataChanged, setDataChanged] = useState(false);
 
   const {
     institution: liveInstitution,
@@ -43,16 +45,6 @@ export default function EnterQueueNumber({
     error: refreshError,
     refetch,
   } = useInstitution(initialInstitution.id);
-
-  const isFirstLoad = useRef(true);
-  const [showSkeleton, setShowSkeleton] = useState(true);
-
-  useEffect(() => {
-    if (!refreshing && isFirstLoad.current) {
-      isFirstLoad.current = false;
-      setShowSkeleton(false);
-    }
-  }, [refreshing]);
 
   // Auto-refresh every 5 seconds silently
   useEffect(() => {
@@ -62,8 +54,20 @@ export default function EnterQueueNumber({
     return () => clearInterval(interval);
   }, [refetch]);
 
-  const institution = liveInstitution ?? initialInstitution;
+  useEffect(() => {
+    if (liveInstitution && prevInstitutionRef.current) {
+      const hasChanged =
+        liveInstitution.serving !== prevInstitutionRef.current.serving ||
+        liveInstitution.inQueue !== prevInstitutionRef.current.inQueue;
+      setDataChanged(hasChanged);
+    }
+    if (liveInstitution) {
+      prevInstitutionRef.current = liveInstitution;
+    }
+  }, [liveInstitution]);
 
+  const institution = liveInstitution ?? initialInstitution;
+  const showSkeleton = refreshing && dataChanged;
   const parsedNumber = parseInt(queueNumberInput, 10);
   const isValid = !isNaN(parsedNumber) && parsedNumber > 0;
 
