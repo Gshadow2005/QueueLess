@@ -172,7 +172,8 @@ export default function LiveTracker({
   }, [error, showToast]);
 
   // ── Mobile tracker card (matches screenshot style) ─────────────────────
-  const MobileTrackerCard = () => (
+  const mobileTrackerCard = (
+
     <div style={{ background: "white", border: "1.5px solid rgba(13,43,110,0.12)", borderRadius: 16, padding: "1.25rem", marginBottom: "1rem" }}>
       {/* Header: live dot + institution name + status badge */}
       <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: "1.25rem" }}>
@@ -249,7 +250,8 @@ export default function LiveTracker({
   );
 
   // ── Desktop tracker card (original layout) ─────────────────────────────
-  const DesktopTrackerCard = () => (
+  const desktopTrackerCard = (
+
     <div style={{ background: "white", border: "1.5px solid rgba(13,43,110,0.12)", borderRadius: 16, padding: "1.5rem" }}>
       <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: "1.5rem" }}>
         <span className="animate-pulse-ring" style={{ width: 8, height: 8, borderRadius: "50%", background: isServing ? "#f59e0b" : "#22c55e", flexShrink: 0 }} />
@@ -334,7 +336,8 @@ export default function LiveTracker({
           <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))", gap: "1.5rem", alignItems: "start" }}>
             {/* Left: Main tracker card */}
             <div style={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
-              <DesktopTrackerCard />
+              {desktopTrackerCard}
+
               <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 10 }}>
                 <button
                   style={{ ...btnBase, color: "var(--navy)", borderColor: "rgba(13,43,110,0.12)", display: "flex", alignItems: "center", gap: 6, justifyContent: "center" }}
@@ -403,7 +406,8 @@ export default function LiveTracker({
 
         {/* ── MOBILE layout (screenshot-style) ── */}
         <div className="lt-mobile-only">
-          <MobileTrackerCard />
+          {mobileTrackerCard}
+
 
           {/* Action buttons */}
           <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 10, marginBottom: "1rem" }}>
