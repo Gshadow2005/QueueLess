@@ -46,7 +46,6 @@ function persistedSessionToInstitution(s: PersistedSession): Institution {
 
 export default function AppPage({ onBack }: AppPageProps) {
   const [screen, setScreen] = useState<Screen>(() => {
-    // On mount, if there's a saved session go straight to tracker
     if (hasActiveSession()) return "tracker";
     return "list";
   });
@@ -80,7 +79,6 @@ export default function AppPage({ onBack }: AppPageProps) {
     };
   });
 
-  // Keep localStorage in sync whenever session-critical fields change
   useEffect(() => {
     if (
       state.sessionId &&
@@ -106,7 +104,6 @@ export default function AppPage({ onBack }: AppPageProps) {
   }, [state.sessionId, state.institution, state.yourNumber, state.joinedAt, screen]);
 
   const handleSelectInst = (inst: Institution) => {
-    // Block if device already has an active session
     if (hasActiveSession()) return;
     setState((s) => ({ ...s, institution: inst }));
     setJoinError(null);
@@ -121,7 +118,6 @@ export default function AppPage({ onBack }: AppPageProps) {
   const handleNumberSubmit = async (queueNumber: number) => {
     if (!state.institution) return;
 
-    // Double-check: block if a session is already active (race condition guard)
     if (hasActiveSession()) {
       setJoinError("You already have an active queue session on this device.");
       return;
@@ -136,7 +132,7 @@ export default function AppPage({ onBack }: AppPageProps) {
         queue_number: queueNumber,
         phone_number: state.pendingPhone || undefined,
         browser_push_opt_in: state.pendingNotify,
-        near_turn_threshold: 3,
+        near_turn_threshold: 5, // We handle 3 locally, but set 5 for backend notifications
       });
 
       const joinedAt = new Date();
