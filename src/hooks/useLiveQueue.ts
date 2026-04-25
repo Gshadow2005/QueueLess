@@ -6,7 +6,7 @@ import {
   type QueueStatusResponse,
 } from "../api/queue";
 
-const POLL_INTERVAL_MS = 10000;
+const POLL_INTERVAL_MS = 5000; // 5 seconds — original was 10
 
 const ADMIN_USER = import.meta.env.VITE_ADMIN_USER ?? "";
 const ADMIN_PASS = import.meta.env.VITE_ADMIN_PASS ?? "";
@@ -84,7 +84,7 @@ export function useLiveQueue({
         !servedCalledRef.current
       ) {
         servedCalledRef.current = true;
-        setTimeout(() => onServedRef.current(), 15000); // 15s after serving to allow user to see the update
+        setTimeout(() => onServedRef.current(), 5000); // 5s after serving to allow user to see the update
       }
     },
     [flash, sessionId]

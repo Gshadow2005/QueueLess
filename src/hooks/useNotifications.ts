@@ -72,8 +72,8 @@ export function useNotifications({
         typeof Notification !== "undefined" &&
         Notification.permission === "granted"
       ) {
-        new Notification("⚠️ Only 3 spots left!", {
-          body: `Queue #${String(yourNumber).padStart(2, "0")} — head back now, you're almost up!`,
+        new Notification("Only 3 spots left!", {
+          body: `Queue #${String(yourNumber).padStart(2, "0")} - head back now, you're almost up!`,
           icon: "/favicon.svg",
           tag: "queueless-3-spots",
           requireInteraction: true,
@@ -113,8 +113,8 @@ export function useNotifications({
               typeof Notification !== "undefined" &&
               Notification.permission === "granted"
             ) {
-              new Notification("🔔 5 spots left!", {
-                body: `Queue #${String(yourNumber).padStart(2, "0")} — you have about 5 people ahead. Start heading back!`,
+              new Notification("5 spots left!", {
+                body: `Queue #${String(yourNumber).padStart(2, "0")} - you have about 5 people ahead. Start heading back!`,
                 icon: "/favicon.svg",
                 tag: "queueless-5-spots",
                 requireInteraction: true,
@@ -131,7 +131,7 @@ export function useNotifications({
               typeof Notification !== "undefined" &&
               Notification.permission === "granted"
             ) {
-              new Notification("🟢 It's your turn!", {
+              new Notification("It's your turn!", {
                 body: `Queue #${String(yourNumber).padStart(2, "0")} is now being served. Please proceed to the counter.`,
                 icon: "/favicon.svg",
                 tag: "queueless-turn-called",

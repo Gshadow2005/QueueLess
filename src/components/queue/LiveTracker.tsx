@@ -152,11 +152,11 @@ export default function LiveTracker({
     : showTurnCalled
     ? "It's your turn!"
     : spotsAway <= 3
-    ? "⚠️ Only 3 spots left!"
-    : "🔔 5 spots left — head back soon!";
+    ? "Only 3 spots left!"
+    : "5 spots left - head back soon!";
 
   const notifMessage = isServing
-    ? `Queue ${formatQueueNumber(yourNumber)} — please go to the counter now!`
+    ? `Queue ${formatQueueNumber(yourNumber)} - please go to the counter now!`
     : showTurnCalled
     ? latestTurnCalled?.message ??
       `Queue ${formatQueueNumber(yourNumber)} is now being served. Head to the counter now!`
@@ -164,7 +164,7 @@ export default function LiveTracker({
     ? `You're ${formatQueueNumber(yourNumber)} with ${spotsAway} spot${spotsAway !== 1 ? "s" : ""} left. Head back immediately!`
     : latestNearTurn
     ? latestNearTurn.message
-    : `You're ${formatQueueNumber(yourNumber)} — about 5 people ahead. Start making your way back.`;
+    : `You're ${formatQueueNumber(yourNumber)} - about 5 people ahead. Start making your way back.`;
 
   const notifStyle: React.CSSProperties =
     showTurnCalled || isServing
@@ -394,7 +394,7 @@ export default function LiveTracker({
                 <button
                   style={{ ...btnBase, color: "var(--navy)", borderColor: "rgba(13,43,110,0.12)", display: "flex", alignItems: "center", gap: 6, justifyContent: "center" }}
                   disabled
-                  title="Auto-updating every 10s"
+                  title="Auto-updating every 5s"
                   onMouseEnter={(e) => { e.currentTarget.style.background = "var(--sky-pale)"; e.currentTarget.style.borderColor = "var(--sky)"; }}
                   onMouseLeave={(e) => { e.currentTarget.style.background = "white"; e.currentTarget.style.borderColor = "rgba(13,43,110,0.12)"; }}
                 >
@@ -427,7 +427,7 @@ export default function LiveTracker({
                   { label: "Institution", value: institution.name.split("–")[0].trim() },
                   { label: "Queue #", value: formatQueueNumber(yourNumber) },
                   { label: "Joined at", value: joinedAt.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }) },
-                  { label: "Alerts at", value: "5 spots & 3 spots" },
+                  { label: "Alerts at", value: "5 - 3 spots" },
                   { label: "Status", value: queueLoading ? "Loading…" : statusBadge },
                 ].map((row, i, arr) => (
                   <div key={row.label} style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "10px 0", borderBottom: i < arr.length - 1 ? "1px solid rgba(13,43,110,0.08)" : "none", gap: 8 }}>
@@ -442,8 +442,8 @@ export default function LiveTracker({
               <div style={{ background: "var(--sky-pale)", border: "1.5px solid var(--sky-light)", borderRadius: 16, padding: "1.25rem" }}>
                 <p className="font-head" style={{ fontWeight: 700, fontSize: "0.85rem", color: "var(--navy)", marginBottom: "0.75rem" }}>While you wait</p>
                 {[
-                  "You'll be notified at 5 spots away — start heading back",
-                  "A second alert fires at 3 spots — return immediately",
+                  "You'll be notified at 5 spots away - start heading back",
+                  "A second alert fires at 3 spots - return immediately",
                   "Have your ID and documents ready",
                 ].map((tip) => (
                   <p key={tip} style={{ fontSize: "0.8rem", color: "var(--navy-light)", display: "flex", gap: 8, alignItems: "flex-start", marginBottom: 6, lineHeight: 1.5 }}>
@@ -464,7 +464,7 @@ export default function LiveTracker({
             <button
               style={{ ...btnBase, color: "var(--navy)", borderColor: "rgba(13,43,110,0.12)", display: "flex", alignItems: "center", gap: 6, justifyContent: "center" }}
               disabled
-              title="Auto-updating every 10s"
+              title="Auto-updating every 5s"
             >
               <RefreshCw size={15} /> Auto
             </button>
@@ -506,8 +506,8 @@ export default function LiveTracker({
           <div style={{ background: "var(--sky-pale)", border: "1.5px solid var(--sky-light)", borderRadius: 16, padding: "1.1rem" }}>
             <p className="font-head" style={{ fontWeight: 700, fontSize: "0.82rem", color: "var(--navy)", marginBottom: "0.6rem" }}>While you wait</p>
             {[
-              "You'll be notified at 5 spots away — start heading back",
-              "A second alert fires at 3 spots — return immediately",
+              "You'll be notified at 5 spots away - start heading back",
+              "A second alert fires at 3 spots - return immediately",
               "Have your ID and documents ready",
             ].map((tip) => (
               <p key={tip} style={{ fontSize: "0.77rem", color: "var(--navy-light)", display: "flex", gap: 8, alignItems: "flex-start", marginBottom: 5, lineHeight: 1.5 }}>
