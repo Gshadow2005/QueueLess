@@ -17,7 +17,22 @@ export default function HeroSection({ onLaunchApp }: HeroSectionProps) {
   };
 
   return (
-    <section className="relative min-h-screen grid md:grid-cols-[1fr_440px] xl:grid-cols-[1fr_480px] gap-10 xl:gap-16 items-center max-w-384 mx-auto px-6 sm:px-10 xl:px-16 py-20">
+    <>
+      <style>{`
+        @media (min-width: 892px) {
+          .hero-section {
+            grid-template-columns: 1fr 440px;
+            gap: 2.5rem;
+          }
+        }
+        @media (min-width: 1280px) {
+          .hero-section {
+            grid-template-columns: 1fr 480px;
+            gap: 4rem;
+          }
+        }
+      `}</style>
+      <section className="hero-section relative min-h-screen grid gap-10 items-center max-w-384 mx-auto px-6 sm:px-10 xl:px-16 py-20">
       {/* Background blobs */}
       <div className="absolute inset-0 pointer-events-none z-0">
         <div
@@ -140,5 +155,6 @@ export default function HeroSection({ onLaunchApp }: HeroSectionProps) {
       {/* Right — Live Demo Card */}
       <LiveDemoCard />
     </section>
+    </>
   );
 }

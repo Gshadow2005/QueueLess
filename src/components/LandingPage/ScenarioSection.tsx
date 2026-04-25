@@ -104,7 +104,7 @@ function PhoneMockup() {
 export default function ScenarioSection() {
   return (
     <section id="sectors" className="py-24" style={{ background: "var(--off)" }}>
-      <div className="max-w-6xl mx-auto grid md:grid-cols-[1fr_340px] gap-16 items-center">
+      <div className="max-w-6xl mx-auto px-6 sm:px-10 xl:px-16 grid md:grid-cols-[1fr_340px] gap-16 items-center">
         {/* Text */}
         <div>
           <p className="text-xs font-bold uppercase tracking-widest mb-3" style={{ color: "var(--sky)" }}>
