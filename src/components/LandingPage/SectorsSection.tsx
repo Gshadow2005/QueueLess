@@ -1,46 +1,60 @@
 const SECTORS = [
-  "Banks",
-  "Hospitals",
-  "Government Offices",
-  "Utility Providers",
-  "Clinics",
-  "Retail",
+  {
+    title: "Banks",
+    desc: "Reduce wait times and improve customer satisfaction with remote queue management.",
+  },
+  {
+    title: "Government Offices",
+    desc: "Streamline citizen services and eliminate long lines at public facilities.",
+  },
+  {
+    title: "Utility Providers",
+    desc: "Help customers manage their time while waiting for bill payments or service requests.",
+  },
 ];
 
 export default function SectorsSection() {
   return (
-    <section id="sectors" className="py-24 px-8" style={{ background: "var(--off)" }}>
-      <div className="max-w-350 mx-auto">
-        <p className="text-xs font-bold uppercase tracking-widest mb-3" style={{ color: "var(--sky)" }}>
+    <section id="sectors" className="py-24" style={{ background: "var(--off)" }}>
+      <div className="max-w-384 mx-auto px-6 sm:px-10 xl:px-16">
+        <p
+          className="text-xs font-bold uppercase tracking-widest mb-3"
+          style={{ color: "var(--sky)" }}
+        >
           Industries
         </p>
         <h2
-          className="font-head font-extrabold mb-10"
-          style={{ fontSize: "clamp(1.75rem, 3vw, 2.5rem)", color: "var(--navy)" }}
+          className="font-head font-extrabold mb-12"
+          style={{ fontSize: "clamp(1.75rem, 2.5vw, 2.75rem)", color: "var(--navy)" }}
         >
           Built for service-heavy sectors
         </h2>
-        <div className="flex flex-wrap gap-3 mt-10">
-          {SECTORS.map((sector) => (
+
+        <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
+          {SECTORS.map((s) => (
             <div
-              key={sector}
-              className="px-6 py-2.5 rounded-full text-sm font-semibold cursor-default"
+              key={s.title}
+              className="rounded-2xl p-7 transition-all duration-200 hover:-translate-y-1 cursor-default"
               style={{
                 background: "white",
-                border: "1.5px solid rgba(13,43,110,0.12)",
-                color: "var(--navy)",
-                transition: "background 0.2s, border-color 0.2s",
+                border: "1px solid rgba(13,43,110,0.12)",
               }}
-              onMouseEnter={(e) => {
-                e.currentTarget.style.background = "var(--sky-pale)";
-                e.currentTarget.style.borderColor = "var(--sky)";
-              }}
-              onMouseLeave={(e) => {
-                e.currentTarget.style.background = "white";
-                e.currentTarget.style.borderColor = "rgba(13,43,110,0.12)";
-              }}
+              onMouseEnter={(e) =>
+                (e.currentTarget.style.boxShadow = "0 8px 32px rgba(13,43,110,0.1)")
+              }
+              onMouseLeave={(e) =>
+                (e.currentTarget.style.boxShadow = "none")
+              }
             >
-              {sector}
+              <h3
+                className="font-head text-base font-bold mb-2"
+                style={{ color: "var(--navy)" }}
+              >
+                {s.title}
+              </h3>
+              <p className="text-sm leading-relaxed" style={{ color: "#6B82A8" }}>
+                {s.desc}
+              </p>
             </div>
           ))}
         </div>
