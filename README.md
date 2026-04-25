@@ -1,102 +1,77 @@
-# QueueLess – Online Queue Tracking Website
+# QueueLess — Online Queue Tracking Platform
 
-QueueLess is a web-based platform that allows customers to track their queue number in real time. Instead of standing in long physical lines, users can view their current position, see which number is being served, and return when their turn is near. This system helps reduce overcrowding, improves fairness, and makes waiting time more productive.
-
----
-
-## Background
-
-Long waiting times and inefficient queue management remain common challenges in service-oriented establishments such as banks, hospitals, government offices, and retail businesses. Traditional queuing methods require customers to wait physically in line without clear information about their remaining wait time — leading to overcrowding, frustration, and reduced service satisfaction.
-
-QueueLess addresses this by digitizing the queuing process, allowing customers to monitor their position remotely and return only when their turn is near.
+**QueueLess** is a web-based queue management platform that lets customers track their queue position in real time — without standing in line. Users can monitor their number remotely, receive automated notifications when their turn is near, and return to the counter only when needed.
 
 ---
 
-## Objectives
+## Overview
 
-**General Objective**
-To design and develop an Online Queue Tracking Website that improves queue management efficiency and enhances customer experience through digital technology.
+Long waiting times and inefficient queue handling remain persistent challenges in service-oriented establishments such as banks, government offices, hospitals, and utility providers. Traditional queuing forces customers to wait physically in line with no visibility into how long they actually have left — leading to overcrowding, frustration, and poor service experiences.
 
-**Specific Objectives**
-1. Provide real-time queue tracking for customers
-2. Implement automated notifications when a user's turn is approaching
-3. Enable remote monitoring of queue positions through a web-based platform
-4. Incorporate interactive features that make waiting time more productive
-5. Improve fairness and transparency in queue handling
-6. Enhance operational efficiency for service providers
-
----
-
-## How It Works
-
-Imagine you are at a bank:
-
-```
-1. You arrive and get Queue #35
-2. The website shows → Now Serving: #20
-3. You check your position on your phone
-4. You sit down, grab food, or run a quick errand
-5. When the system reaches #32, you get a notification
-6. You return just before #35 is called
-```
-
-No more standing in line the whole time.
+QueueLess digitizes this process entirely. Customers get a queue number, leave freely, and are notified automatically when they are a few spots away from being served.
 
 ---
 
 ## Features
 
-- Real-time queue tracking — see your position live
-- Now Serving display — always know which number is being served
-- Automated notifications — get alerted when your turn is near
-- Web-based access — works on any device, anywhere
-- Remote monitoring — no need to stay physically in line
-- Fair and transparent — systematic queue handling for everyone
+- **Real-time queue tracking** — live position updates, no refresh required
+- **Now Serving display** — always know which number is currently being called
+- **Automated notifications** — browser push alerts when your turn is approaching
+- **Remote monitoring** — track from anywhere on any device
+- **Session persistence** — active queue sessions are saved across page reloads
+- **Institution browser** — searchable and filterable list of participating establishments
+- **Live queue statistics** — serving number, people in queue, and estimated wait time per institution
+- **Done screen with rating** — session summary and experience feedback after being served
 
 ---
 
-## Target Establishments
+## How It Works
 
-- Banks
-- Hospitals and clinics
-- Government offices
-- Retail businesses
-- Any service-oriented establishment with queues
+```
+1. Browse and select an institution (bank, government office, utility provider)
+2. Pick up a physical ticket at the counter
+3. Enter your ticket number into QueueLess
+4. Leave — grab food, run errands, or simply sit elsewhere
+5. Receive a notification when you are a few spots away
+6. Return just in time to be served
+```
+
+No more standing in line for the entirety of your wait.
 
 ---
 
 ## Tech Stack
 
-- **Frontend:** Typescript, React, Vite, Tailwind
-- **Backend:** Django
-- **Database:** Postman
-- **Real-time:**
+| Layer | Technology |
+|---|---|
+| Frontend | TypeScript, React, Vite, Tailwind CSS |
+| Backend | Django (REST API) |
+| Real-time | Polling via `fetch` (10s interval) |
+| Notifications | Web Push API (browser notifications) |
+| Deployment | Vercel (frontend) |
+| Analytics | Vercel Analytics + Speed Insights |
 
 ---
 
-## How to Run
+## Target Establishments
 
-```bash
-# Clone the repository
-git clone https://github.com/Gshadow2005/queueless.git
-cd queueless
-
-# Install dependencies
-npm install
-
-# Run the development server
-npm start
-```
+- Banks and financial institutions
+- Government offices and public service centers
+- Hospitals and clinics
+- Utility service providers
+- Any establishment with structured walk-in queuing
 
 ---
 
-## Team Members
+## Team
 
-- Anino, Glenn Mark R.
-- Antonio, Den Jester B.
-- Casia, John Jaybird L.
-- Espina, John Cyril G.
-- Flores, Sophia Marie M.
+| Name | Role |
+|---|---|
+| Glenn Mark R. Anino | Frontend Developer |
+| Den Jester B. Antonio | Frontend Developer |
+| John Cyril G. Espina | Backend Developer |
+| Sophia Marie M. Flores | UI/UX Designer |
+| John Jaybird L. Casia | UI/UX Designer |
 
 ---
 

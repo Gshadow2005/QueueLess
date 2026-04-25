@@ -9,7 +9,9 @@ const POLL_INTERVAL_MS = 15000;
 
 interface UseNotificationsOptions {
   sessionId: string | null;
-  onNearTurn?: () => void;
+  yourNumber: number;
+  peopleAhead: number;
+  onNearTurn?: (spotsLeft: number) => void;
   onTurnCalled?: () => void;
 }
 
@@ -24,6 +26,8 @@ interface NotificationsState {
 
 export function useNotifications({
   sessionId,
+  yourNumber,
+  peopleAhead,
   onNearTurn,
   onTurnCalled,
 }: UseNotificationsOptions): NotificationsState & {
@@ -45,10 +49,40 @@ export function useNotifications({
   onTurnCalledRef.current = onTurnCalled;
 
   const firedCallbacksRef = useRef<Set<number>>(new Set());
-  const [tick, setTick] = useState(0);
+  const firedLocalThresholdsRef = useRef<Set<number>>(new Set());
 
+  const [tick, setTick] = useState(0);
   const refetch = useCallback(() => setTick((n) => n + 1), []);
 
+  // ── Local threshold check (3 spots) ───────────────────────────────────
+  // Backend handles 5 spots via near_turn_threshold. We handle 3 locally.
+  useEffect(() => {
+    if (peopleAhead <= 0) return;
+
+    const LOCAL_THRESHOLD = 3;
+
+    if (
+      peopleAhead <= LOCAL_THRESHOLD &&
+      !firedLocalThresholdsRef.current.has(LOCAL_THRESHOLD)
+    ) {
+      firedLocalThresholdsRef.current.add(LOCAL_THRESHOLD);
+      onNearTurnRef.current?.(LOCAL_THRESHOLD);
+
+      if (
+        typeof Notification !== "undefined" &&
+        Notification.permission === "granted"
+      ) {
+        new Notification("⚠️ Only 3 spots left!", {
+          body: `Queue #${String(yourNumber).padStart(2, "0")} — head back now, you're almost up!`,
+          icon: "/favicon.svg",
+          tag: "queueless-3-spots",
+          requireInteraction: true,
+        });
+      }
+    }
+  }, [peopleAhead, yourNumber]);
+
+  // ── Backend notification polling ───────────────────────────────────────
   useEffect(() => {
     if (!sessionId) return;
 
@@ -73,15 +107,41 @@ export function useNotifications({
           firedCallbacksRef.current.add(notification.id);
 
           if (notification.event_type === "near_turn") {
-            onNearTurnRef.current?.();
+            onNearTurnRef.current?.(5);
+
+            if (
+              typeof Notification !== "undefined" &&
+              Notification.permission === "granted"
+            ) {
+              new Notification("🔔 5 spots left!", {
+                body: `Queue #${String(yourNumber).padStart(2, "0")} — you have about 5 people ahead. Start heading back!`,
+                icon: "/favicon.svg",
+                tag: "queueless-5-spots",
+                requireInteraction: true,
+              });
+            }
+
             acknowledgeNotification(sessionId, notification.id, {
               delivered: true,
-            }).catch(() => { /* non-fatal */ });
+            }).catch(() => {});
           } else if (notification.event_type === "turn_called") {
             onTurnCalledRef.current?.();
+
+            if (
+              typeof Notification !== "undefined" &&
+              Notification.permission === "granted"
+            ) {
+              new Notification("🟢 It's your turn!", {
+                body: `Queue #${String(yourNumber).padStart(2, "0")} is now being served. Please proceed to the counter.`,
+                icon: "/favicon.svg",
+                tag: "queueless-turn-called",
+                requireInteraction: true,
+              });
+            }
+
             acknowledgeNotification(sessionId, notification.id, {
               delivered: true,
-            }).catch(() => { /* non-fatal */ });
+            }).catch(() => {});
           }
         }
 
@@ -98,7 +158,10 @@ export function useNotifications({
           setState((s) => ({
             ...s,
             loading: false,
-            error: err instanceof Error ? err.message : "Failed to fetch notifications",
+            error:
+              err instanceof Error
+                ? err.message
+                : "Failed to fetch notifications",
           }));
         }
       }
@@ -112,7 +175,7 @@ export function useNotifications({
       stopped = true;
       clearInterval(id);
     };
-  }, [sessionId, tick]);
+  }, [sessionId, yourNumber, tick]);
 
   const markAllRead = useCallback(async () => {
     if (!sessionId) return;

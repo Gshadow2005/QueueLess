@@ -1,12 +1,11 @@
 import apiFetch from "./clients";
 
-// ── Notification types ─────────────────────────────────────────────────────
-
 export type NotificationChannel = "browser" | "sms" | "system";
 export type NotificationEventType =
   | "near_turn"
   | "turn_called"
   | "session_expired"
+  | "session_completed"
   | "generic";
 
 export interface APINotification {
@@ -38,8 +37,6 @@ export interface NotificationAckPayload {
   error_detail?: string;
 }
 
-// ── API calls ──────────────────────────────────────────────────────────────
-
 export const fetchNotifications = (
   sessionId: string,
   params?: {
@@ -55,7 +52,7 @@ export const fetchNotifications = (
   if (params?.limit) query.set("limit", String(params.limit));
   const qs = query.toString();
   return apiFetch<NotificationsListResponse>(
-    `/api/queue/entries/${sessionId}/notifications/${qs ? `?${qs}` : ""}`
+    `/api/notifications/entries/${sessionId}/notifications/${qs ? `?${qs}` : ""}`
   );
 };
 
@@ -65,7 +62,7 @@ export const acknowledgeNotification = (
   payload: NotificationAckPayload
 ) =>
   apiFetch<APINotification>(
-    `/api/queue/entries/${sessionId}/notifications/${notificationId}/ack/`,
+    `/api/notifications/entries/${sessionId}/notifications/${notificationId}/ack/`,
     {
       method: "PATCH",
       body: JSON.stringify(payload),

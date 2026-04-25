@@ -1,5 +1,5 @@
-import { useReducer, useEffect } from "react";
-import { fetchInstitutions, type APIInstitution } from "../api/queue";
+import { useReducer, useEffect, useCallback } from "react";
+import { fetchInstitutions, fetchInstitution, type APIInstitution } from "../api/queue";
 import type { Institution } from "../types/institution";
 
 function mapAPIInstitution(api: APIInstitution): Institution {
@@ -33,20 +33,75 @@ function mapAPIInstitution(api: APIInstitution): Institution {
 }
 
 interface State {
-  institutions: Institution[];
+  institution: Institution | null;
   loading: boolean;
   error: string | null;
 }
 
 type Action =
   | { type: "FETCH_START" }
-  | { type: "FETCH_SUCCESS"; payload: Institution[] }
+  | { type: "FETCH_SUCCESS"; payload: Institution }
   | { type: "FETCH_ERROR"; payload: string };
 
 function reducer(state: State, action: Action): State {
   switch (action.type) {
     case "FETCH_START":
-      return { institutions: [], loading: true, error: null };
+      return { ...state, loading: true, error: null };
+    case "FETCH_SUCCESS":
+      return { institution: action.payload, loading: false, error: null };
+    case "FETCH_ERROR":
+      return { ...state, loading: false, error: action.payload };
+  }
+}
+
+export function useInstitution(id: number | null) {
+  const [state, dispatch] = useReducer(reducer, {
+    institution: null,
+    loading: false,
+    error: null,
+  });
+
+  const [tick, setTick] = useReducer((n: number) => n + 1, 0);
+
+  const refetch = useCallback(() => setTick(), []);
+
+  useEffect(() => {
+    if (id === null) return;
+    let cancelled = false;
+
+    dispatch({ type: "FETCH_START" });
+
+    fetchInstitution(id)
+      .then((data) => {
+        if (!cancelled)
+          dispatch({ type: "FETCH_SUCCESS", payload: mapAPIInstitution(data) });
+      })
+      .catch((err: Error) => {
+        if (!cancelled)
+          dispatch({ type: "FETCH_ERROR", payload: err.message });
+      });
+
+    return () => { cancelled = true; };
+  }, [id, tick]);
+
+  return { ...state, refetch };
+}
+
+interface InstitutionsState {
+  institutions: Institution[];
+  loading: boolean;
+  error: string | null;
+}
+
+type InstitutionsAction =
+  | { type: "FETCH_START" }
+  | { type: "FETCH_SUCCESS"; payload: Institution[] }
+  | { type: "FETCH_ERROR"; payload: string };
+
+function institutionsReducer(state: InstitutionsState, action: InstitutionsAction): InstitutionsState {
+  switch (action.type) {
+    case "FETCH_START":
+      return { ...state, loading: true, error: null };
     case "FETCH_SUCCESS":
       return { institutions: action.payload, loading: false, error: null };
     case "FETCH_ERROR":
@@ -54,22 +109,16 @@ function reducer(state: State, action: Action): State {
   }
 }
 
-const initialState: State = {
-  institutions: [],
-  loading: true,
-  error: null,
-};
+export function useInstitutions() {
+  const [state, dispatch] = useReducer(institutionsReducer, {
+    institutions: [],
+    loading: true,
+    error: null,
+  });
 
-interface UseInstitutionsResult {
-  institutions: Institution[];
-  loading: boolean;
-  error: string | null;
-  refetch: () => void;
-}
-
-export function useInstitutions(): UseInstitutionsResult {
-  const [state, dispatch] = useReducer(reducer, initialState);
   const [tick, setTick] = useReducer((n: number) => n + 1, 0);
+
+  const refetch = useCallback(() => setTick(), []);
 
   useEffect(() => {
     let cancelled = false;
@@ -78,18 +127,18 @@ export function useInstitutions(): UseInstitutionsResult {
 
     fetchInstitutions()
       .then((data) => {
-        if (!cancelled)
+        if (!cancelled) {
           dispatch({ type: "FETCH_SUCCESS", payload: data.map(mapAPIInstitution) });
+        }
       })
       .catch((err: Error) => {
-        if (!cancelled)
+        if (!cancelled) {
           dispatch({ type: "FETCH_ERROR", payload: err.message });
+        }
       });
 
-    return () => {
-      cancelled = true;
-    };
+    return () => { cancelled = true; };
   }, [tick]);
 
-  return { ...state, refetch: setTick };
+  return { ...state, refetch };
 }

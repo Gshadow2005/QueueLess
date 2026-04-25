@@ -1,4 +1,4 @@
-import { useCallback, useEffect } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { Bell, RefreshCw, Share2, X, ArrowRight } from "lucide-react";
 import { type Institution } from "../../types/institution";
 import { formatQueueNumber } from "../../utils/queueHelpers";
@@ -16,6 +16,14 @@ interface LiveTrackerProps {
   onDone: (waitMinutes: number, cancelled: boolean) => void;
 }
 
+async function requestNotificationPermission(): Promise<boolean> {
+  if (typeof Notification === "undefined") return false;
+  if (Notification.permission === "granted") return true;
+  if (Notification.permission === "denied") return false;
+  const result = await Notification.requestPermission();
+  return result === "granted";
+}
+
 export default function LiveTracker({
   institution,
   sessionId,
@@ -23,6 +31,16 @@ export default function LiveTracker({
   joinedAt,
   onDone,
 }: LiveTrackerProps) {
+  const [notifPermission, setNotifPermission] = useState<NotificationPermission>(
+    typeof Notification !== "undefined" ? Notification.permission : "denied"
+  );
+
+  useEffect(() => {
+    requestNotificationPermission().then((granted) => {
+      setNotifPermission(granted ? "granted" : "denied");
+    });
+  }, []);
+
   const {
     currentServing,
     peopleAhead,
@@ -40,33 +58,22 @@ export default function LiveTracker({
     },
   });
 
-  // ── Notifications ──────────────────────────────────────────────────────
-  const handleNearTurn = useCallback(() => {
-    if (
-      typeof Notification !== "undefined" &&
-      Notification.permission === "granted"
-    ) {
-      new Notification("Almost your turn!", {
-        body: `Queue ${formatQueueNumber(yourNumber)} — head back now!`,
-        icon: "/favicon.svg",
-      });
-    }
-  }, [yourNumber]);
+  // ── Notification callbacks ─────────────────────────────────────────────
+  const handleNearTurn = useCallback(
+    (spotsLeft: number) => {
+      console.info(`[QueueLess] Near-turn fired: ${spotsLeft} spots left`);
+    },
+    []
+  );
 
   const handleTurnCalled = useCallback(() => {
-    if (
-      typeof Notification !== "undefined" &&
-      Notification.permission === "granted"
-    ) {
-      new Notification("It's your turn!", {
-        body: `Queue ${formatQueueNumber(yourNumber)} is now being served.`,
-        icon: "/favicon.svg",
-      });
-    }
-  }, [yourNumber]);
+    console.info("[QueueLess] Turn called notification fired");
+  }, []);
 
   const { latestNearTurn, latestTurnCalled } = useNotifications({
     sessionId,
+    yourNumber,
+    peopleAhead,
     onNearTurn: handleNearTurn,
     onTurnCalled: handleTurnCalled,
   });
@@ -76,12 +83,12 @@ export default function LiveTracker({
   const pct = Math.max(0, Math.min(100, 100 - (spotsAway / 15) * 100));
 
   const isServing = status === "serving";
-  const isTurn = status === "served" || spotsAway === 0;
+  const isNext = spotsAway === 0 && status !== "served" && status !== "serving";
+  const isTurn = status === "served" || status === "serving";
   const isAlmost =
     nearTurnNotified ||
     !!latestNearTurn ||
-    (spotsAway <= 3 && spotsAway > 0);
-  const isNext = spotsAway === 0 && status !== "served" && status !== "serving";
+    (spotsAway <= 5 && spotsAway > 0);
 
   const handleCancel = useCallback(() => {
     if (!window.confirm("Cancel your spot in the queue?")) return;
@@ -100,10 +107,10 @@ export default function LiveTracker({
 
   const awayLabel = isServing
     ? "Head to the counter now!"
+    : isNext
+    ? "Next up! Get ready."
     : isTurn
     ? "It's your turn!"
-    : isNext
-    ? "Next up!"
     : `${spotsAway} spot${spotsAway !== 1 ? "s" : ""} away`;
 
   const statusColor = isServing
@@ -137,31 +144,41 @@ export default function LiveTracker({
   // ── Notification banner logic ──────────────────────────────────────────
   const showTurnCalled = !!(latestTurnCalled || status === "served" || status === "serving");
   const showNearTurn =
-    !!(nearTurnNotified || latestNearTurn || (spotsAway <= 3 && spotsAway > 0)) &&
+    !!(nearTurnNotified || latestNearTurn || (spotsAway <= 5 && spotsAway > 0)) &&
     !showTurnCalled;
 
   const notifTitle = isServing
     ? "Head to the counter!"
     : showTurnCalled
     ? "It's your turn!"
-    : "Almost your turn!";
+    : spotsAway <= 3
+    ? "⚠️ Only 3 spots left!"
+    : "🔔 5 spots left — head back soon!";
 
   const notifMessage = isServing
     ? `Queue ${formatQueueNumber(yourNumber)} — please go to the counter now!`
     : showTurnCalled
     ? latestTurnCalled?.message ??
       `Queue ${formatQueueNumber(yourNumber)} is now being served. Head to the counter now!`
+    : spotsAway <= 3
+    ? `You're ${formatQueueNumber(yourNumber)} with ${spotsAway} spot${spotsAway !== 1 ? "s" : ""} left. Head back immediately!`
     : latestNearTurn
     ? latestNearTurn.message
-    : `You're ${formatQueueNumber(yourNumber)}, currently serving ${formatQueueNumber(currentServing)}. Head back now!`;
+    : `You're ${formatQueueNumber(yourNumber)} — about 5 people ahead. Start making your way back.`;
 
-  const notifStyle: React.CSSProperties = showTurnCalled || isServing
-    ? { background: "#f0fdf4", border: "1.5px solid #86efac", borderRadius: 16, padding: "1rem 1.25rem", display: "flex", gap: 12, alignItems: "flex-start", marginBottom: "1.5rem" }
-    : { background: "var(--navy)", borderRadius: 16, padding: "1rem 1.25rem", display: "flex", gap: 12, alignItems: "flex-start", marginBottom: "1.5rem" };
+  const notifStyle: React.CSSProperties =
+    showTurnCalled || isServing
+      ? { background: "#f0fdf4", border: "1.5px solid #86efac", borderRadius: 16, padding: "1rem 1.25rem", display: "flex", gap: 12, alignItems: "flex-start", marginBottom: "1.5rem" }
+      : spotsAway <= 3
+      ? { background: "#fff7ed", border: "1.5px solid #fed7aa", borderRadius: 16, padding: "1rem 1.25rem", display: "flex", gap: 12, alignItems: "flex-start", marginBottom: "1.5rem" }
+      : { background: "var(--navy)", borderRadius: 16, padding: "1rem 1.25rem", display: "flex", gap: 12, alignItems: "flex-start", marginBottom: "1.5rem" };
 
-  const notifIconColor = showTurnCalled || isServing ? "#16a34a" : "white";
-  const notifTitleColor = showTurnCalled || isServing ? "#15803d" : "white";
-  const notifBodyColor = showTurnCalled || isServing ? "#166534" : "var(--sky-light)";
+  const notifIconColor =
+    showTurnCalled || isServing ? "#16a34a" : spotsAway <= 3 ? "#c2410c" : "white";
+  const notifTitleColor =
+    showTurnCalled || isServing ? "#15803d" : spotsAway <= 3 ? "#c2410c" : "white";
+  const notifBodyColor =
+    showTurnCalled || isServing ? "#166534" : spotsAway <= 3 ? "#7c2d12" : "var(--sky-light)";
 
   const { toasts, showToast, removeToast } = useToast();
 
@@ -171,11 +188,51 @@ export default function LiveTracker({
     }
   }, [error, showToast]);
 
-  // ── Mobile tracker card (matches screenshot style) ─────────────────────
-  const mobileTrackerCard = (
+  // ── Notification permission banner ─────────────────────────────────────
+  const permissionBanner = notifPermission !== "granted" && (
+    <div
+      style={{
+        background: "var(--sky-pale)",
+        border: "1.5px solid var(--sky-light)",
+        borderRadius: 12,
+        padding: "0.875rem 1.125rem",
+        marginBottom: "1.25rem",
+        display: "flex",
+        alignItems: "center",
+        gap: 10,
+      }}
+    >
+      <Bell size={18} style={{ color: "var(--sky)", flexShrink: 0 }} />
+      <p style={{ fontSize: "0.84rem", color: "var(--navy-light)", fontWeight: 500, lineHeight: 1.5, margin: 0, flex: 1 }}>
+        Enable notifications to get alerted at 5 and 3 spots away.
+      </p>
+      <button
+        onClick={() =>
+          requestNotificationPermission().then((granted) =>
+            setNotifPermission(granted ? "granted" : "denied")
+          )
+        }
+        style={{
+          padding: "6px 14px",
+          borderRadius: 999,
+          border: "1.5px solid var(--sky)",
+          background: "white",
+          color: "var(--navy-light)",
+          fontSize: "0.78rem",
+          fontWeight: 600,
+          cursor: "pointer",
+          fontFamily: "var(--font-body)",
+          flexShrink: 0,
+        }}
+      >
+        Allow
+      </button>
+    </div>
+  );
 
+  // ── Mobile tracker card ────────────────────────────────────────────────
+  const mobileTrackerCard = (
     <div style={{ background: "white", border: "1.5px solid rgba(13,43,110,0.12)", borderRadius: 16, padding: "1.25rem", marginBottom: "1rem" }}>
-      {/* Header: live dot + institution name + status badge */}
       <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: "1.25rem" }}>
         <span
           className="animate-pulse-ring"
@@ -195,9 +252,7 @@ export default function LiveTracker({
         </span>
       </div>
 
-      {/* Now Serving / Your Number — stacked vertically like the screenshot */}
       <div style={{ display: "flex", flexDirection: "column", gap: 0, marginBottom: "1.25rem" }}>
-        {/* Now Serving */}
         <div style={{ textAlign: "center", paddingBottom: "1.25rem", borderBottom: "1px solid rgba(13,43,110,0.1)" }}>
           <p style={{ fontSize: "0.65rem", textTransform: "uppercase", letterSpacing: "0.08em", color: "#6B82A8", marginBottom: 8, fontWeight: 500 }}>
             Now serving
@@ -214,7 +269,6 @@ export default function LiveTracker({
           )}
         </div>
 
-        {/* Your Number */}
         <div style={{ textAlign: "center", paddingTop: "1.25rem" }}>
           <p style={{ fontSize: "0.65rem", textTransform: "uppercase", letterSpacing: "0.08em", color: "#6B82A8", marginBottom: 8, fontWeight: 500 }}>
             Your number
@@ -232,7 +286,6 @@ export default function LiveTracker({
         </div>
       </div>
 
-      {/* Progress bar */}
       <div style={{ height: 6, borderRadius: 999, overflow: "hidden", background: "var(--sky-pale)", marginBottom: 8 }}>
         <div style={{
           height: "100%", borderRadius: 999,
@@ -249,9 +302,8 @@ export default function LiveTracker({
     </div>
   );
 
-  // ── Desktop tracker card (original layout) ─────────────────────────────
+  // ── Desktop tracker card ───────────────────────────────────────────────
   const desktopTrackerCard = (
-
     <div style={{ background: "white", border: "1.5px solid rgba(13,43,110,0.12)", borderRadius: 16, padding: "1.5rem" }}>
       <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: "1.5rem" }}>
         <span className="animate-pulse-ring" style={{ width: 8, height: 8, borderRadius: "50%", background: isServing ? "#f59e0b" : "#22c55e", flexShrink: 0 }} />
@@ -306,7 +358,6 @@ export default function LiveTracker({
 
   return (
     <>
-      {/* Responsive styles injected once */}
       <style>{`
         .lt-mobile-only { display: none; }
         .lt-desktop-only { display: block; }
@@ -321,6 +372,8 @@ export default function LiveTracker({
           <Toast key={t.id} message={t.message} variant={t.variant} onClose={() => removeToast(t.id)} />
         ))}
 
+        {permissionBanner}
+
         {!queueLoading && (showTurnCalled || showNearTurn || isServing) && (
           <div style={notifStyle}>
             <Bell style={{ flexShrink: 0, width: 24, height: 24, color: notifIconColor }} />
@@ -331,10 +384,9 @@ export default function LiveTracker({
           </div>
         )}
 
-        {/* ── DESKTOP layout (original) ── */}
+        {/* ── DESKTOP layout ── */}
         <div className="lt-desktop-only">
           <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))", gap: "1.5rem", alignItems: "start" }}>
-            {/* Left: Main tracker card */}
             <div style={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
               {desktopTrackerCard}
 
@@ -358,16 +410,16 @@ export default function LiveTracker({
                 </button>
                 <button
                   onClick={handleCancel}
-                  style={{ ...btnBase, color: "#dc2626", borderColor: "rgba(220,38,38,0.2)", display: "flex", alignItems: "center", gap: 6, justifyContent: "center" }}
-                  onMouseEnter={(e) => { e.currentTarget.style.background = "#fff5f5"; e.currentTarget.style.borderColor = "#dc2626"; }}
-                  onMouseLeave={(e) => { e.currentTarget.style.background = "white"; e.currentTarget.style.borderColor = "rgba(220,38,38,0.2)"; }}
+                  disabled={isServing}
+                  style={{ ...btnBase, color: isServing ? "#94a3b8" : "#dc2626", borderColor: isServing ? "rgba(148,163,184,0.3)" : "rgba(220,38,38,0.2)", display: "flex", alignItems: "center", gap: 6, justifyContent: "center", cursor: isServing ? "not-allowed" : "pointer", opacity: isServing ? 0.5 : 1 }}
+                  onMouseEnter={(e) => { if (!isServing) { e.currentTarget.style.background = "#fff5f5"; e.currentTarget.style.borderColor = "#dc2626"; }}}
+                  onMouseLeave={(e) => { if (!isServing) { e.currentTarget.style.background = "white"; e.currentTarget.style.borderColor = "rgba(220,38,38,0.2)"; }}}
                 >
                   <X size={16} /> Cancel
                 </button>
               </div>
             </div>
 
-            {/* Right: Session info */}
             <div style={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
               <div style={{ background: "white", border: "1.5px solid rgba(13,43,110,0.12)", borderRadius: 16, padding: "1.5rem" }}>
                 <h4 className="font-head" style={{ fontWeight: 700, fontSize: "0.9rem", color: "var(--navy)", marginBottom: "1rem" }}>Session info</h4>
@@ -375,7 +427,7 @@ export default function LiveTracker({
                   { label: "Institution", value: institution.name.split("–")[0].trim() },
                   { label: "Queue #", value: formatQueueNumber(yourNumber) },
                   { label: "Joined at", value: joinedAt.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }) },
-                  { label: "Notify threshold", value: "3 spots" },
+                  { label: "Alerts at", value: "5 spots & 3 spots" },
                   { label: "Status", value: queueLoading ? "Loading…" : statusBadge },
                 ].map((row, i, arr) => (
                   <div key={row.label} style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "10px 0", borderBottom: i < arr.length - 1 ? "1px solid rgba(13,43,110,0.08)" : "none", gap: 8 }}>
@@ -390,8 +442,8 @@ export default function LiveTracker({
               <div style={{ background: "var(--sky-pale)", border: "1.5px solid var(--sky-light)", borderRadius: 16, padding: "1.25rem" }}>
                 <p className="font-head" style={{ fontWeight: 700, fontSize: "0.85rem", color: "var(--navy)", marginBottom: "0.75rem" }}>While you wait</p>
                 {[
-                  "Queue updates automatically every 10 seconds",
-                  "Return when you get the near-turn notification",
+                  "You'll be notified at 5 spots away — start heading back",
+                  "A second alert fires at 3 spots — return immediately",
                   "Have your ID and documents ready",
                 ].map((tip) => (
                   <p key={tip} style={{ fontSize: "0.8rem", color: "var(--navy-light)", display: "flex", gap: 8, alignItems: "flex-start", marginBottom: 6, lineHeight: 1.5 }}>
@@ -404,12 +456,10 @@ export default function LiveTracker({
           </div>
         </div>
 
-        {/* ── MOBILE layout (screenshot-style) ── */}
+        {/* ── MOBILE layout ── */}
         <div className="lt-mobile-only">
           {mobileTrackerCard}
 
-
-          {/* Action buttons */}
           <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 10, marginBottom: "1rem" }}>
             <button
               style={{ ...btnBase, color: "var(--navy)", borderColor: "rgba(13,43,110,0.12)", display: "flex", alignItems: "center", gap: 6, justifyContent: "center" }}
@@ -426,20 +476,22 @@ export default function LiveTracker({
             </button>
             <button
               onClick={handleCancel}
-              style={{ ...btnBase, color: "#dc2626", borderColor: "rgba(220,38,38,0.2)", display: "flex", alignItems: "center", gap: 6, justifyContent: "center" }}
+              disabled={isServing}
+              style={{ ...btnBase, color: isServing ? "#94a3b8" : "#dc2626", borderColor: isServing ? "rgba(148,163,184,0.3)" : "rgba(220,38,38,0.2)", display: "flex", alignItems: "center", gap: 6, justifyContent: "center", cursor: isServing ? "not-allowed" : "pointer", opacity: isServing ? 0.5 : 1 }}
+              onMouseEnter={(e) => { if (!isServing) { e.currentTarget.style.background = "#fff5f5"; e.currentTarget.style.borderColor = "#dc2626"; }}}
+              onMouseLeave={(e) => { if (!isServing) { e.currentTarget.style.background = "white"; e.currentTarget.style.borderColor = "rgba(220,38,38,0.2)"; }}}
             >
               <X size={15} /> Cancel
             </button>
           </div>
 
-          {/* Session info — compact on mobile */}
           <div style={{ background: "white", border: "1.5px solid rgba(13,43,110,0.12)", borderRadius: 16, padding: "1.25rem", marginBottom: "1rem" }}>
             <h4 className="font-head" style={{ fontWeight: 700, fontSize: "0.85rem", color: "var(--navy)", marginBottom: "0.75rem" }}>Session info</h4>
             {[
               { label: "Institution", value: institution.name.split("–")[0].trim() },
               { label: "Queue #", value: formatQueueNumber(yourNumber) },
               { label: "Joined at", value: joinedAt.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }) },
-              { label: "Notify threshold", value: "3 spots" },
+              { label: "Alerts at", value: "5 spots & 3 spots" },
               { label: "Status", value: queueLoading ? "Loading…" : statusBadge },
             ].map((row, i, arr) => (
               <div key={row.label} style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "9px 0", borderBottom: i < arr.length - 1 ? "1px solid rgba(13,43,110,0.08)" : "none", gap: 8 }}>
@@ -451,12 +503,11 @@ export default function LiveTracker({
             ))}
           </div>
 
-          {/* Tips */}
           <div style={{ background: "var(--sky-pale)", border: "1.5px solid var(--sky-light)", borderRadius: 16, padding: "1.1rem" }}>
             <p className="font-head" style={{ fontWeight: 700, fontSize: "0.82rem", color: "var(--navy)", marginBottom: "0.6rem" }}>While you wait</p>
             {[
-              "Queue updates automatically every 10 seconds",
-              "Return when you get the near-turn notification",
+              "You'll be notified at 5 spots away — start heading back",
+              "A second alert fires at 3 spots — return immediately",
               "Have your ID and documents ready",
             ].map((tip) => (
               <p key={tip} style={{ fontSize: "0.77rem", color: "var(--navy-light)", display: "flex", gap: 8, alignItems: "flex-start", marginBottom: 5, lineHeight: 1.5 }}>
