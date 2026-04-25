@@ -10,7 +10,7 @@ const SECTORS = [
 export default function SectorsSection() {
   return (
     <section id="sectors" className="py-24 px-8" style={{ background: "var(--off)" }}>
-      <div className="max-w-6xl mx-auto">
+      <div className="max-w-350 mx-auto">
         <p className="text-xs font-bold uppercase tracking-widest mb-3" style={{ color: "var(--sky)" }}>
           Industries
         </p>

@@ -21,16 +21,16 @@ export default function FeaturesSection() {
   return (
     <section
       id="features"
-      className="py-24 px-8"
+      className="py-24"
       style={{ background: "var(--off)" }}
     >
-      <div className="max-w-6xl mx-auto">
+      <div className="max-w-384 mx-auto px-6 sm:px-10 xl:px-16">
         <p className="text-xs font-bold uppercase tracking-widest mb-3" style={{ color: "var(--sky)" }}>
           What you get
         </p>
         <h2
           className="font-head font-extrabold mb-12"
-          style={{ fontSize: "clamp(1.75rem, 3vw, 2.5rem)", color: "var(--navy)" }}
+          style={{ fontSize: "clamp(1.75rem, 2.5vw, 2.75rem)", color: "var(--navy)" }}
         >
           Built for real waiting
         </h2>

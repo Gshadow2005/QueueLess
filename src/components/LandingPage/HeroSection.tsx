@@ -17,31 +17,31 @@ export default function HeroSection({ onLaunchApp }: HeroSectionProps) {
   };
 
   return (
-    <section className="relative min-h-screen grid md:grid-cols-[1fr_420px] gap-12 items-center max-w-6xl mx-auto px-8 py-20">
+    <section className="relative min-h-screen grid md:grid-cols-[1fr_440px] xl:grid-cols-[1fr_480px] gap-10 xl:gap-16 items-center max-w-384 mx-auto px-6 sm:px-10 xl:px-16 py-20">
       {/* Background blobs */}
-      <div className="absolute inset-0 overflow-hidden pointer-events-none z-0">
+      <div className="absolute inset-0 pointer-events-none z-0">
         <div
           className="absolute rounded-full"
           style={{
-            width: 600,
-            height: 600,
+            width: 900,
+            height: 900,
             background: "var(--sky)",
-            filter: "blur(80px)",
-            opacity: 0.18,
-            top: -100,
-            right: -100,
+            filter: "blur(140px)",
+            opacity: 0.12,
+            top: -200,
+            right: -200,
           }}
         />
         <div
           className="absolute rounded-full"
           style={{
-            width: 400,
-            height: 400,
+            width: 700,
+            height: 700,
             background: "var(--navy-light)",
-            filter: "blur(80px)",
-            opacity: 0.18,
-            bottom: 0,
-            left: -80,
+            filter: "blur(140px)",
+            opacity: 0.12,
+            bottom: -100,
+            left: -150,
           }}
         />
       </div>
@@ -63,7 +63,7 @@ export default function HeroSection({ onLaunchApp }: HeroSectionProps) {
         {/* Title */}
         <h1
           className="font-head font-extrabold leading-tight mb-5"
-          style={{ fontSize: "clamp(2.25rem, 4vw, 3.5rem)", color: "var(--navy)" }}
+          style={{ fontSize: "clamp(2.25rem, 3.5vw, 4rem)", color: "var(--navy)" }}
         >
           Your place in line,
           <br />
@@ -72,8 +72,8 @@ export default function HeroSection({ onLaunchApp }: HeroSectionProps) {
 
         {/* Subtitle */}
         <p
-          className="text-lg leading-relaxed max-w-lg mb-8"
-          style={{ color: "#6B82A8" }}
+          className="leading-relaxed max-w-xl mb-8"
+          style={{ fontSize: "clamp(1rem, 1.25vw, 1.2rem)", color: "#6B82A8" }}
         >
           Stop standing in line. QueueLess lets you track your queue position
           remotely — get notified when your turn is near, so you can use your
@@ -84,16 +84,17 @@ export default function HeroSection({ onLaunchApp }: HeroSectionProps) {
         <div className="flex flex-wrap gap-4 items-center mb-12">
           <button
             onClick={onLaunchApp}
-            className="text-base font-semibold px-8 py-3 rounded-full text-white transition-all duration-200 hover:-translate-y-px"
-            style={{ background: "var(--navy)", border: "2px solid var(--navy)", fontFamily: "var(--font-body)", cursor: "pointer" }}
+            className="font-semibold px-8 py-3 rounded-full text-white transition-all duration-200 hover:-translate-y-px"
+            style={{ fontSize: "clamp(0.9rem, 1vw, 1.05rem)", background: "var(--navy)", border: "2px solid var(--navy)", fontFamily: "var(--font-body)", cursor: "pointer" }}
           >
             Join a Queue
           </button>
           <a
             href="#how"
             onClick={(e) => handleScroll(e, "how")}
-            className="text-base font-medium px-6 py-3 rounded-full transition-all duration-200"
+            className="font-medium px-6 py-3 rounded-full transition-all duration-200"
             style={{
+              fontSize: "clamp(0.9rem, 1vw, 1.05rem)",
               color: "#6B82A8",
               border: "2px solid rgba(13,43,110,0.2)",
             }}
@@ -116,12 +117,12 @@ export default function HeroSection({ onLaunchApp }: HeroSectionProps) {
             <div key={stat.value} className="flex items-center gap-6">
               <div>
                 <strong
-                  className="block font-head text-2xl font-extrabold"
-                  style={{ color: "var(--navy)" }}
+                  className="block font-head font-extrabold"
+                  style={{ fontSize: "clamp(1.4rem, 1.75vw, 2rem)", color: "var(--navy)" }}
                 >
                   {stat.value}
                 </strong>
-                <span className="text-xs" style={{ color: "#6B82A8" }}>
+                <span style={{ fontSize: "clamp(0.7rem, 0.75vw, 0.8rem)", color: "#6B82A8" }}>
                   {stat.label}
                 </span>
               </div>
