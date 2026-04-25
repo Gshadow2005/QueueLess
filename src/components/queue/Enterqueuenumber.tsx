@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect } from "react";
 import { type Institution, TYPE_LABELS } from "../../types/institution";
 import { formatQueueNumber } from "../../utils/queueHelpers";
 import Toast from "../common/Toast";
@@ -36,8 +36,6 @@ export default function EnterQueueNumber({
   const [queueNumberInput, setQueueNumberInput] = useState("");
   const [inputError, setInputError] = useState("");
   const { toasts, showToast, removeToast } = useToast();
-  const prevInstitutionRef = useRef<Institution | null>(null);
-  const [dataChanged, setDataChanged] = useState(false);
 
   const {
     institution: liveInstitution,
@@ -54,20 +52,10 @@ export default function EnterQueueNumber({
     return () => clearInterval(interval);
   }, [refetch]);
 
-  useEffect(() => {
-    if (liveInstitution && prevInstitutionRef.current) {
-      const hasChanged =
-        liveInstitution.serving !== prevInstitutionRef.current.serving ||
-        liveInstitution.inQueue !== prevInstitutionRef.current.inQueue;
-      setDataChanged(hasChanged);
-    }
-    if (liveInstitution) {
-      prevInstitutionRef.current = liveInstitution;
-    }
-  }, [liveInstitution]);
-
   const institution = liveInstitution ?? initialInstitution;
-  const showSkeleton = refreshing && dataChanged;
+
+  const showSkeleton = refreshing && liveInstitution == null;
+
   const parsedNumber = parseInt(queueNumberInput, 10);
   const isValid = !isNaN(parsedNumber) && parsedNumber > 0;
 
