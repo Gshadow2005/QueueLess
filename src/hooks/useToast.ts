@@ -11,7 +11,10 @@ export function useToast() {
 
   const showToast = useCallback((message: string, variant: ToastItem["variant"] = "error") => {
     const id = Date.now() + Math.random();
-    setToasts((prev) => [...prev, { id, message, variant }]);
+    setToasts((prev) => {
+      const next = [...prev, { id, message, variant }];
+      return next.length > 3 ? next.slice(-3) : next;
+    });
   }, []);
 
   const removeToast = useCallback((id: number) => {
