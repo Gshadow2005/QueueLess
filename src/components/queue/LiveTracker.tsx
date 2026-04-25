@@ -1,10 +1,12 @@
-import { useCallback } from "react";
+import { useCallback, useEffect } from "react";
 import { Bell, RefreshCw, Share2, X, ArrowRight } from "lucide-react";
 import { type Institution } from "../../types/institution";
 import { formatQueueNumber } from "../../utils/queueHelpers";
 import { useLiveQueue } from "../../hooks/useLiveQueue";
 import { useNotifications } from "../../hooks/useNotifications";
+import { useToast } from "../../hooks/useToast";
 import Skeleton from "../common/Skeleton";
+import Toast from "../common/Toast";
 
 interface LiveTrackerProps {
   institution: Institution;
@@ -135,13 +137,19 @@ export default function LiveTracker({
   const notifTitleColor = showTurnCalled ? "#15803d" : "white";
   const notifBodyColor = showTurnCalled ? "#166534" : "var(--sky-light)";
 
+  const { toasts, showToast, removeToast } = useToast();
+
+  useEffect(() => {
+    if (error) {
+      showToast(`Could not update queue status: ${error}`);
+    }
+  }, [error, showToast]);
+
   return (
     <div>
-      {error && (
-        <div style={{ background: "#fff5f5", border: "1.5px solid #fecaca", borderRadius: 12, padding: "0.875rem 1.25rem", marginBottom: "1.25rem", fontSize: "0.85rem", color: "#dc2626" }}>
-          ⚠ Could not update queue status: {error}
-        </div>
-      )}
+      {toasts.map((t) => (
+        <Toast key={t.id} message={t.message} variant={t.variant} onClose={() => removeToast(t.id)} />
+      ))}
 
       {!queueLoading && (showTurnCalled || showNearTurn) && (
         <div style={notifStyle}>

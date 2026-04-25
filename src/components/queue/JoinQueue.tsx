@@ -1,6 +1,8 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Ticket, Hash, Bell, MapPin } from "lucide-react";
 import { type Institution, TYPE_LABELS } from "../../types/institution";
+import { useToast } from "../../hooks/useToast";
+import Toast from "../common/Toast";
 
 interface JoinQueueProps {
   institution: Institution;
@@ -13,9 +15,20 @@ interface JoinQueueProps {
 export default function JoinQueue({ institution, onJoin, joining = false, joinError = null }: JoinQueueProps) {
   const [phone, setPhone] = useState("");
   const [notify, setNotify] = useState(true);
+  const { toasts, showToast, removeToast } = useToast();
+
+  useEffect(() => {
+    if (joinError) {
+      showToast(joinError);
+    }
+  }, [joinError, showToast]);
 
   return (
     <div>
+      {toasts.map((t) => (
+        <Toast key={t.id} message={t.message} variant={t.variant} onClose={() => removeToast(t.id)} />
+      ))}
+
       {/* ── Page header ── */}
       <div style={{ marginBottom: "1.75rem" }}>
         <p style={{ fontSize: "0.7rem", fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.1em", color: "var(--sky)", marginBottom: "0.5rem" }}>
@@ -28,13 +41,6 @@ export default function JoinQueue({ institution, onJoin, joining = false, joinEr
           {institution.address}
         </p>
       </div>
-
-      {/* ── Error banner ── */}
-      {joinError && (
-        <div style={{ background: "#fff5f5", border: "1.5px solid #fecaca", borderRadius: 12, padding: "0.875rem 1.25rem", marginBottom: "1.25rem", fontSize: "0.875rem", color: "#dc2626", fontWeight: 500 }}>
-          ⚠ {joinError}
-        </div>
-      )}
 
       {/* ── Two-column layout ── */}
       <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(min(100%, 280px), 1fr))", gap: "1.25rem", alignItems: "start" }}>
