@@ -410,9 +410,10 @@ export default function LiveTracker({
                 </button>
                 <button
                   onClick={handleCancel}
-                  style={{ ...btnBase, color: "#dc2626", borderColor: "rgba(220,38,38,0.2)", display: "flex", alignItems: "center", gap: 6, justifyContent: "center" }}
-                  onMouseEnter={(e) => { e.currentTarget.style.background = "#fff5f5"; e.currentTarget.style.borderColor = "#dc2626"; }}
-                  onMouseLeave={(e) => { e.currentTarget.style.background = "white"; e.currentTarget.style.borderColor = "rgba(220,38,38,0.2)"; }}
+                  disabled={isServing}
+                  style={{ ...btnBase, color: isServing ? "#94a3b8" : "#dc2626", borderColor: isServing ? "rgba(148,163,184,0.3)" : "rgba(220,38,38,0.2)", display: "flex", alignItems: "center", gap: 6, justifyContent: "center", cursor: isServing ? "not-allowed" : "pointer", opacity: isServing ? 0.5 : 1 }}
+                  onMouseEnter={(e) => { if (!isServing) { e.currentTarget.style.background = "#fff5f5"; e.currentTarget.style.borderColor = "#dc2626"; }}}
+                  onMouseLeave={(e) => { if (!isServing) { e.currentTarget.style.background = "white"; e.currentTarget.style.borderColor = "rgba(220,38,38,0.2)"; }}}
                 >
                   <X size={16} /> Cancel
                 </button>
@@ -475,7 +476,10 @@ export default function LiveTracker({
             </button>
             <button
               onClick={handleCancel}
-              style={{ ...btnBase, color: "#dc2626", borderColor: "rgba(220,38,38,0.2)", display: "flex", alignItems: "center", gap: 6, justifyContent: "center" }}
+              disabled={isServing}
+              style={{ ...btnBase, color: isServing ? "#94a3b8" : "#dc2626", borderColor: isServing ? "rgba(148,163,184,0.3)" : "rgba(220,38,38,0.2)", display: "flex", alignItems: "center", gap: 6, justifyContent: "center", cursor: isServing ? "not-allowed" : "pointer", opacity: isServing ? 0.5 : 1 }}
+              onMouseEnter={(e) => { if (!isServing) { e.currentTarget.style.background = "#fff5f5"; e.currentTarget.style.borderColor = "#dc2626"; }}}
+              onMouseLeave={(e) => { if (!isServing) { e.currentTarget.style.background = "white"; e.currentTarget.style.borderColor = "rgba(220,38,38,0.2)"; }}}
             >
               <X size={15} /> Cancel
             </button>
