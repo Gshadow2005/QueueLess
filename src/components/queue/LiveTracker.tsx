@@ -83,12 +83,12 @@ export default function LiveTracker({
   const pct = Math.max(0, Math.min(100, 100 - (spotsAway / 15) * 100));
 
   const isServing = status === "serving";
-  const isTurn = status === "served" || spotsAway === 0;
+  const isNext = spotsAway === 0 && status !== "served" && status !== "serving";
+  const isTurn = status === "served" || status === "serving";
   const isAlmost =
     nearTurnNotified ||
     !!latestNearTurn ||
     (spotsAway <= 5 && spotsAway > 0);
-  const isNext = spotsAway === 0 && status !== "served" && status !== "serving";
 
   const handleCancel = useCallback(() => {
     if (!window.confirm("Cancel your spot in the queue?")) return;
@@ -107,10 +107,10 @@ export default function LiveTracker({
 
   const awayLabel = isServing
     ? "Head to the counter now!"
+    : isNext
+    ? "Next up! Get ready."
     : isTurn
     ? "It's your turn!"
-    : isNext
-    ? "Next up!"
     : `${spotsAway} spot${spotsAway !== 1 ? "s" : ""} away`;
 
   const statusColor = isServing
