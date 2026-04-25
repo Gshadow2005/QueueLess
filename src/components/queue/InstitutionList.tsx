@@ -20,9 +20,13 @@ type FilterType = "all" | InstitutionType;
 
 interface InstitutionListProps {
   onSelect: (inst: Institution) => void;
+  hasActiveSession?: boolean;
 }
 
-export default function InstitutionList({ onSelect }: InstitutionListProps) {
+export default function InstitutionList({
+  onSelect,
+  hasActiveSession = false,
+}: InstitutionListProps) {
   const [query, setQuery] = useState("");
   const [filter, setFilter] = useState<FilterType>("all");
   const { institutions, loading, error, refetch } = useInstitutions();
@@ -67,6 +71,27 @@ export default function InstitutionList({ onSelect }: InstitutionListProps) {
       {toasts.map((t) => (
         <Toast key={t.id} message={t.message} variant={t.variant} onClose={() => removeToast(t.id)} />
       ))}
+
+      {/* ── Active session warning banner ── */}
+      {hasActiveSession && (
+        <div
+          style={{
+            background: "#fff7ed",
+            border: "1.5px solid #fed7aa",
+            borderRadius: 12,
+            padding: "0.875rem 1.125rem",
+            marginBottom: "1.25rem",
+            display: "flex",
+            alignItems: "center",
+            gap: 10,
+          }}
+        >
+          <span style={{ fontSize: "1.1rem", flexShrink: 0 }}>⚠️</span>
+          <p style={{ fontSize: "0.84rem", color: "#c2410c", fontWeight: 500, lineHeight: 1.5, margin: 0 }}>
+            You already have an active queue session on this device. Finish or cancel it before joining a new one.
+          </p>
+        </div>
+      )}
 
       {/* ── Page header ── */}
       <div style={{ marginBottom: "1.75rem" }}>
@@ -167,12 +192,24 @@ export default function InstitutionList({ onSelect }: InstitutionListProps) {
           <div style={{ display: "flex", flexDirection: "column", gap: "0.625rem", margin: "0 auto" }}>
             {filtered.map((inst) => {
               const s = statusColors[inst.status];
-              const disabled = inst.status === "closed";
+              const disabled = inst.status === "closed" || hasActiveSession;
               return (
                 <div
                   key={inst.id}
                   onClick={() => !disabled && onSelect(inst)}
-                  style={{ background: "white", border: "1.5px solid rgba(13,43,110,0.10)", borderRadius: 14, padding: "1rem 1.125rem", opacity: disabled ? 0.5 : 1, cursor: disabled ? "not-allowed" : "pointer", transition: "border-color 0.15s, box-shadow 0.15s, transform 0.15s", display: "flex", flexDirection: "row", alignItems: "center", gap: 12 }}
+                  style={{
+                    background: "white",
+                    border: "1.5px solid rgba(13,43,110,0.10)",
+                    borderRadius: 14,
+                    padding: "1rem 1.125rem",
+                    opacity: disabled ? 0.5 : 1,
+                    cursor: disabled ? "not-allowed" : "pointer",
+                    transition: "border-color 0.15s, box-shadow 0.15s, transform 0.15s",
+                    display: "flex",
+                    flexDirection: "row",
+                    alignItems: "center",
+                    gap: 12,
+                  }}
                   onMouseEnter={(e) => {
                     if (!disabled) {
                       const el = e.currentTarget;
@@ -188,12 +225,10 @@ export default function InstitutionList({ onSelect }: InstitutionListProps) {
                     el.style.transform = "translateY(0)";
                   }}
                 >
-                  {/* Icon */}
                   <div style={{ width: 40, height: 40, borderRadius: 10, background: iconBg[inst.type], display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
                     {renderIcon(INSTITUTION_ICONS[inst.type])}
                   </div>
 
-                  {/* Name + address */}
                   <div style={{ flex: 1, minWidth: 0 }}>
                     <p className="font-head" style={{ fontWeight: 600, fontSize: "0.9rem", color: "var(--navy)", marginBottom: 2, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
                       {inst.name}
@@ -201,12 +236,10 @@ export default function InstitutionList({ onSelect }: InstitutionListProps) {
                     <p style={{ fontSize: "0.775rem", color: "#6B82A8", fontWeight: 400 }}>{inst.address}</p>
                   </div>
 
-                  {/* Status badge */}
                   <span style={{ fontSize: "0.7rem", fontWeight: 600, padding: "3px 9px", borderRadius: 999, background: s.bg, color: s.text, flexShrink: 0 }}>
                     {s.label}
                   </span>
 
-                  {/* Stats — hidden on mobile */}
                   <div className="inst-stats" style={{ display: "flex", borderLeft: "1px solid rgba(13,43,110,0.08)", marginLeft: 4, flexShrink: 0 }}>
                     {[
                       { label: "Serving", value: `#${String(inst.serving).padStart(2, "0")}` },

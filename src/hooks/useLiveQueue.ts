@@ -1,5 +1,10 @@
 import { useState, useEffect, useRef, useCallback } from "react";
-import { fetchQueueStatus, simulateTick, type QueueStatusResponse } from "../api/queue";
+import {
+  fetchQueueStatus,
+  autoTick,
+  checkIn,
+  type QueueStatusResponse,
+} from "../api/queue";
 
 const POLL_INTERVAL_MS = 10000;
 
@@ -40,76 +45,92 @@ export function useLiveQueue({
   });
 
   const onServedRef = useRef(onServed);
-  onServedRef.current = onServed;
-
+  useEffect(() => {
+    onServedRef.current = onServed;
+  }, [onServed]);
   const servedCalledRef = useRef(false);
+  const checkInCalledRef = useRef(false);
 
   const flash = useCallback(() => {
     setState((s) => ({ ...s, isFlashing: true }));
     setTimeout(() => setState((s) => ({ ...s, isFlashing: false })), 400);
   }, []);
 
+  const applyStatus = useCallback(
+    (data: QueueStatusResponse) => {
+      setState((prev) => {
+        const didAdvance = data.current_serving_number !== prev.currentServing;
+        if (didAdvance) flash();
+        return {
+          queueNumber: data.queue_number,
+          currentServing: data.current_serving_number,
+          peopleAhead: data.people_ahead,
+          status: data.status,
+          nearTurnNotified: data.near_turn_notified,
+          isFlashing: prev.isFlashing,
+          loading: false,
+          error: null,
+        };
+      });
+
+      if (data.status === "serving" && !checkInCalledRef.current) {
+        checkInCalledRef.current = true;
+        checkIn(sessionId).catch(() => {
+        });
+      }
+
+      if (
+        (data.status === "serving" || data.status === "served") &&
+        !servedCalledRef.current
+      ) {
+        servedCalledRef.current = true;
+        setTimeout(() => onServedRef.current(), 15000); // 15s after serving to allow user to see the update
+      }
+    },
+    [flash, sessionId]
+  );
+
   useEffect(() => {
     if (!sessionId) return;
     servedCalledRef.current = false;
-
+    checkInCalledRef.current = false;
     let stopped = false;
 
-    const tick = async () => {
+    fetchQueueStatus(sessionId)
+      .then((data) => { if (!stopped) applyStatus(data); })
+      .catch((err: Error) => {
+        if (!stopped)
+          setState((s) => ({ ...s, loading: false, error: err.message }));
+      });
+
+    const tick = () => {
       if (stopped) return;
-
       if (ADMIN_USER && ADMIN_PASS) {
-        await simulateTick(institutionId, {
-          username: ADMIN_USER,
-          password: ADMIN_PASS,
-        }).catch(() => undefined);
+        autoTick(
+          { username: ADMIN_USER, password: ADMIN_PASS },
+          false
+        ).catch(() => undefined);
       }
 
-      try {
-        const data = await fetchQueueStatus(sessionId);
-        if (stopped) return;
-
-        setState((prev) => {
-          const didAdvance = data.current_serving_number !== prev.currentServing;
-          if (didAdvance) flash();
-          return {
-            queueNumber: data.queue_number,
-            currentServing: data.current_serving_number,
-            peopleAhead: data.people_ahead,
-            status: data.status,
-            nearTurnNotified: data.near_turn_notified,
-            isFlashing: prev.isFlashing,
-            loading: false,
-            error: null,
-          };
+      fetchQueueStatus(sessionId)
+        .then((data) => { if (!stopped) applyStatus(data); })
+        .catch((err: Error) => {
+          if (!stopped)
+            setState((s) => ({
+              ...s,
+              loading: false,
+              error: err instanceof Error ? err.message : "Failed to fetch status",
+            }));
         });
-
-        if (
-          (data.status === "serving" || data.status === "served") &&
-          !servedCalledRef.current
-        ) {
-          servedCalledRef.current = true;
-          setTimeout(() => onServedRef.current(), 4000);
-        }
-      } catch (err: unknown) {
-        if (!stopped) {
-          setState((s) => ({
-            ...s,
-            loading: false,
-            error: err instanceof Error ? err.message : "Failed to fetch status",
-          }));
-        }
-      }
     };
 
-    tick();
     const id = setInterval(tick, POLL_INTERVAL_MS);
 
     return () => {
       stopped = true;
       clearInterval(id);
     };
-  }, [sessionId, institutionId, flash]);
+  }, [sessionId, institutionId, applyStatus]);
 
   return state;
 }

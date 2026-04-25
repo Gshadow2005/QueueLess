@@ -1,6 +1,13 @@
-import { useState, useCallback } from "react";
+import { useState, useCallback, useEffect } from "react";
 import { type Institution } from "../types/institution";
 import { joinQueue } from "../api/queue";
+import {
+  saveSession,
+  loadSession,
+  clearSession,
+  hasActiveSession,
+  type PersistedSession,
+} from "../utils/storage";
 import InstitutionList from "../components/queue/InstitutionList";
 import JoinQueue from "../components/queue/JoinQueue";
 import EnterQueueNumber from "../components/queue/Enterqueuenumber";
@@ -24,36 +31,102 @@ interface AppPageProps {
   onBack: () => void;
 }
 
+function persistedSessionToInstitution(s: PersistedSession): Institution {
+  return {
+    id: s.institutionId,
+    name: s.institutionName,
+    type: s.institutionType,
+    address: s.institutionAddress,
+    status: s.institutionStatus,
+    serving: s.institutionServing,
+    inQueue: s.institutionInQueue,
+    waitPer: s.institutionWaitPer,
+  };
+}
+
 export default function AppPage({ onBack }: AppPageProps) {
-  const [screen, setScreen] = useState<Screen>("list");
-  const [joining, setJoining] = useState(false);
-  const [joinError, setJoinError] = useState<string | null>(null);
-  const [state, setState] = useState<AppState>({
-    institution: null,
-    sessionId: null,
-    yourNumber: 0,
-    joinedAt: null,
-    waitMinutes: 0,
-    cancelled: false,
-    pendingPhone: "",
-    pendingNotify: true,
+  const [screen, setScreen] = useState<Screen>(() => {
+    // On mount, if there's a saved session go straight to tracker
+    if (hasActiveSession()) return "tracker";
+    return "list";
   });
 
+  const [joining, setJoining] = useState(false);
+  const [joinError, setJoinError] = useState<string | null>(null);
+
+  const [state, setState] = useState<AppState>(() => {
+    const saved = loadSession();
+    if (saved) {
+      return {
+        institution: persistedSessionToInstitution(saved),
+        sessionId: saved.sessionId,
+        yourNumber: saved.yourNumber,
+        joinedAt: new Date(saved.joinedAt),
+        waitMinutes: 0,
+        cancelled: false,
+        pendingPhone: "",
+        pendingNotify: true,
+      };
+    }
+    return {
+      institution: null,
+      sessionId: null,
+      yourNumber: 0,
+      joinedAt: null,
+      waitMinutes: 0,
+      cancelled: false,
+      pendingPhone: "",
+      pendingNotify: true,
+    };
+  });
+
+  // Keep localStorage in sync whenever session-critical fields change
+  useEffect(() => {
+    if (
+      state.sessionId &&
+      state.institution &&
+      state.joinedAt &&
+      screen === "tracker"
+    ) {
+      const toSave: PersistedSession = {
+        sessionId: state.sessionId,
+        institutionId: state.institution.id,
+        institutionName: state.institution.name,
+        institutionType: state.institution.type,
+        institutionAddress: state.institution.address,
+        institutionStatus: state.institution.status,
+        institutionServing: state.institution.serving,
+        institutionInQueue: state.institution.inQueue,
+        institutionWaitPer: state.institution.waitPer,
+        yourNumber: state.yourNumber,
+        joinedAt: state.joinedAt.toISOString(),
+      };
+      saveSession(toSave);
+    }
+  }, [state.sessionId, state.institution, state.yourNumber, state.joinedAt, screen]);
+
   const handleSelectInst = (inst: Institution) => {
+    // Block if device already has an active session
+    if (hasActiveSession()) return;
     setState((s) => ({ ...s, institution: inst }));
     setJoinError(null);
     setScreen("join");
   };
 
-  // Step 1: just store phone/notify, navigate to enter-number
   const handleJoin = (phone: string, notifyEnabled: boolean) => {
     setState((s) => ({ ...s, pendingPhone: phone, pendingNotify: notifyEnabled }));
     setScreen("enter-number");
   };
 
-  // Step 2: user entered ticket number — now call the API
   const handleNumberSubmit = async (queueNumber: number) => {
     if (!state.institution) return;
+
+    // Double-check: block if a session is already active (race condition guard)
+    if (hasActiveSession()) {
+      setJoinError("You already have an active queue session on this device.");
+      return;
+    }
+
     setJoining(true);
     setJoinError(null);
 
@@ -66,11 +139,28 @@ export default function AppPage({ onBack }: AppPageProps) {
         near_turn_threshold: 3,
       });
 
+      const joinedAt = new Date();
+
+      const toSave: PersistedSession = {
+        sessionId: res.session_id,
+        institutionId: state.institution.id,
+        institutionName: state.institution.name,
+        institutionType: state.institution.type,
+        institutionAddress: state.institution.address,
+        institutionStatus: state.institution.status,
+        institutionServing: state.institution.serving,
+        institutionInQueue: state.institution.inQueue,
+        institutionWaitPer: state.institution.waitPer,
+        yourNumber: res.queue_number,
+        joinedAt: joinedAt.toISOString(),
+      };
+      saveSession(toSave);
+
       setState((s) => ({
         ...s,
         sessionId: res.session_id,
         yourNumber: res.queue_number,
-        joinedAt: new Date(),
+        joinedAt,
       }));
 
       setScreen("tracker");
@@ -82,6 +172,7 @@ export default function AppPage({ onBack }: AppPageProps) {
   };
 
   const handleDone = useCallback((waitMinutes: number, cancelled: boolean) => {
+    clearSession();
     setState((s) => ({ ...s, waitMinutes, cancelled }));
     setScreen("done");
   }, []);
@@ -89,6 +180,7 @@ export default function AppPage({ onBack }: AppPageProps) {
   const handleGoHome = () => onBack();
 
   const handleReset = () => {
+    clearSession();
     setState({
       institution: null,
       sessionId: null,
@@ -167,15 +259,20 @@ export default function AppPage({ onBack }: AppPageProps) {
           </div>
         )}
 
-        {screen === "list" && <InstitutionList onSelect={handleSelectInst} />}
+        {screen === "list" && (
+          <InstitutionList
+            onSelect={handleSelectInst}
+            hasActiveSession={hasActiveSession()}
+          />
+        )}
 
         {screen === "join" && state.institution && (
           <JoinQueue
             institution={state.institution}
             onBack={() => setScreen("list")}
             onJoin={handleJoin}
-            joining={false}
-            joinError={null}
+            joining={joining}
+            joinError={joinError}
           />
         )}
 

@@ -1,8 +1,9 @@
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import { type Institution, TYPE_LABELS } from "../../types/institution";
 import { formatQueueNumber } from "../../utils/queueHelpers";
 import Toast from "../common/Toast";
 import { useToast } from "../../hooks/useToast";
+import { useInstitution } from "../../hooks/useInstitutions";
 
 interface EnterQueueNumberProps {
   institution: Institution;
@@ -12,8 +13,22 @@ interface EnterQueueNumberProps {
   joinError?: string | null;
 }
 
+function StatSkeleton() {
+  return (
+    <div
+      style={{
+        height: "2.25rem",
+        width: 64,
+        borderRadius: 6,
+        background: "rgba(255,255,255,0.15)",
+        animation: "pulse 1.2s ease-in-out infinite",
+      }}
+    />
+  );
+}
+
 export default function EnterQueueNumber({
-  institution,
+  institution: initialInstitution,
   onSubmit,
   joining = false,
   joinError = null,
@@ -21,6 +36,33 @@ export default function EnterQueueNumber({
   const [queueNumberInput, setQueueNumberInput] = useState("");
   const [inputError, setInputError] = useState("");
   const { toasts, showToast, removeToast } = useToast();
+
+  const {
+    institution: liveInstitution,
+    loading: refreshing,
+    error: refreshError,
+    refetch,
+  } = useInstitution(initialInstitution.id);
+
+  const isFirstLoad = useRef(true);
+  const [showSkeleton, setShowSkeleton] = useState(true);
+
+  useEffect(() => {
+    if (!refreshing && isFirstLoad.current) {
+      isFirstLoad.current = false;
+      setShowSkeleton(false);
+    }
+  }, [refreshing]);
+
+  // Auto-refresh every 5 seconds silently
+  useEffect(() => {
+    const interval = setInterval(() => {
+      refetch();
+    }, 5000);
+    return () => clearInterval(interval);
+  }, [refetch]);
+
+  const institution = liveInstitution ?? initialInstitution;
 
   const parsedNumber = parseInt(queueNumberInput, 10);
   const isValid = !isNaN(parsedNumber) && parsedNumber > 0;
@@ -41,10 +83,15 @@ export default function EnterQueueNumber({
     onSubmit(parsedNumber);
   };
 
-  // Show join errors via toast
-  useState(() => {
+  useEffect(() => {
     if (joinError) showToast(joinError);
-  });
+  }, [joinError, showToast]);
+
+  useEffect(() => {
+    if (refreshError) showToast("Could not refresh queue data. Showing last known values.");
+  }, [refreshError, showToast]);
+
+  const shortName = institution.name.split("–")[0].trim();
 
   return (
     <div style={{ maxWidth: 560, margin: "0 auto" }}>
@@ -53,12 +100,27 @@ export default function EnterQueueNumber({
       ))}
 
       <div style={{ marginBottom: "2rem" }}>
-        <p style={{ fontSize: "0.72rem", fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.1em", color: "var(--sky)", marginBottom: "0.5rem" }}>
-          {TYPE_LABELS[institution.type]} · {institution.name.split("–")[0].trim()}
+        <p
+          style={{
+            fontSize: "0.72rem",
+            fontWeight: 600,
+            textTransform: "uppercase",
+            letterSpacing: "0.1em",
+            color: "var(--sky)",
+            marginBottom: "0.5rem",
+          }}
+        >
+          {TYPE_LABELS[institution.type]} · {shortName}
         </p>
         <h1
           className="font-head"
-          style={{ fontSize: "clamp(1.4rem, 3vw, 2rem)", fontWeight: 800, color: "var(--navy)", marginBottom: "0.4rem", lineHeight: 1.2 }}
+          style={{
+            fontSize: "clamp(1.4rem, 3vw, 2rem)",
+            fontWeight: 800,
+            color: "var(--navy)",
+            marginBottom: "0.4rem",
+            lineHeight: 1.2,
+          }}
         >
           Enter your queue number
         </h1>
@@ -68,41 +130,141 @@ export default function EnterQueueNumber({
       </div>
 
       {/* ── Current serving context ── */}
-      <div style={{ background: "var(--navy)", borderRadius: 16, padding: "1.25rem 1.5rem", marginBottom: "1.5rem" }}>
-        <div style={{ display: "flex", gap: 0, alignItems: "stretch" }}>
-          <div style={{ flex: 1 }}>
-            <p style={{ fontSize: "0.65rem", textTransform: "uppercase", letterSpacing: "0.08em", color: "var(--sky-light)", marginBottom: 6, fontWeight: 500 }}>
-              Now serving at {institution.name.split("–")[0].trim()}
-            </p>
-            <p className="font-head" style={{ fontWeight: 800, fontSize: "2.25rem", color: "white", lineHeight: 1 }}>
-              {formatQueueNumber(institution.serving)}
-            </p>
+      <div
+        style={{
+          background: "var(--navy)",
+          borderRadius: 16,
+          padding: "1.25rem 1.5rem",
+          marginBottom: "1.5rem",
+        }}
+      >
+        {/* Label row */}
+        <div style={{ display: "flex", gap: 0, marginBottom: 6 }}>
+          <p
+            style={{
+              flex: 1,
+              fontSize: "0.65rem",
+              textTransform: "uppercase",
+              letterSpacing: "0.08em",
+              color: "var(--sky-light)",
+              fontWeight: 500,
+              margin: 0,
+              paddingRight: "1.25rem",
+            }}
+          >
+            Now serving
+          </p>
+          <div style={{ width: 1, flexShrink: 0, marginRight: "1.25rem" }} />
+          <p
+            style={{
+              flex: 1,
+              fontSize: "0.65rem",
+              textTransform: "uppercase",
+              letterSpacing: "0.08em",
+              color: "var(--sky-light)",
+              fontWeight: 500,
+              margin: 0,
+            }}
+          >
+            People in queue
+          </p>
+        </div>
+
+        {/* Value row */}
+        <div style={{ display: "flex", gap: 0, alignItems: "center" }}>
+          <div style={{ flex: 1, paddingRight: "1.25rem" }}>
+            {showSkeleton ? (
+              <StatSkeleton />
+            ) : (
+              <p
+                className="font-head"
+                style={{ fontWeight: 800, fontSize: "2.25rem", color: "white", lineHeight: 1, margin: 0 }}
+              >
+                {formatQueueNumber(institution.serving)}
+              </p>
+            )}
           </div>
-          <div style={{ width: 1, background: "rgba(255,255,255,0.15)", margin: "0 1.25rem", flexShrink: 0 }} />
+
+          <div
+            style={{
+              width: 1,
+              background: "rgba(255,255,255,0.15)",
+              alignSelf: "stretch",
+              marginRight: "1.25rem",
+              flexShrink: 0,
+            }}
+          />
+
           <div style={{ flex: 1 }}>
-            <p style={{ fontSize: "0.65rem", textTransform: "uppercase", letterSpacing: "0.08em", color: "var(--sky-light)", marginBottom: 6, fontWeight: 500 }}>
-              People in queue
-            </p>
-            <p className="font-head" style={{ fontWeight: 800, fontSize: "2.25rem", color: "white", lineHeight: 1 }}>
-              {institution.inQueue}
-            </p>
+            {showSkeleton ? (
+              <StatSkeleton />
+            ) : (
+              <p
+                className="font-head"
+                style={{ fontWeight: 800, fontSize: "2.25rem", color: "white", lineHeight: 1, margin: 0 }}
+              >
+                {institution.inQueue}
+              </p>
+            )}
           </div>
         </div>
+
+        {/* Institution name */}
+        {!showSkeleton && (
+          <p
+            style={{
+              fontSize: "0.6rem",
+              color: "rgba(255,255,255,0.35)",
+              marginTop: 10,
+              marginBottom: 0,
+              whiteSpace: "nowrap",
+              overflow: "hidden",
+              textOverflow: "ellipsis",
+            }}
+          >
+            {institution.name}
+          </p>
+        )}
       </div>
 
       {/* ── Input + preview ── */}
-      <div style={{ background: "white", border: "1.5px solid rgba(13,43,110,0.12)", borderRadius: 16, padding: "1.75rem", marginBottom: "1rem" }}>
-        <label style={{ display: "block", fontSize: "0.78rem", fontWeight: 600, color: "#6B82A8", marginBottom: 10, letterSpacing: "0.04em", textTransform: "uppercase" }}>
+      <div
+        style={{
+          background: "white",
+          border: "1.5px solid rgba(13,43,110,0.12)",
+          borderRadius: 16,
+          padding: "1.75rem",
+          marginBottom: "1rem",
+        }}
+      >
+        <label
+          style={{
+            display: "block",
+            fontSize: "0.78rem",
+            fontWeight: 600,
+            color: "#6B82A8",
+            marginBottom: 10,
+            letterSpacing: "0.04em",
+            textTransform: "uppercase",
+          }}
+        >
           Your ticket number
         </label>
 
-        {/* Number input */}
         <div style={{ position: "relative", marginBottom: inputError ? 6 : 0 }}>
-          <span style={{
-            position: "absolute", left: 18, top: "50%", transform: "translateY(-50%)",
-            fontSize: "1.5rem", color: "#6B82A8", fontFamily: "var(--font-head)",
-            fontWeight: 700, pointerEvents: "none" as const,
-          }}>
+          <span
+            style={{
+              position: "absolute",
+              left: 18,
+              top: "50%",
+              transform: "translateY(-50%)",
+              fontSize: "1.5rem",
+              color: "#6B82A8",
+              fontFamily: "var(--font-head)",
+              fontWeight: 700,
+              pointerEvents: "none" as const,
+            }}
+          >
             #
           </span>
           <input
@@ -135,15 +297,29 @@ export default function EnterQueueNumber({
               opacity: joining ? 0.6 : 1,
               MozAppearance: "textfield" as unknown as undefined,
             }}
-            onFocus={(e) => { if (!inputError) e.currentTarget.style.borderColor = "var(--sky)"; }}
-            onBlur={(e) => { if (!inputError && !isValid) e.currentTarget.style.borderColor = "rgba(13,43,110,0.14)"; }}
+            onFocus={(e) => {
+              if (!inputError) e.currentTarget.style.borderColor = "var(--sky)";
+            }}
+            onBlur={(e) => {
+              if (!inputError && !isValid) e.currentTarget.style.borderColor = "rgba(13,43,110,0.14)";
+            }}
           />
           {isValid && (
-            <span style={{
-              position: "absolute", right: 16, top: "50%", transform: "translateY(-50%)",
-              fontSize: "0.7rem", fontWeight: 600, padding: "3px 8px", borderRadius: 999,
-              background: "var(--sky-light)", color: "var(--navy-light)", fontFamily: "var(--font-body)",
-            }}>
+            <span
+              style={{
+                position: "absolute",
+                right: 16,
+                top: "50%",
+                transform: "translateY(-50%)",
+                fontSize: "0.7rem",
+                fontWeight: 600,
+                padding: "3px 8px",
+                borderRadius: 999,
+                background: "var(--sky-light)",
+                color: "var(--navy-light)",
+                fontFamily: "var(--font-body)",
+              }}
+            >
               Entered
             </span>
           )}
@@ -155,17 +331,49 @@ export default function EnterQueueNumber({
           </p>
         )}
 
-        {/* Preview stats — only show when a valid number is entered */}
         {isValid && (
-          <div style={{ background: "var(--sky-pale)", border: "1px solid var(--sky-light)", borderRadius: 12, padding: "0.875rem 1rem", margin: "1.25rem 0 1.5rem", display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
+          <div
+            style={{
+              background: "var(--sky-pale)",
+              border: "1px solid var(--sky-light)",
+              borderRadius: 12,
+              padding: "0.875rem 1rem",
+              margin: "1.25rem 0 1.5rem",
+              display: "grid",
+              gridTemplateColumns: "1fr 1fr",
+              gap: 12,
+            }}
+          >
             <div>
-              <p style={{ fontSize: "0.68rem", color: "#6B82A8", textTransform: "uppercase", letterSpacing: "0.06em", fontWeight: 500, marginBottom: 3 }}>Spots ahead of you</p>
+              <p
+                style={{
+                  fontSize: "0.68rem",
+                  color: "#6B82A8",
+                  textTransform: "uppercase",
+                  letterSpacing: "0.06em",
+                  fontWeight: 500,
+                  marginBottom: 3,
+                }}
+              >
+                Spots ahead of you
+              </p>
               <p className="font-head" style={{ fontWeight: 700, fontSize: "1.1rem", color: "var(--navy)" }}>
                 {spotsAway === 0 ? "You're next!" : `${spotsAway} spot${spotsAway !== 1 ? "s" : ""}`}
               </p>
             </div>
             <div>
-              <p style={{ fontSize: "0.68rem", color: "#6B82A8", textTransform: "uppercase", letterSpacing: "0.06em", fontWeight: 500, marginBottom: 3 }}>Est. wait time</p>
+              <p
+                style={{
+                  fontSize: "0.68rem",
+                  color: "#6B82A8",
+                  textTransform: "uppercase",
+                  letterSpacing: "0.06em",
+                  fontWeight: 500,
+                  marginBottom: 3,
+                }}
+              >
+                Est. wait time
+              </p>
               <p className="font-head" style={{ fontWeight: 700, fontSize: "1.1rem", color: "var(--navy)" }}>
                 {estWait === 0 ? "Any moment!" : `~${estWait} min`}
               </p>
@@ -207,7 +415,17 @@ export default function EnterQueueNumber({
         >
           {joining ? (
             <>
-              <span style={{ width: 16, height: 16, border: "2px solid rgba(255,255,255,0.4)", borderTopColor: "white", borderRadius: "50%", animation: "spin 0.8s linear infinite", display: "inline-block" }} />
+              <span
+                style={{
+                  width: 16,
+                  height: 16,
+                  border: "2px solid rgba(255,255,255,0.4)",
+                  borderTopColor: "white",
+                  borderRadius: "50%",
+                  animation: "spin 0.8s linear infinite",
+                  display: "inline-block",
+                }}
+              />
               Joining queue…
             </>
           ) : (
@@ -224,6 +442,10 @@ export default function EnterQueueNumber({
         input[type=number]::-webkit-inner-spin-button,
         input[type=number]::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
         @keyframes spin { to { transform: rotate(360deg); } }
+        @keyframes pulse {
+          0%, 100% { opacity: 1; }
+          50% { opacity: 0.4; }
+        }
       `}</style>
     </div>
   );

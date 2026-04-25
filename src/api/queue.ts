@@ -1,7 +1,5 @@
 import apiFetch from "./clients";
 
-// ── Institution types ──────────────────────────────────────────────────────
-
 export interface APIInstitution {
   id: number;
   name: string;
@@ -16,11 +14,9 @@ export interface APIInstitution {
   next_queue_number: number;
 }
 
-// ── Queue types ────────────────────────────────────────────────────────────
-
 export interface QueueJoinPayload {
   institution_id: number;
-  queue_number: number;
+  queue_number?: number;
   phone_number?: string;
   browser_push_opt_in?: boolean;
   near_turn_threshold?: number;
@@ -64,7 +60,12 @@ export interface SimulateTickResponse {
   message?: string;
 }
 
-// ── API calls ──────────────────────────────────────────────────────────────
+export interface AutoTickResponse {
+  institutions_considered: number;
+  institutions_ticked: number;
+  institutions_skipped: number;
+  force: boolean;
+}
 
 export const fetchInstitutions = () =>
   apiFetch<APIInstitution[]>("/api/institutions/");
@@ -81,12 +82,35 @@ export const joinQueue = (payload: QueueJoinPayload) =>
 export const fetchQueueStatus = (sessionId: string) =>
   apiFetch<QueueStatusResponse>(`/api/queue/entries/${sessionId}/status/`);
 
+export const checkIn = (sessionId: string) =>
+  apiFetch<QueueStatusResponse>(
+    `/api/queue/entries/${sessionId}/check-in/`,
+    { method: "PATCH" }
+  );
+
 export const simulateTick = (
   institutionId: number,
   adminCredentials: { username: string; password: string }
 ) =>
   apiFetch<SimulateTickResponse>(
     `/api/queue/institutions/${institutionId}/simulate-tick/?randomize=true`,
+    {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization:
+          "Basic " +
+          btoa(`${adminCredentials.username}:${adminCredentials.password}`),
+      },
+    }
+  );
+
+export const autoTick = (
+  adminCredentials: { username: string; password: string },
+  force = false
+) =>
+  apiFetch<AutoTickResponse>(
+    `/api/queue/auto-tick/?force=${force}`,
     {
       method: "POST",
       headers: {
