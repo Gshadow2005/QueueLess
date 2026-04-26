@@ -44,18 +44,14 @@ export default function LiveTracker({
   const [pushSubscribed, setPushSubscribed] = useState(false);
   const [pushLoading, setPushLoading] = useState(false);
 
+  const { toasts, showToast, removeToast } = useToast();
+
   // ── On mount: only register the SW silently + listen for SW messages ──────
-  // We do NOT auto-call subscribeToPush() here because on mobile browsers,
-  // requestPermission() must be triggered by a direct user gesture (button tap).
-  // Auto-calling it silently either fails or shows a prompt that gets dismissed.
-  // The user must tap "Allow" to trigger the real subscription flow.
   useEffect(() => {
-    // Pre-register the SW so it's ready by the time the user taps Allow
     if ("serviceWorker" in navigator) {
       navigator.serviceWorker.register("/sw.js", { scope: "/" }).catch(() => {});
     }
 
-    // If permission was already granted previously, re-subscribe silently
     if (
       typeof Notification !== "undefined" &&
       Notification.permission === "granted"
@@ -66,7 +62,6 @@ export default function LiveTracker({
       });
     }
 
-    // Listen for SW messages (subscription renewal, notification clicks)
     const unsub = onSwMessage((msg) => {
       if (msg.type === "PUSH_SUBSCRIPTION_RENEWED") {
         subscribeToPush(sessionId).catch(() => {});
@@ -156,16 +151,53 @@ export default function LiveTracker({
 
   // ── Allow user to manually enable push ──────────────────────────────────
   const handleEnablePush = useCallback(async () => {
-    const okPromise = subscribeToPush(sessionId);
     setPushLoading(true);
     try {
-      const ok = await okPromise;
+      if (!("Notification" in window)) {
+        showToast("Your browser does not support notifications.");
+        return;
+      }
+
+      if (Notification.permission === "denied") {
+        showToast(
+          "Notifications are blocked. Please click the lock/bell icon in your address bar and allow notifications, then try again."
+        );
+        return;
+      }
+
+      const permission = await Promise.race([
+        Notification.requestPermission(),
+        new Promise<NotificationPermission>((resolve) =>
+          setTimeout(() => resolve("denied"), 10000)
+        ),
+      ]);
+
+      if (permission !== "granted") {
+        showToast(
+          "Notification permission was not granted. Please allow notifications in your browser settings and try again."
+        );
+        return;
+      }
+
+      // Step 2: subscribe to push after permission is confirmed
+      const ok = await subscribeToPush(sessionId);
       setPushSubscribed(ok);
-      if (ok) setNotifPermission("granted");
+
+      if (ok) {
+        setNotifPermission("granted");
+        showToast("Push notifications enabled! You'll be alerted when your turn is near. ✓");
+      } else {
+        showToast(
+          "Notifications allowed but push setup failed. Try refreshing the page and enabling again."
+        );
+      }
+    } catch (err) {
+      console.error("[QueueLess Push] handleEnablePush error:", err);
+      showToast("Something went wrong enabling notifications. Please try again.");
     } finally {
       setPushLoading(false);
     }
-  }, [sessionId]);
+  }, [sessionId, showToast]);
 
   // ── Labels / styles ──────────────────────────────────────────────────────
   const awayLabel = isServing
@@ -269,16 +301,12 @@ export default function LiveTracker({
       ? "#7c2d12"
       : "var(--sky-light)";
 
-  const { toasts, showToast, removeToast } = useToast();
-
   useEffect(() => {
     if (error) showToast(`Could not update queue status: ${error}`);
   }, [error, showToast]);
 
   // ── Notification permission / push banner ────────────────────────────────
-  // Show banner only if push isn't subscribed yet
   const showPushBanner = !pushSubscribed && notifPermission !== "granted";
-
   const pushUnsupported = !isPushSupported();
 
   const permissionBanner = showPushBanner && (
@@ -351,7 +379,7 @@ export default function LiveTracker({
     </div>
   );
 
-  // ── Tracker cards (unchanged from original) ──────────────────────────────
+  // ── Tracker cards ────────────────────────────────────────────────────────
   const mobileTrackerCard = (
     <div
       style={{
