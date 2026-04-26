@@ -156,9 +156,10 @@ export default function LiveTracker({
 
   // ── Allow user to manually enable push ──────────────────────────────────
   const handleEnablePush = useCallback(async () => {
+    const okPromise = subscribeToPush(sessionId);
     setPushLoading(true);
     try {
-      const ok = await subscribeToPush(sessionId);
+      const ok = await okPromise;
       setPushSubscribed(ok);
       if (ok) setNotifPermission("granted");
     } finally {
