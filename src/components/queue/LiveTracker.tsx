@@ -42,17 +42,29 @@ export default function LiveTracker({
     getSafeNotifPermission()
   );
   const [pushSubscribed, setPushSubscribed] = useState(false);
+  const [pushLoading, setPushLoading] = useState(false);
 
-  // ── Register SW + subscribe to Web Push on mount ────────────────────────
+  // ── On mount: only register the SW silently + listen for SW messages ──────
+  // We do NOT auto-call subscribeToPush() here because on mobile browsers,
+  // requestPermission() must be triggered by a direct user gesture (button tap).
+  // Auto-calling it silently either fails or shows a prompt that gets dismissed.
+  // The user must tap "Allow" to trigger the real subscription flow.
   useEffect(() => {
-    let cancelled = false;
+    // Pre-register the SW so it's ready by the time the user taps Allow
+    if ("serviceWorker" in navigator) {
+      navigator.serviceWorker.register("/sw.js", { scope: "/" }).catch(() => {});
+    }
 
-    subscribeToPush(sessionId).then((ok) => {
-      if (!cancelled) {
+    // If permission was already granted previously, re-subscribe silently
+    if (
+      typeof Notification !== "undefined" &&
+      Notification.permission === "granted"
+    ) {
+      subscribeToPush(sessionId).then((ok) => {
         setPushSubscribed(ok);
         if (ok) setNotifPermission("granted");
-      }
-    });
+      });
+    }
 
     // Listen for SW messages (subscription renewal, notification clicks)
     const unsub = onSwMessage((msg) => {
@@ -64,10 +76,7 @@ export default function LiveTracker({
       }
     });
 
-    return () => {
-      cancelled = true;
-      unsub();
-    };
+    return () => unsub();
   }, [sessionId]);
 
   // ── Live queue polling ───────────────────────────────────────────────────
@@ -147,9 +156,14 @@ export default function LiveTracker({
 
   // ── Allow user to manually enable push ──────────────────────────────────
   const handleEnablePush = useCallback(async () => {
-    const ok = await subscribeToPush(sessionId);
-    setPushSubscribed(ok);
-    if (ok) setNotifPermission("granted");
+    setPushLoading(true);
+    try {
+      const ok = await subscribeToPush(sessionId);
+      setPushSubscribed(ok);
+      if (ok) setNotifPermission("granted");
+    } finally {
+      setPushLoading(false);
+    }
   }, [sessionId]);
 
   // ── Labels / styles ──────────────────────────────────────────────────────
@@ -297,20 +311,40 @@ export default function LiveTracker({
       {!pushUnsupported && (
         <button
           onClick={handleEnablePush}
+          disabled={pushLoading}
           style={{
             padding: "6px 14px",
             borderRadius: 999,
             border: "1.5px solid var(--sky)",
-            background: "white",
+            background: pushLoading ? "var(--sky-pale)" : "white",
             color: "var(--navy-light)",
             fontSize: "0.78rem",
             fontWeight: 600,
-            cursor: "pointer",
+            cursor: pushLoading ? "not-allowed" : "pointer",
             fontFamily: "var(--font-body)",
             flexShrink: 0,
+            display: "flex",
+            alignItems: "center",
+            gap: 6,
+            opacity: pushLoading ? 0.7 : 1,
+            transition: "all 0.15s",
           }}
         >
-          Allow
+          {pushLoading && (
+            <span
+              style={{
+                width: 12,
+                height: 12,
+                border: "2px solid rgba(13,43,110,0.2)",
+                borderTopColor: "var(--sky)",
+                borderRadius: "50%",
+                animation: "spin 0.8s linear infinite",
+                display: "inline-block",
+                flexShrink: 0,
+              }}
+            />
+          )}
+          {pushLoading ? "Enabling…" : "Allow"}
         </button>
       )}
     </div>
