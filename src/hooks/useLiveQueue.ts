@@ -6,7 +6,7 @@ import {
   type QueueStatusResponse,
 } from "../api/queue";
 
-const POLL_INTERVAL_MS = 10000;
+const POLL_INTERVAL_MS = 5000; // 5 seconds
 
 const ADMIN_USER = import.meta.env.VITE_ADMIN_USER ?? "";
 const ADMIN_PASS = import.meta.env.VITE_ADMIN_PASS ?? "";
@@ -75,8 +75,7 @@ export function useLiveQueue({
 
       if (data.status === "serving" && !checkInCalledRef.current) {
         checkInCalledRef.current = true;
-        checkIn(sessionId).catch(() => {
-        });
+        checkIn(sessionId).catch(() => {});
       }
 
       if (
@@ -84,7 +83,7 @@ export function useLiveQueue({
         !servedCalledRef.current
       ) {
         servedCalledRef.current = true;
-        setTimeout(() => onServedRef.current(), 15000); // 15s after serving to allow user to see the update
+        setTimeout(() => onServedRef.current(), 5000);
       }
     },
     [flash, sessionId]
@@ -105,11 +104,16 @@ export function useLiveQueue({
 
     const tick = () => {
       if (stopped) return;
-      if (ADMIN_USER && ADMIN_PASS) {
-        autoTick(
-          { username: ADMIN_USER, password: ADMIN_PASS },
-          false
-        ).catch(() => undefined);
+
+      try {
+        if (ADMIN_USER && ADMIN_PASS) {
+          autoTick(
+            { username: ADMIN_USER, password: ADMIN_PASS },
+            false
+          ).catch(() => undefined);
+        }
+      } catch {
+        // ignore 
       }
 
       fetchQueueStatus(sessionId)

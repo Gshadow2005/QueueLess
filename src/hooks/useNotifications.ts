@@ -24,6 +24,16 @@ interface NotificationsState {
   error: string | null;
 }
 
+function safeNotify(title: string, options: NotificationOptions & { tag: string }) {
+  try {
+    if (typeof Notification === "undefined") return;
+    if (Notification.permission !== "granted") return;
+    new Notification(title, options);
+  } catch {
+    // ignore
+  }
+}
+
 export function useNotifications({
   sessionId,
   yourNumber,
@@ -55,7 +65,6 @@ export function useNotifications({
   const refetch = useCallback(() => setTick((n) => n + 1), []);
 
   // ── Local threshold check (3 spots) ───────────────────────────────────
-  // Backend handles 5 spots via near_turn_threshold. We handle 3 locally.
   useEffect(() => {
     if (peopleAhead <= 0) return;
 
@@ -68,17 +77,12 @@ export function useNotifications({
       firedLocalThresholdsRef.current.add(LOCAL_THRESHOLD);
       onNearTurnRef.current?.(LOCAL_THRESHOLD);
 
-      if (
-        typeof Notification !== "undefined" &&
-        Notification.permission === "granted"
-      ) {
-        new Notification("⚠️ Only 3 spots left!", {
-          body: `Queue #${String(yourNumber).padStart(2, "0")} — head back now, you're almost up!`,
-          icon: "/favicon.svg",
-          tag: "queueless-3-spots",
-          requireInteraction: true,
-        });
-      }
+      safeNotify("Only 3 spots left!", {
+        body: `Queue #${String(yourNumber).padStart(2, "0")} - head back now, you're almost up!`,
+        icon: "/favicon.svg",
+        tag: "queueless-3-spots",
+        requireInteraction: true,
+      });
     }
   }, [peopleAhead, yourNumber]);
 
@@ -109,17 +113,12 @@ export function useNotifications({
           if (notification.event_type === "near_turn") {
             onNearTurnRef.current?.(5);
 
-            if (
-              typeof Notification !== "undefined" &&
-              Notification.permission === "granted"
-            ) {
-              new Notification("🔔 5 spots left!", {
-                body: `Queue #${String(yourNumber).padStart(2, "0")} — you have about 5 people ahead. Start heading back!`,
-                icon: "/favicon.svg",
-                tag: "queueless-5-spots",
-                requireInteraction: true,
-              });
-            }
+            safeNotify("5 spots left!", {
+              body: `Queue #${String(yourNumber).padStart(2, "0")} - you have about 5 people ahead. Start heading back!`,
+              icon: "/favicon.svg",
+              tag: "queueless-5-spots",
+              requireInteraction: true,
+            });
 
             acknowledgeNotification(sessionId, notification.id, {
               delivered: true,
@@ -127,17 +126,12 @@ export function useNotifications({
           } else if (notification.event_type === "turn_called") {
             onTurnCalledRef.current?.();
 
-            if (
-              typeof Notification !== "undefined" &&
-              Notification.permission === "granted"
-            ) {
-              new Notification("🟢 It's your turn!", {
-                body: `Queue #${String(yourNumber).padStart(2, "0")} is now being served. Please proceed to the counter.`,
-                icon: "/favicon.svg",
-                tag: "queueless-turn-called",
-                requireInteraction: true,
-              });
-            }
+            safeNotify("It's your turn!", {
+              body: `Queue #${String(yourNumber).padStart(2, "0")} is now being served. Please proceed to the counter.`,
+              icon: "/favicon.svg",
+              tag: "queueless-turn-called",
+              requireInteraction: true,
+            });
 
             acknowledgeNotification(sessionId, notification.id, {
               delivered: true,

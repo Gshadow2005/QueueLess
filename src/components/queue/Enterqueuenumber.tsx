@@ -268,6 +268,9 @@ export default function EnterQueueNumber({
               setQueueNumberInput(e.target.value);
               if (inputError) setInputError("");
             }}
+            onKeyDown={(e) => {
+              if (e.key === "Enter") handleSubmit();
+            }}
             disabled={joining}
             style={{
               width: "100%",
@@ -323,6 +326,7 @@ export default function EnterQueueNumber({
           </p>
         )}
 
+        {/* ── Spots ahead / Est. wait preview ── */}
         {isValid && (
           <div
             style={{
@@ -331,42 +335,60 @@ export default function EnterQueueNumber({
               borderRadius: 12,
               padding: "0.875rem 1rem",
               margin: "1.25rem 0 1.5rem",
-              display: "grid",
-              gridTemplateColumns: "1fr 1fr",
-              gap: 12,
+              display: "flex",
+              gap: 0,
             }}
           >
-            <div>
+            <div style={{ flex: 1 }}>
               <p
                 style={{
                   fontSize: "0.68rem",
                   color: "#6B82A8",
-                  textTransform: "uppercase",
-                  letterSpacing: "0.06em",
-                  fontWeight: 500,
-                  marginBottom: 3,
+                  letterSpacing: "0.04em",
+                  fontWeight: 600,
+                  marginBottom: 4,
+                  lineHeight: 1.3,
+                  whiteSpace: "nowrap",
                 }}
               >
-                Spots ahead of you
+                Spots ahead
               </p>
-              <p className="font-head" style={{ fontWeight: 700, fontSize: "1.1rem", color: "var(--navy)" }}>
+              <p
+                className="font-head"
+                style={{ fontWeight: 700, fontSize: "1.1rem", color: "var(--navy)", margin: 0 }}
+              >
                 {spotsAway === 0 ? "You're next!" : `${spotsAway} spot${spotsAway !== 1 ? "s" : ""}`}
               </p>
             </div>
-            <div>
+
+            <div
+              style={{
+                width: 1,
+                background: "var(--sky-light)",
+                margin: "0 1rem",
+                alignSelf: "stretch",
+                flexShrink: 0,
+              }}
+            />
+
+            <div style={{ flex: 1 }}>
               <p
                 style={{
                   fontSize: "0.68rem",
                   color: "#6B82A8",
-                  textTransform: "uppercase",
-                  letterSpacing: "0.06em",
-                  fontWeight: 500,
-                  marginBottom: 3,
+                  letterSpacing: "0.04em",
+                  fontWeight: 600,
+                  marginBottom: 4,
+                  lineHeight: 1.3,
+                  whiteSpace: "nowrap",
                 }}
               >
-                Est. wait time
+                Est. wait
               </p>
-              <p className="font-head" style={{ fontWeight: 700, fontSize: "1.1rem", color: "var(--navy)" }}>
+              <p
+                className="font-head"
+                style={{ fontWeight: 700, fontSize: "1.1rem", color: "var(--navy)", margin: 0 }}
+              >
                 {estWait === 0 ? "Any moment!" : `~${estWait} min`}
               </p>
             </div>
