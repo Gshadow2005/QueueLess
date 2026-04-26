@@ -51,6 +51,11 @@ export function useLiveQueue({
   const servedCalledRef = useRef(false);
   const checkInCalledRef = useRef(false);
 
+  const sessionIdRef = useRef(sessionId);
+  useEffect(() => {
+    sessionIdRef.current = sessionId;
+  }, [sessionId]);
+
   const flash = useCallback(() => {
     setState((s) => ({ ...s, isFlashing: true }));
     setTimeout(() => setState((s) => ({ ...s, isFlashing: false })), 400);
@@ -89,6 +94,7 @@ export function useLiveQueue({
     [flash, sessionId]
   );
 
+  // ── Main polling loop ────────────────────────────────────────────────────
   useEffect(() => {
     if (!sessionId) return;
     servedCalledRef.current = false;
@@ -113,7 +119,7 @@ export function useLiveQueue({
           ).catch(() => undefined);
         }
       } catch {
-        // ignore 
+        // ignore
       }
 
       fetchQueueStatus(sessionId)
@@ -135,6 +141,22 @@ export function useLiveQueue({
       clearInterval(id);
     };
   }, [sessionId, institutionId, applyStatus]);
+
+  useEffect(() => {
+    const handleVisibilityChange = () => {
+      if (document.visibilityState !== "visible") return;
+      if (!sessionIdRef.current) return;
+
+      fetchQueueStatus(sessionIdRef.current)
+        .then((data) => applyStatus(data))
+        .catch(() => {
+          // Silently ignore
+        });
+    };
+
+    document.addEventListener("visibilitychange", handleVisibilityChange);
+    return () => document.removeEventListener("visibilitychange", handleVisibilityChange);
+  }, [applyStatus]);
 
   return state;
 }
