@@ -179,13 +179,12 @@ export default function LiveTracker({
         return;
       }
 
-      // Step 2: subscribe to push after permission is confirmed
       const ok = await subscribeToPush(sessionId);
       setPushSubscribed(ok);
 
       if (ok) {
         setNotifPermission("granted");
-        showToast("Push notifications enabled! You'll be alerted when your turn is near. ✓");
+        showToast("Push notifications enabled! You'll be alerted when your turn is near. ✓", "success");
       } else {
         showToast(
           "Notifications allowed but push setup failed. Try refreshing the page and enabling again."
@@ -334,7 +333,7 @@ export default function LiveTracker({
         }}
       >
         {pushUnsupported
-          ? "Add this page to your home screen to enable push notifications."
+          ? "To enable push notifications, please open this page in a supported browser."
           : "Enable notifications to get alerted when your turn is near."}
       </p>
       {!pushUnsupported && (
