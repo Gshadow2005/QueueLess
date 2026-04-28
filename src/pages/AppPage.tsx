@@ -204,7 +204,7 @@ export default function AppPage({ onBack }: AppPageProps) {
         <div className="app-nav-inner">
           {/* Logo */}
           <div style={{ display: "flex", alignItems: "center", gap: 8, flexShrink: 0 }}>
-            <span style={{ fontSize: "1.375rem" }}>⏱</span>
+            <img src="/QueuelessLogo.ico" alt="QueueLess Logo" style={{ width: 32, height: 32 }} />
             <span className="font-head" style={{ fontSize: "1.25rem", color: "var(--navy)" }}>
               Queue<strong style={{ fontWeight: 800 }}>Less</strong>
             </span>
