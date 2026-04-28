@@ -31,6 +31,51 @@ export default function HeroSection({ onLaunchApp }: HeroSectionProps) {
             gap: 4rem;
           }
         }
+
+        /* Buttons: full width (with right margin) when they wrap to their own line */
+        .cta-buttons {
+          /* Use a container query-like trick: when the flex container is narrow,
+             each button fills the full width minus the existing left spacing. */
+        }
+        .cta-btn {
+          /* Default: natural (shrink-wrap) width */
+          flex: 0 1 auto;
+        }
+        @media (max-width: 480px) {
+          .cta-buttons {
+            flex-direction: column;
+            align-items: stretch;
+          }
+          .cta-btn {
+            width: 100%;
+            margin-right: 1.5rem; /* right margin to match visual balance */
+            text-align: center;
+          }
+        }
+
+        /* Stats dividers: only visible when all stats fit in one row.
+           We use a flex + overflow trick: hide dividers by default when items wrap. */
+        .stats-row {
+          /* overflow: hidden so we can detect wrapping */
+        }
+        .stat-divider {
+          display: block;
+        }
+        /* When the stats-row wraps, each stat-item is on its own line —
+           hide dividers in that case using a container width heuristic. */
+        @media (max-width: 540px) {
+          .stat-divider {
+            display: none;
+          }
+          .stats-row {
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 1rem;
+          }
+          .stat-item {
+            gap: 0;
+          }
+        }
       `}</style>
       <section className="hero-section relative min-h-screen grid gap-10 items-center max-w-384 mx-auto px-6 sm:px-10 xl:px-16 py-20">
       {/* Background blobs */}
@@ -96,10 +141,10 @@ export default function HeroSection({ onLaunchApp }: HeroSectionProps) {
         </p>
 
         {/* CTA buttons */}
-        <div className="flex flex-wrap gap-4 items-center mb-12">
+        <div className="cta-buttons flex flex-wrap gap-4 items-center mb-12">
           <button
             onClick={onLaunchApp}
-            className="font-semibold px-8 py-3 rounded-full text-white transition-all duration-200 hover:-translate-y-px"
+            className="cta-btn font-semibold px-8 py-3 rounded-full text-white transition-all duration-200 hover:-translate-y-px"
             style={{ fontSize: "clamp(0.9rem, 1vw, 1.05rem)", background: "var(--navy)", border: "2px solid var(--navy)", fontFamily: "var(--font-body)", cursor: "pointer" }}
           >
             Join a Queue
@@ -107,7 +152,7 @@ export default function HeroSection({ onLaunchApp }: HeroSectionProps) {
           <a
             href="#how"
             onClick={(e) => handleScroll(e, "how")}
-            className="font-medium px-6 py-3 rounded-full transition-all duration-200"
+            className="cta-btn font-medium px-6 py-3 rounded-full transition-all duration-200 text-center"
             style={{
               fontSize: "clamp(0.9rem, 1vw, 1.05rem)",
               color: "#6B82A8",
@@ -127,9 +172,9 @@ export default function HeroSection({ onLaunchApp }: HeroSectionProps) {
         </div>
 
         {/* Stats */}
-        <div className="flex flex-wrap items-center gap-6">
+        <div className="stats-row flex flex-wrap items-center gap-6">
           {STATS.map((stat, i) => (
-            <div key={stat.value} className="flex items-center gap-6">
+            <div key={stat.value} className="stat-item flex items-center gap-6">
               <div>
                 <strong
                   className="block font-head font-extrabold"
@@ -143,7 +188,7 @@ export default function HeroSection({ onLaunchApp }: HeroSectionProps) {
               </div>
               {i < STATS.length - 1 && (
                 <div
-                  className="w-px h-9"
+                  className="stat-divider w-px h-9"
                   style={{ background: "rgba(13,43,110,0.12)" }}
                 />
               )}
