@@ -13,7 +13,6 @@ import JoinQueue from "../components/queue/JoinQueue";
 import EnterQueueNumber from "../components/queue/Enterqueuenumber";
 import LiveTracker from "../components/queue/LiveTracker";
 import DoneScreen from "../components/queue/DoneScreen";
-import QueuelessLogo from "./../assets/QueuelessLogo.ico";
 
 type Screen = "list" | "join" | "enter-number" | "tracker" | "done";
 
@@ -205,7 +204,7 @@ export default function AppPage({ onBack }: AppPageProps) {
         <div className="app-nav-inner">
           {/* Logo */}
           <div style={{ display: "flex", alignItems: "center", gap: 8, flexShrink: 0 }}>
-            <img src={QueuelessLogo} alt="QueueLess Logo" style={{ width: 32, height: 32 }} />
+            <img src="/QueuelessLogo.ico" alt="QueueLess Logo" style={{ width: 32, height: 32 }} />
             <span className="font-head" style={{ fontSize: "1.25rem", color: "var(--navy)" }}>
               Queue<strong style={{ fontWeight: 800 }}>Less</strong>
             </span>

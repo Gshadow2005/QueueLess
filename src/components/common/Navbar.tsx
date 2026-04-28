@@ -1,5 +1,3 @@
-import QueuelessLogo from "../../assets/QueuelessLogo.ico";
-
 interface NavbarProps {
   onLaunchApp: () => void;
 }
@@ -30,7 +28,7 @@ export default function Navbar({ onLaunchApp }: NavbarProps) {
       >
         {/* Logo */}
         <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-          <img src={QueuelessLogo} alt="QueueLess Logo" style={{ width: 32, height: 32 }} />
+          <img src="/QueuelessLogo.ico" alt="QueueLess Logo" style={{ width: 32, height: 32 }} />
           <span className="font-head" style={{ fontSize: "1.25rem", color: "var(--navy)" }}>
             Queue<strong style={{ fontWeight: 800 }}>Less</strong>
           </span>
