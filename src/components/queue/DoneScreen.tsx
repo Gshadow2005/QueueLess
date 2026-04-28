@@ -283,7 +283,7 @@ export default function DoneScreen({
                         size={20}
                         strokeWidth={1.5}
                         fill="currentColor"
-                        color="#f59e0b"
+                        color="var(--sky)"
                       />
                     ) : (
                       <Star size={20} strokeWidth={2.5} />
@@ -300,7 +300,7 @@ export default function DoneScreen({
                     fontWeight: 600,
                   }}
                 >
-                  Thanks for the {rating}-star rating!
+                  Thanks for the {rating} star rating!
                 </p>
               )}
             </div>
