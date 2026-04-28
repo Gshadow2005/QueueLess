@@ -32,13 +32,7 @@ export default function HeroSection({ onLaunchApp }: HeroSectionProps) {
           }
         }
 
-        /* Buttons: full width (with right margin) when they wrap to their own line */
-        .cta-buttons {
-          /* Use a container query-like trick: when the flex container is narrow,
-             each button fills the full width minus the existing left spacing. */
-        }
         .cta-btn {
-          /* Default: natural (shrink-wrap) width */
           flex: 0 1 auto;
         }
         @media (max-width: 480px) {
@@ -48,21 +42,13 @@ export default function HeroSection({ onLaunchApp }: HeroSectionProps) {
           }
           .cta-btn {
             width: 100%;
-            margin-right: 1.5rem; /* right margin to match visual balance */
             text-align: center;
           }
         }
 
-        /* Stats dividers: only visible when all stats fit in one row.
-           We use a flex + overflow trick: hide dividers by default when items wrap. */
-        .stats-row {
-          /* overflow: hidden so we can detect wrapping */
-        }
         .stat-divider {
           display: block;
         }
-        /* When the stats-row wraps, each stat-item is on its own line —
-           hide dividers in that case using a container width heuristic. */
         @media (max-width: 540px) {
           .stat-divider {
             display: none;
@@ -76,8 +62,13 @@ export default function HeroSection({ onLaunchApp }: HeroSectionProps) {
             gap: 0;
           }
         }
+
+        .hero-section {
+          padding-top: clamp(7rem, 14vw, 9rem);
+          padding-bottom: clamp(4rem, 8vw, 6rem);
+        }
       `}</style>
-      <section className="hero-section relative min-h-screen grid gap-10 items-center max-w-384 mx-auto px-6 sm:px-10 xl:px-16 py-20">
+      <section className="hero-section relative min-h-screen grid gap-10 items-center max-w-384 mx-auto px-6 sm:px-10 xl:px-16">
       {/* Background blobs */}
       <div className="absolute inset-0 pointer-events-none z-0">
         <div
