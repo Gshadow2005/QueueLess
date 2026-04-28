@@ -225,6 +225,12 @@ export function useTrackerState({
     ? "Almost!"
     : "Waiting";
 
+  const bannerAccent = (showTurnCalled || isServing)
+    ? "#22c55e"
+    : spotsAway <= 3
+    ? "#f59e0b"
+    : "#6366f1";
+
   const notifTitle = isServing
     ? "Head to the counter!"
     : showTurnCalled
@@ -278,6 +284,7 @@ export function useTrackerState({
     awayLabel,
     statusColor,
     statusBadge,
+    bannerAccent,
     // handlers
     handleCancel,
     handleShare,

@@ -22,7 +22,6 @@ export default function LiveTracker({
   const {
     // queue state
     currentServing,
-    spotsAway,
     pct,
     queueLoading,
     isFlashing,
@@ -33,7 +32,7 @@ export default function LiveTracker({
     isAlmost,
     showTurnCalled,
     showNearTurn,
-    // notification alert
+    // notification
     notifTitle,
     notifMessage,
     // push
@@ -45,6 +44,7 @@ export default function LiveTracker({
     awayLabel,
     statusColor,
     statusBadge,
+    bannerAccent,
     // handlers
     handleCancel,
     handleShare,
@@ -53,51 +53,6 @@ export default function LiveTracker({
     toasts,
     removeToast,
   } = useTrackerState({ institution, sessionId, yourNumber, joinedAt, onDone });
-
-  // ── Notification alert banner styles ─────────────────────────────────────
-  const notifStyle: React.CSSProperties =
-    showTurnCalled || isServing
-      ? {
-          background: "#f0fdf4",
-          border: "1.5px solid #86efac",
-          borderRadius: 16,
-          padding: "1rem 1.25rem",
-          display: "flex",
-          gap: 12,
-          alignItems: "flex-start",
-          marginBottom: "1.5rem",
-        }
-      : spotsAway <= 3
-      ? {
-          background: "#fff7ed",
-          border: "1.5px solid #fed7aa",
-          borderRadius: 16,
-          padding: "1rem 1.25rem",
-          display: "flex",
-          gap: 12,
-          alignItems: "flex-start",
-          marginBottom: "1.5rem",
-        }
-      : {
-          background: "var(--navy)",
-          borderRadius: 16,
-          padding: "1rem 1.25rem",
-          display: "flex",
-          gap: 12,
-          alignItems: "flex-start",
-          marginBottom: "1.5rem",
-        };
-
-  const notifIconColor =
-    showTurnCalled || isServing ? "#16a34a" : spotsAway <= 3 ? "#c2410c" : "white";
-  const notifTitleColor =
-    showTurnCalled || isServing ? "#15803d" : spotsAway <= 3 ? "#c2410c" : "white";
-  const notifBodyColor =
-    showTurnCalled || isServing
-      ? "#166534"
-      : spotsAway <= 3
-      ? "#7c2d12"
-      : "var(--sky-light)";
 
   return (
     <div>
@@ -115,9 +70,9 @@ export default function LiveTracker({
       {showPushBanner && (
         <div
           style={{
-            background: "var(--sky-pale)",
-            border: "1.5px solid var(--sky-light)",
-            borderRadius: 12,
+            background: "white",
+            border: "1.5px solid rgba(13,43,110,0.12)",
+            borderRadius: 16,
             padding: "0.875rem 1.125rem",
             marginBottom: "1.25rem",
             display: "flex",
@@ -184,15 +139,34 @@ export default function LiveTracker({
 
       {/* ── Near-turn / turn-called alert ── */}
       {!queueLoading && (showTurnCalled || showNearTurn || isServing) && (
-        <div style={notifStyle}>
+        <div
+          style={{
+            background: "white",
+            border: "1.5px solid rgba(13,43,110,0.12)",
+            borderRadius: 16,
+            padding: "1rem 1.25rem",
+            display: "flex",
+            gap: 12,
+            alignItems: "flex-start",
+            marginBottom: "1.5rem",
+            transition: "border-color 0.4s ease",
+          }}
+        >
           <Bell
-            style={{ flexShrink: 0, width: 24, height: 24, color: notifIconColor }}
+            style={{
+              flexShrink: 0,
+              width: 20,
+              height: 20,
+              color: bannerAccent,
+              marginTop: 1,
+              transition: "color 0.4s ease",
+            }}
           />
           <div style={{ flex: 1 }}>
             <strong
               style={{
                 display: "block",
-                color: notifTitleColor,
+                color: "var(--navy)",
                 fontSize: "0.9rem",
                 marginBottom: 2,
               }}
@@ -200,7 +174,7 @@ export default function LiveTracker({
               {notifTitle}
             </strong>
             <p
-              style={{ fontSize: "0.8rem", color: notifBodyColor, lineHeight: 1.5 }}
+              style={{ fontSize: "0.8rem", color: "#6B82A8", lineHeight: 1.5, margin: 0 }}
             >
               {notifMessage}
             </p>

@@ -77,7 +77,7 @@ export default function JoinQueue({ institution, onJoin, joining = false, joinEr
               { icon: <Bell size={20} strokeWidth={2} />, text: "We'll notify you when your turn is near" },
               { icon: <MapPin size={20} strokeWidth={2} />, text: "You can track from anywhere" },
             ].map((item) => (
-              <div key={item.text} style={{ display: "flex", alignItems: "flex-start", gap: 10, padding: "7px 0", borderBottom: "1px solid rgba(13,43,110,0.06)" }}>
+              <div key={item.text} style={{ display: "flex", alignItems: "flex-start", gap: 10, padding: "7px 0" }}>
                 <span style={{ fontSize: "0.9rem", flexShrink: 0 }}>{item.icon}</span>
                 <span style={{ fontSize: "0.84rem", color: "#6B82A8", fontWeight: 400, lineHeight: 1.5 }}>{item.text}</span>
               </div>
@@ -108,7 +108,7 @@ export default function JoinQueue({ institution, onJoin, joining = false, joinEr
               />
             </div>
 
-            <div style={{ display: "flex", alignItems: "center", gap: 12, padding: "10px 0", borderTop: "1px solid rgba(13,43,110,0.07)" }}>
+            <div style={{ display: "flex", alignItems: "center", gap: 12, padding: "1px 0"}}>
               <span style={{ flex: 1, fontSize: "0.84rem", color: "var(--navy)", fontWeight: 400, lineHeight: 1.4 }}>
                 Notify me when my turn is near
               </span>
