@@ -31,8 +31,44 @@ export default function HeroSection({ onLaunchApp }: HeroSectionProps) {
             gap: 4rem;
           }
         }
+
+        .cta-btn {
+          flex: 0 1 auto;
+        }
+        @media (max-width: 480px) {
+          .cta-buttons {
+            flex-direction: column;
+            align-items: stretch;
+          }
+          .cta-btn {
+            width: 100%;
+            text-align: center;
+          }
+        }
+
+        .stat-divider {
+          display: block;
+        }
+        @media (max-width: 540px) {
+          .stat-divider {
+            display: none;
+          }
+          .stats-row {
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 1rem;
+          }
+          .stat-item {
+            gap: 0;
+          }
+        }
+
+        .hero-section {
+          padding-top: clamp(7rem, 14vw, 9rem);
+          padding-bottom: clamp(4rem, 8vw, 6rem);
+        }
       `}</style>
-      <section className="hero-section relative min-h-screen grid gap-10 items-center max-w-384 mx-auto px-6 sm:px-10 xl:px-16 py-20">
+      <section className="hero-section relative min-h-screen grid gap-10 items-center max-w-384 mx-auto px-6 sm:px-10 xl:px-16">
       {/* Background blobs */}
       <div className="absolute inset-0 pointer-events-none z-0">
         <div
@@ -96,10 +132,10 @@ export default function HeroSection({ onLaunchApp }: HeroSectionProps) {
         </p>
 
         {/* CTA buttons */}
-        <div className="flex flex-wrap gap-4 items-center mb-12">
+        <div className="cta-buttons flex flex-wrap gap-4 items-center mb-12">
           <button
             onClick={onLaunchApp}
-            className="font-semibold px-8 py-3 rounded-full text-white transition-all duration-200 hover:-translate-y-px"
+            className="cta-btn font-semibold px-8 py-3 rounded-full text-white transition-all duration-200 hover:-translate-y-px"
             style={{ fontSize: "clamp(0.9rem, 1vw, 1.05rem)", background: "var(--navy)", border: "2px solid var(--navy)", fontFamily: "var(--font-body)", cursor: "pointer" }}
           >
             Join a Queue
@@ -107,7 +143,7 @@ export default function HeroSection({ onLaunchApp }: HeroSectionProps) {
           <a
             href="#how"
             onClick={(e) => handleScroll(e, "how")}
-            className="font-medium px-6 py-3 rounded-full transition-all duration-200"
+            className="cta-btn font-medium px-6 py-3 rounded-full transition-all duration-200 text-center"
             style={{
               fontSize: "clamp(0.9rem, 1vw, 1.05rem)",
               color: "#6B82A8",
@@ -127,9 +163,9 @@ export default function HeroSection({ onLaunchApp }: HeroSectionProps) {
         </div>
 
         {/* Stats */}
-        <div className="flex flex-wrap items-center gap-6">
+        <div className="stats-row flex flex-wrap items-center gap-6">
           {STATS.map((stat, i) => (
-            <div key={stat.value} className="flex items-center gap-6">
+            <div key={stat.value} className="stat-item flex items-center gap-6">
               <div>
                 <strong
                   className="block font-head font-extrabold"
@@ -143,7 +179,7 @@ export default function HeroSection({ onLaunchApp }: HeroSectionProps) {
               </div>
               {i < STATS.length - 1 && (
                 <div
-                  className="w-px h-9"
+                  className="stat-divider w-px h-9"
                   style={{ background: "rgba(13,43,110,0.12)" }}
                 />
               )}

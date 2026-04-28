@@ -145,12 +145,11 @@ export default function InstitutionList({
         )}
         <button
           onClick={refetch}
-          title="Refresh"
           style={{ display: "flex", alignItems: "center", gap: 4, background: "none", border: "none", color: "#94a3b8", cursor: "pointer", fontSize: "0.75rem", fontFamily: "var(--font-body)" }}
           onMouseEnter={(e) => (e.currentTarget.style.color = "var(--sky)")}
           onMouseLeave={(e) => (e.currentTarget.style.color = "#94a3b8")}
         >
-          <RefreshCw size={12} /> Refresh
+          <RefreshCw size={12} style={{ animation: loading ? "spin 1s linear infinite" : "none" }} /> Refresh
         </button>
       </div>
 
