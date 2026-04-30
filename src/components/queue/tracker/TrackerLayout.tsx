@@ -35,11 +35,12 @@ const SESSION_ROWS = (params: {
 interface ActionButtonsProps {
   isServing: boolean;
   compact: boolean;
+  cancelling: boolean;
   onShare: () => void;
   onCancel: () => void;
 }
 
-function ActionButtons({ isServing, compact, onShare, onCancel }: ActionButtonsProps) {
+function ActionButtons({ isServing, compact, cancelling, onShare, onCancel }: ActionButtonsProps) {
   const size = compact ? 15 : 16;
   const btnBase: React.CSSProperties = {
     padding: "10px",
@@ -122,32 +123,50 @@ function ActionButtons({ isServing, compact, onShare, onCancel }: ActionButtonsP
       {/* Cancel */}
       <button
         onClick={onCancel}
-        disabled={isServing}
+        disabled={isServing || cancelling}
         style={{
           ...btnBase,
-          color: isServing ? "#94a3b8" : "#dc2626",
-          borderColor: isServing ? "rgba(148,163,184,0.3)" : "rgba(220,38,38,0.2)",
+          color: isServing || cancelling ? "#94a3b8" : "#dc2626",
+          borderColor: isServing || cancelling ? "rgba(148,163,184,0.3)" : "rgba(220,38,38,0.2)",
           display: "flex",
           alignItems: "center",
           gap: 6,
           justifyContent: "center",
-          cursor: isServing ? "not-allowed" : "pointer",
-          opacity: isServing ? 0.5 : 1,
+          cursor: isServing || cancelling ? "not-allowed" : "pointer",
+          opacity: isServing || cancelling ? 0.5 : 1,
         }}
         onMouseEnter={(e) => {
-          if (!isServing) {
+          if (!isServing && !cancelling) {
             e.currentTarget.style.background = "#fff5f5";
             e.currentTarget.style.borderColor = "#dc2626";
           }
         }}
         onMouseLeave={(e) => {
-          if (!isServing) {
+          if (!isServing && !cancelling) {
             e.currentTarget.style.background = "white";
             e.currentTarget.style.borderColor = "rgba(220,38,38,0.2)";
           }
         }}
       >
-        <X size={size} /> Cancel
+        {cancelling ? (
+          <>
+            <span
+              style={{
+                width: 14,
+                height: 14,
+                border: "2px solid rgba(220,38,38,0.2)",
+                borderTopColor: "#dc2626",
+                borderRadius: "50%",
+                animation: "spin 0.8s linear infinite",
+                display: "inline-block",
+                flexShrink: 0,
+              }}
+            />
+            Cancelling…
+          </>
+        ) : (
+          <><X size={size} /> Cancel</>
+        )}
       </button>
     </div>
   );
@@ -296,6 +315,7 @@ interface TrackerLayoutProps {
   statusColor: string;
   statusBadge: string;
   pushSubscribed: boolean;
+  cancelling: boolean;
   // handlers
   onShare: () => void;
   onCancel: () => void;
@@ -317,6 +337,7 @@ export default function TrackerLayout({
   statusColor,
   statusBadge,
   pushSubscribed,
+  cancelling,
   onShare,
   onCancel,
 }: TrackerLayoutProps) {
@@ -372,6 +393,7 @@ export default function TrackerLayout({
             <ActionButtons
               isServing={isServing}
               compact={false}
+              cancelling={cancelling}
               onShare={onShare}
               onCancel={onCancel}
             />
@@ -391,6 +413,7 @@ export default function TrackerLayout({
         <ActionButtons
           isServing={isServing}
           compact
+          cancelling={cancelling}
           onShare={onShare}
           onCancel={onCancel}
         />

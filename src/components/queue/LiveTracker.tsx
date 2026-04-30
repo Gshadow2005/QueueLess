@@ -45,6 +45,8 @@ export default function LiveTracker({
     statusColor,
     statusBadge,
     bannerAccent,
+    // cancelling
+    cancelling,
     // handlers
     handleCancel,
     handleShare,
@@ -199,6 +201,7 @@ export default function LiveTracker({
         statusColor={statusColor}
         statusBadge={statusBadge}
         pushSubscribed={pushSubscribed}
+        cancelling={cancelling}
         onShare={handleShare}
         onCancel={handleCancel}
       />

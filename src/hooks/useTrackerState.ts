@@ -39,6 +39,7 @@ export function useTrackerState({
     useState<NotificationPermission>(getSafeNotifPermission());
   const [pushSubscribed, setPushSubscribed] = useState(false);
   const [pushLoading, setPushLoading] = useState(false);
+  const [cancelling, setCancelling] = useState(false);
 
   const { toasts, showToast, removeToast } = useToast();
 
@@ -140,6 +141,7 @@ export function useTrackerState({
   // ── Handlers ─────────────────────────────────────────────────────────────
   const handleCancel = useCallback(async () => {
     if (!window.confirm("Cancel your spot in the queue?")) return;
+    setCancelling(true);
     try {
       await cancelQueue(sessionId);
       const mins = Math.round((Date.now() - joinedAt.getTime()) / 60000) || 0;
@@ -148,6 +150,8 @@ export function useTrackerState({
       showToast(
         err instanceof Error ? err.message : "Failed to cancel queue entry."
       );
+    } finally {
+      setCancelling(false);
     }
   }, [sessionId, joinedAt, onDone, showToast]);
 
@@ -293,6 +297,8 @@ export function useTrackerState({
     statusColor,
     statusBadge,
     bannerAccent,
+    // cancelling
+    cancelling,
     // handlers
     handleCancel,
     handleShare,
