@@ -6,7 +6,7 @@ import {
   type QueueStatusResponse,
 } from "../api/queue";
 
-const POLL_INTERVAL_MS = 5000; // 5 seconds
+const POLL_INTERVAL_MS = 5000;
 
 const ADMIN_USER = import.meta.env.VITE_ADMIN_USER ?? "";
 const ADMIN_PASS = import.meta.env.VITE_ADMIN_PASS ?? "";
@@ -29,12 +29,16 @@ interface LiveQueueState {
   error: string | null;
 }
 
+interface UseLiveQueueReturn extends LiveQueueState {
+  refresh: () => Promise<void>;
+}
+
 export function useLiveQueue({
   sessionId,
   institutionId,
   onServed,
   onExpired,
-}: UseLiveQueueOptions): LiveQueueState {
+}: UseLiveQueueOptions): UseLiveQueueReturn {
   const [state, setState] = useState<LiveQueueState>({
     queueNumber: 0,
     currentServing: 0,
@@ -168,5 +172,17 @@ export function useLiveQueue({
     return () => document.removeEventListener("visibilitychange", handleVisibilityChange);
   }, [applyStatus]);
 
-  return state;
+  const refresh = useCallback(async () => {
+    try {
+      const data = await fetchQueueStatus(sessionId);
+      applyStatus(data);
+    } catch (err: unknown) {
+      setState((s) => ({
+        ...s,
+        error: err instanceof Error ? err.message : "Failed to fetch status",
+      }));
+    }
+  }, [sessionId, applyStatus]);
+
+  return { ...state, refresh };
 }

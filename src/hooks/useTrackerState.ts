@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useState } from "react";
 import { type Institution } from "../types/institution";
 import { formatQueueNumber } from "../utils/queueHelpers";
-import { cancelQueue, fetchQueueStatus } from "../api/queue";
+import { cancelQueue } from "../api/queue";
 import { useLiveQueue } from "./useLiveQueue";
 import { useNotifications } from "./useNotifications";
 import { useToast } from "./useToast";
@@ -45,7 +45,6 @@ export function useTrackerState({
 
   const { toasts, showToast, removeToast } = useToast();
 
-  // ── On mount: register SW + listen for SW messages ──────────────────────
   useEffect(() => {
     if ("serviceWorker" in navigator) {
       navigator.serviceWorker.register("/sw.js", { scope: "/" }).catch(() => {});
@@ -82,6 +81,7 @@ export function useTrackerState({
     isFlashing,
     loading: queueLoading,
     error,
+    refresh,
   } = useLiveQueue({
     sessionId,
     institutionId: institution.id,
@@ -190,7 +190,7 @@ export function useTrackerState({
   const handleRefresh = useCallback(async () => {
     setRefreshing(true);
     try {
-      await fetchQueueStatus(sessionId);
+      await refresh();
     } catch (err) {
       showToast(
         err instanceof Error ? err.message : "Failed to refresh queue status."
@@ -198,7 +198,7 @@ export function useTrackerState({
     } finally {
       setRefreshing(false);
     }
-  }, [sessionId, showToast]);
+  }, [refresh, showToast]);
 
   const handleEnablePush = useCallback(async () => {
     setPushLoading(true);
@@ -246,7 +246,6 @@ export function useTrackerState({
     }
   }, [sessionId, showToast]);
 
-  // ── Labels / styles ──────────────────────────────────────────────────────
   const awayLabel = isServing
     ? "Head to the counter now!"
     : isNext
