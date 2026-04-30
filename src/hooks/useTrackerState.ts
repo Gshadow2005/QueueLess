@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useState } from "react";
 import { type Institution } from "../types/institution";
 import { formatQueueNumber } from "../utils/queueHelpers";
+import { cancelQueue } from "../api/queue";
 import { useLiveQueue } from "./useLiveQueue";
 import { useNotifications } from "./useNotifications";
 import { useToast } from "./useToast";
@@ -137,11 +138,18 @@ export function useTrackerState({
   }, [error, showToast]);
 
   // ── Handlers ─────────────────────────────────────────────────────────────
-  const handleCancel = useCallback(() => {
+  const handleCancel = useCallback(async () => {
     if (!window.confirm("Cancel your spot in the queue?")) return;
-    const mins = Math.round((Date.now() - joinedAt.getTime()) / 60000) || 0;
-    onDone(mins, true);
-  }, [joinedAt, onDone]);
+    try {
+      await cancelQueue(sessionId);
+      const mins = Math.round((Date.now() - joinedAt.getTime()) / 60000) || 0;
+      onDone(mins, true);
+    } catch (err) {
+      showToast(
+        err instanceof Error ? err.message : "Failed to cancel queue entry."
+      );
+    }
+  }, [sessionId, joinedAt, onDone, showToast]);
 
   const handleShare = useCallback(() => {
     const txt = `I'm ${formatQueueNumber(yourNumber)} in the queue at ${institution.name}. Track with QueueLess!`;

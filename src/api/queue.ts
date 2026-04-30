@@ -88,6 +88,12 @@ export const checkIn = (sessionId: string) =>
     { method: "PATCH" }
   );
 
+export const cancelQueue = (sessionId: string) =>
+  apiFetch<QueueStatusResponse>(
+    `/api/queue/entries/${sessionId}/cancel/`,
+    { method: "POST" }
+  );
+
 export const simulateTick = (
   institutionId: number,
   adminCredentials: { username: string; password: string }
