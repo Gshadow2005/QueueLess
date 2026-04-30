@@ -40,6 +40,7 @@ export function useTrackerState({
   const [pushSubscribed, setPushSubscribed] = useState(false);
   const [pushLoading, setPushLoading] = useState(false);
   const [cancelling, setCancelling] = useState(false);
+  const [showCancelModal, setShowCancelModal] = useState(false);
 
   const { toasts, showToast, removeToast } = useToast();
 
@@ -139,8 +140,12 @@ export function useTrackerState({
   }, [error, showToast]);
 
   // ── Handlers ─────────────────────────────────────────────────────────────
-  const handleCancel = useCallback(async () => {
-    if (!window.confirm("Cancel your spot in the queue?")) return;
+  const handleCancelClick = useCallback(() => {
+    setShowCancelModal(true);
+  }, []);
+
+  const handleCancelConfirm = useCallback(async () => {
+    setShowCancelModal(false);
     setCancelling(true);
     try {
       await cancelQueue(sessionId);
@@ -154,6 +159,10 @@ export function useTrackerState({
       setCancelling(false);
     }
   }, [sessionId, joinedAt, onDone, showToast]);
+
+  const handleCancelClose = useCallback(() => {
+    setShowCancelModal(false);
+  }, []);
 
   const handleShare = useCallback(() => {
     const txt = `I'm ${formatQueueNumber(yourNumber)} in the queue at ${institution.name}. Track with QueueLess!`;
@@ -299,8 +308,11 @@ export function useTrackerState({
     bannerAccent,
     // cancelling
     cancelling,
+    showCancelModal,
     // handlers
-    handleCancel,
+    handleCancelClick,
+    handleCancelConfirm,
+    handleCancelClose,
     handleShare,
     handleEnablePush,
     // toasts

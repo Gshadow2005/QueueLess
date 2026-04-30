@@ -3,6 +3,7 @@ import { type Institution } from "../../types/institution";
 import { useTrackerState } from "../../hooks/useTrackerState";
 import TrackerLayout from "./tracker/TrackerLayout";
 import Toast from "../common/Toast";
+import ConfirmModal from "../common/ConfirmModal";
 
 interface LiveTrackerProps {
   institution: Institution;
@@ -47,8 +48,11 @@ export default function LiveTracker({
     bannerAccent,
     // cancelling
     cancelling,
+    showCancelModal,
     // handlers
-    handleCancel,
+    handleCancelClick,
+    handleCancelConfirm,
+    handleCancelClose,
     handleShare,
     handleEnablePush,
     // toasts
@@ -203,7 +207,19 @@ export default function LiveTracker({
         pushSubscribed={pushSubscribed}
         cancelling={cancelling}
         onShare={handleShare}
-        onCancel={handleCancel}
+        onCancel={handleCancelClick}
+      />
+
+      {/* ── Cancel confirmation modal ── */}
+      <ConfirmModal
+        open={showCancelModal}
+        title="Cancel Queue"
+        message="Are you sure you want to leave the queue? Your spot will be lost."
+        confirmLabel="Leave Queue"
+        cancelLabel="Stay"
+        onConfirm={handleCancelConfirm}
+        onCancel={handleCancelClose}
+        danger={true}
       />
     </div>
   );
