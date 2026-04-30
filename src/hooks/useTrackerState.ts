@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useState } from "react";
 import { type Institution } from "../types/institution";
 import { formatQueueNumber } from "../utils/queueHelpers";
-import { cancelQueue } from "../api/queue";
+import { cancelQueue, fetchQueueStatus } from "../api/queue";
 import { useLiveQueue } from "./useLiveQueue";
 import { useNotifications } from "./useNotifications";
 import { useToast } from "./useToast";
@@ -41,6 +41,7 @@ export function useTrackerState({
   const [pushLoading, setPushLoading] = useState(false);
   const [cancelling, setCancelling] = useState(false);
   const [showCancelModal, setShowCancelModal] = useState(false);
+  const [refreshing, setRefreshing] = useState(false);
 
   const { toasts, showToast, removeToast } = useToast();
 
@@ -174,6 +175,19 @@ export function useTrackerState({
         .then(() => alert("Copied to clipboard!"));
     }
   }, [yourNumber, institution.name]);
+
+  const handleRefresh = useCallback(async () => {
+    setRefreshing(true);
+    try {
+      await fetchQueueStatus(sessionId);
+    } catch (err) {
+      showToast(
+        err instanceof Error ? err.message : "Failed to refresh queue status."
+      );
+    } finally {
+      setRefreshing(false);
+    }
+  }, [sessionId, showToast]);
 
   const handleEnablePush = useCallback(async () => {
     setPushLoading(true);
@@ -309,11 +323,14 @@ export function useTrackerState({
     // cancelling
     cancelling,
     showCancelModal,
+    // refresh
+    refreshing,
     // handlers
     handleCancelClick,
     handleCancelConfirm,
     handleCancelClose,
     handleShare,
+    handleRefresh,
     handleEnablePush,
     // toasts
     toasts,

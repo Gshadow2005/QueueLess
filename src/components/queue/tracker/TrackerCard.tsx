@@ -7,6 +7,7 @@ interface TrackerCardProps {
   yourNumber: number;
   pct: number;
   queueLoading: boolean;
+  refreshing?: boolean;
   isFlashing: boolean;
   isServing: boolean;
   isAlmost: boolean;
@@ -15,7 +16,6 @@ interface TrackerCardProps {
   awayLabel: string;
   statusColor: string;
   statusBadge: string;
-  /** Pass extra padding/margin styles for mobile vs desktop variants */
   compact?: boolean;
 }
 
@@ -25,6 +25,7 @@ export default function TrackerCard({
   yourNumber,
   pct,
   queueLoading,
+  refreshing = false,
   isFlashing,
   isServing,
   isAlmost,
@@ -40,21 +41,23 @@ export default function TrackerCard({
     ? "clamp(2.5rem, 12vw, 3.5rem)"
     : "clamp(2rem, 5vw, 4rem)";
 
-  const badgeBg = !queueLoading && isServing
+  const isLoading = queueLoading || refreshing;
+
+  const badgeBg = !isLoading && isServing
     ? "rgba(245,158,11,0.1)"
-    : !queueLoading && (isAlmost || isTurn)
+    : !isLoading && (isAlmost || isTurn)
     ? "rgba(34,197,94,0.1)"
     : "var(--sky-pale)";
 
-  const badgeColor = !queueLoading && isServing
+  const badgeColor = !isLoading && isServing
     ? "#b45309"
-    : !queueLoading && (isAlmost || isTurn)
+    : !isLoading && (isAlmost || isTurn)
     ? "#16a34a"
     : "var(--navy-light)";
 
-  const badgeBorder = !queueLoading && isServing
+  const badgeBorder = !isLoading && isServing
     ? "rgba(245,158,11,0.3)"
-    : !queueLoading && (isAlmost || isTurn)
+    : !isLoading && (isAlmost || isTurn)
     ? "rgba(34,197,94,0.3)"
     : "var(--sky-light)";
 
@@ -108,7 +111,7 @@ export default function TrackerCard({
             flexShrink: 0,
           }}
         >
-          {queueLoading ? "Loading…" : statusBadge}
+          {isLoading ? "Loading…" : statusBadge}
         </span>
       </div>
 
@@ -143,7 +146,7 @@ export default function TrackerCard({
           >
             Now serving
           </p>
-          {queueLoading ? (
+          {isLoading ? (
             <Skeleton width={compact ? 100 : 80} height={compact ? 56 : 48} borderRadius={8} style={{ margin: "0 auto" }} />
           ) : (
             <p
@@ -180,7 +183,7 @@ export default function TrackerCard({
           >
             Your number
           </p>
-          {queueLoading ? (
+          {isLoading ? (
             <Skeleton width={compact ? 100 : 80} height={compact ? 56 : 48} borderRadius={8} style={{ margin: "0 auto" }} />
           ) : (
             <p
@@ -212,7 +215,7 @@ export default function TrackerCard({
           style={{
             height: "100%",
             borderRadius: 999,
-            width: queueLoading ? "0%" : isServing ? "100%" : `${pct}%`,
+            width: isLoading ? "0%" : isServing ? "100%" : `${pct}%`,
             background: isServing
               ? "linear-gradient(90deg, #f59e0b, #d97706)"
               : "linear-gradient(90deg, var(--sky), var(--navy-light))",
@@ -227,11 +230,11 @@ export default function TrackerCard({
           textAlign: "center",
           fontSize: "0.9rem",
           fontWeight:
-            !queueLoading && (isTurn || isAlmost || isNext || isServing) ? 600 : 400,
-          color: queueLoading ? "#6B82A8" : statusColor,
+            !isLoading && (isTurn || isAlmost || isNext || isServing) ? 600 : 400,
+          color: isLoading ? "#6B82A8" : statusColor,
         }}
       >
-        {queueLoading ? "Loading status…" : awayLabel}
+        {isLoading ? "Loading status…" : awayLabel}
       </p>
     </div>
   );

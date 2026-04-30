@@ -36,11 +36,13 @@ interface ActionButtonsProps {
   isServing: boolean;
   compact: boolean;
   cancelling: boolean;
+  refreshing: boolean;
   onShare: () => void;
   onCancel: () => void;
+  onRefresh: () => void;
 }
 
-function ActionButtons({ isServing, compact, cancelling, onShare, onCancel }: ActionButtonsProps) {
+function ActionButtons({ isServing, compact, cancelling, refreshing, onShare, onCancel, onRefresh }: ActionButtonsProps) {
   const size = compact ? 15 : 16;
   const btnBase: React.CSSProperties = {
     padding: "10px",
@@ -63,33 +65,54 @@ function ActionButtons({ isServing, compact, cancelling, onShare, onCancel }: Ac
         marginBottom: compact ? "1rem" : 0,
       }}
     >
-      {/* Auto refresh — disabled, just informational */}
+      {/* Auto refresh — now functional */}
       <button
+        onClick={onRefresh}
+        disabled={refreshing}
         style={{
           ...btnBase,
-          color: "var(--navy)",
-          borderColor: "rgba(13,43,110,0.12)",
+          color: refreshing ? "#94a3b8" : "var(--navy)",
+          borderColor: refreshing ? "rgba(148,163,184,0.3)" : "rgba(13,43,110,0.12)",
           display: "flex",
           alignItems: "center",
           gap: 6,
           justifyContent: "center",
+          cursor: refreshing ? "not-allowed" : "pointer",
+          opacity: refreshing ? 0.7 : 1,
         }}
-        disabled
-        title="Auto-updating every 5s"
+        title={refreshing ? "Refreshing..." : "Refresh queue status"}
         onMouseEnter={(e) => {
-          if (!compact) {
+          if (!compact && !refreshing) {
             e.currentTarget.style.background = "var(--sky-pale)";
             e.currentTarget.style.borderColor = "var(--sky)";
           }
         }}
         onMouseLeave={(e) => {
-          if (!compact) {
+          if (!compact && !refreshing) {
             e.currentTarget.style.background = "white";
             e.currentTarget.style.borderColor = "rgba(13,43,110,0.12)";
           }
         }}
       >
-        <RefreshCw size={size} /> Auto
+        {refreshing ? (
+          <>
+            <span
+              style={{
+                width: size === 15 ? 12 : 14,
+                height: size === 15 ? 12 : 14,
+                border: "2px solid rgba(13,43,110,0.2)",
+                borderTopColor: "var(--sky)",
+                borderRadius: "50%",
+                animation: "spin 0.8s linear infinite",
+                display: "inline-block",
+                flexShrink: 0,
+              }}
+            />
+            Syncing…
+          </>
+        ) : (
+          <><RefreshCw size={size} /> Refresh</>
+        )}
       </button>
 
       {/* Share */}
@@ -316,9 +339,11 @@ interface TrackerLayoutProps {
   statusBadge: string;
   pushSubscribed: boolean;
   cancelling: boolean;
+  refreshing: boolean;
   // handlers
   onShare: () => void;
   onCancel: () => void;
+  onRefresh: () => void;
 }
 
 export default function TrackerLayout({
@@ -338,8 +363,10 @@ export default function TrackerLayout({
   statusBadge,
   pushSubscribed,
   cancelling,
+  refreshing,
   onShare,
   onCancel,
+  onRefresh,
 }: TrackerLayoutProps) {
   const cardProps = {
     institutionName: institution.name,
@@ -347,6 +374,7 @@ export default function TrackerLayout({
     yourNumber,
     pct,
     queueLoading,
+    refreshing,
     isFlashing,
     isServing,
     isAlmost,
@@ -394,8 +422,10 @@ export default function TrackerLayout({
               isServing={isServing}
               compact={false}
               cancelling={cancelling}
+              refreshing={refreshing}
               onShare={onShare}
               onCancel={onCancel}
+              onRefresh={onRefresh}
             />
           </div>
 
@@ -414,8 +444,10 @@ export default function TrackerLayout({
           isServing={isServing}
           compact
           cancelling={cancelling}
+          refreshing={refreshing}
           onShare={onShare}
           onCancel={onCancel}
+          onRefresh={onRefresh}
         />
         <SessionInfo rows={sessionRows} compact />
         <WaitTips compact />

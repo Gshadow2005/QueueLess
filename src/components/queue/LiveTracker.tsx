@@ -49,11 +49,14 @@ export default function LiveTracker({
     // cancelling
     cancelling,
     showCancelModal,
+    // refresh
+    refreshing,
     // handlers
     handleCancelClick,
     handleCancelConfirm,
     handleCancelClose,
     handleShare,
+    handleRefresh,
     handleEnablePush,
     // toasts
     toasts,
@@ -206,8 +209,10 @@ export default function LiveTracker({
         statusBadge={statusBadge}
         pushSubscribed={pushSubscribed}
         cancelling={cancelling}
+        refreshing={refreshing}
         onShare={handleShare}
         onCancel={handleCancelClick}
+        onRefresh={handleRefresh}
       />
 
       {/* ── Cancel confirmation modal ── */}
