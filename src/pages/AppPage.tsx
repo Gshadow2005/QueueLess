@@ -13,6 +13,7 @@ import JoinQueue from "../components/queue/JoinQueue";
 import EnterQueueNumber from "../components/queue/Enterqueuenumber";
 import LiveTracker from "../components/queue/LiveTracker";
 import DoneScreen from "../components/queue/DoneScreen";
+import QueuelessLogo from "../assets/QueuelessLogo.ico";
 
 type Screen = "list" | "join" | "enter-number" | "tracker" | "done";
 
@@ -132,7 +133,7 @@ export default function AppPage({ onBack }: AppPageProps) {
         queue_number: queueNumber,
         phone_number: state.pendingPhone || undefined,
         browser_push_opt_in: state.pendingNotify,
-        near_turn_threshold: 5, // We handle 3 locally, but set 5 for backend notifications
+        near_turn_threshold: 5,
       });
 
       const joinedAt = new Date();
@@ -198,42 +199,42 @@ export default function AppPage({ onBack }: AppPageProps) {
 
   const showBack = screen === "join" || screen === "list" || screen === "enter-number";
 
-  const title =
-    screen === "list" ? null :
-    screen === "join" ? (state.institution?.name.split("–")[0].trim() ?? "Join Queue") :
-    screen === "enter-number" ? "Enter Queue Number" :
-    screen === "tracker" ? (state.institution?.name.split("–")[0].trim() ?? "Live Tracker") :
-    "All done!";
-
   return (
     <div style={{ minHeight: "100vh", background: "var(--off)", color: "var(--navy)" }}>
       <nav style={{ position: "sticky", top: 0, zIndex: 50, background: "rgba(255,255,255,0.92)", backdropFilter: "blur(12px)", borderBottom: "1px solid rgba(13,43,110,0.12)" }}>
         <div className="app-nav-inner">
-          {screen === "list" ? (
-            <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-              <span style={{ fontSize: "1.375rem" }}>⏱</span>
-              <span className="font-head" style={{ fontSize: "1.25rem", color: "var(--navy)" }}>
-                Queue<strong style={{ fontWeight: 800 }}>Less</strong>
-              </span>
-            </div>
-          ) : (
-            <span className="font-head" style={{ fontSize: "1rem", fontWeight: 700, color: "var(--navy)", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
-              {title}
+          {/* Logo */}
+          <div style={{ display: "flex", alignItems: "center", gap: 8, flexShrink: 0 }}>
+            <img src={QueuelessLogo} alt="QueueLess Logo" style={{ width: 32, height: 32 }} />
+            <span className="font-head" style={{ fontSize: "1.25rem", color: "var(--navy)" }}>
+              Queue<strong style={{ fontWeight: 800 }}>Less</strong>
             </span>
-          )}
+          </div>
 
           <div style={{ flex: 1 }} />
-
-          {screen === "tracker" && (
-            <span style={{ fontSize: "0.72rem", fontWeight: 600, padding: "4px 12px", borderRadius: 999, background: "var(--sky-pale)", color: "var(--navy-light)", border: "1px solid var(--sky-light)", letterSpacing: "0.04em", textTransform: "uppercase", flexShrink: 0 }}>
-              Live
-            </span>
-          )}
 
           {screen === "list" && (
             <div className="app-nav-links">
               <span style={{ fontSize: "0.85rem", color: "#6B82A8" }}>Queue management</span>
             </div>
+          )}
+
+          {screen === "join" && (
+            <div className="app-nav-links">
+              <span style={{ fontSize: "0.85rem", color: "#6B82A8" }}>Enter Details</span>
+            </div>
+          )}
+
+          {screen === "enter-number" && (
+            <div className="app-nav-links">
+              <span style={{ fontSize: "0.85rem", color: "#6B82A8" }}>Enter Queue Number</span>
+            </div>
+          )}
+
+          {screen === "tracker" && (
+            <span style={{ fontSize: "0.72rem", fontWeight: 600, padding: "4px 12px", borderRadius: 999, background: "var(--sky-pale)", color: "var(--navy-light)", border: "1px solid var(--sky-light)", letterSpacing: "0.04em", textTransform: "uppercase", flexShrink: 0 }}>
+              Live
+            </span>
           )}
         </div>
       </nav>

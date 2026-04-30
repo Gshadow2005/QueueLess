@@ -64,7 +64,13 @@ export async function requestPermission(): Promise<NotificationPermission> {
   if (Notification.permission === "granted") return "granted";
   if (Notification.permission === "denied") return "denied";
 
-  const result = await Notification.requestPermission();
+  const result = await Promise.race([
+    Notification.requestPermission(),
+    new Promise<NotificationPermission>((resolve) =>
+      setTimeout(() => resolve("denied"), 10000)
+    ),
+  ]);
+
   return result;
 }
 
@@ -84,8 +90,10 @@ export async function subscribeToPush(sessionId: string): Promise<boolean> {
     return false;
   }
 
-  const permission = await requestPermission();
-  if (permission !== "granted") return false;
+  if (typeof Notification !== "undefined" && Notification.permission !== "granted") {
+    console.warn("[QueueLess Push] Permission not granted — aborting subscribe.");
+    return false;
+  }
 
   try {
     const registration = await getSwRegistration();

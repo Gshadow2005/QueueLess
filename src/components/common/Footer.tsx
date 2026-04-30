@@ -1,3 +1,5 @@
+import QueuelessLogo from "../../assets/QueuelessLogo.ico";
+
 export default function Footer() {
   return (
     <footer
@@ -6,7 +8,7 @@ export default function Footer() {
     >
       <div className="max-w-6xl mx-auto">
         <div className="flex items-center justify-center gap-2 mb-2">
-          <span className="text-xl">⏱</span>
+          <img src={QueuelessLogo} alt="QueueLess Logo" style={{ width: 28, height: 28 }} />
           <span className="font-head text-lg" style={{ color: "var(--navy)" }}>
             Queue<strong className="font-extrabold">Less</strong>
           </span>

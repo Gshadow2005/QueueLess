@@ -6,7 +6,7 @@ import {
   type QueueStatusResponse,
 } from "../api/queue";
 
-const POLL_INTERVAL_MS = 5000; // 5 seconds
+const POLL_INTERVAL_MS = 5000;
 
 const ADMIN_USER = import.meta.env.VITE_ADMIN_USER ?? "";
 const ADMIN_PASS = import.meta.env.VITE_ADMIN_PASS ?? "";
@@ -15,6 +15,7 @@ interface UseLiveQueueOptions {
   sessionId: string;
   institutionId: number;
   onServed: () => void;
+  onExpired: () => void;
 }
 
 interface LiveQueueState {
@@ -28,11 +29,16 @@ interface LiveQueueState {
   error: string | null;
 }
 
+interface UseLiveQueueReturn extends LiveQueueState {
+  refresh: () => Promise<void>;
+}
+
 export function useLiveQueue({
   sessionId,
   institutionId,
   onServed,
-}: UseLiveQueueOptions): LiveQueueState {
+  onExpired,
+}: UseLiveQueueOptions): UseLiveQueueReturn {
   const [state, setState] = useState<LiveQueueState>({
     queueNumber: 0,
     currentServing: 0,
@@ -45,11 +51,17 @@ export function useLiveQueue({
   });
 
   const onServedRef = useRef(onServed);
-  useEffect(() => {
-    onServedRef.current = onServed;
-  }, [onServed]);
+  useEffect(() => { onServedRef.current = onServed; }, [onServed]);
+
+  const onExpiredRef = useRef(onExpired);
+  useEffect(() => { onExpiredRef.current = onExpired; }, [onExpired]);
+
   const servedCalledRef = useRef(false);
+  const expiredCalledRef = useRef(false);
   const checkInCalledRef = useRef(false);
+
+  const sessionIdRef = useRef(sessionId);
+  useEffect(() => { sessionIdRef.current = sessionId; }, [sessionId]);
 
   const flash = useCallback(() => {
     setState((s) => ({ ...s, isFlashing: true }));
@@ -85,13 +97,23 @@ export function useLiveQueue({
         servedCalledRef.current = true;
         setTimeout(() => onServedRef.current(), 5000);
       }
+
+      if (
+        (data.status === "expired" || data.status === "cancelled") &&
+        !expiredCalledRef.current
+      ) {
+        expiredCalledRef.current = true;
+        setTimeout(() => onExpiredRef.current(), 2000);
+      }
     },
     [flash, sessionId]
   );
 
+  // ── Main polling loop ────────────────────────────────────────────────────
   useEffect(() => {
     if (!sessionId) return;
     servedCalledRef.current = false;
+    expiredCalledRef.current = false;
     checkInCalledRef.current = false;
     let stopped = false;
 
@@ -113,7 +135,7 @@ export function useLiveQueue({
           ).catch(() => undefined);
         }
       } catch {
-        // ignore 
+        // ignore
       }
 
       fetchQueueStatus(sessionId)
@@ -136,5 +158,31 @@ export function useLiveQueue({
     };
   }, [sessionId, institutionId, applyStatus]);
 
-  return state;
+  useEffect(() => {
+    const handleVisibilityChange = () => {
+      if (document.visibilityState !== "visible") return;
+      if (!sessionIdRef.current) return;
+
+      fetchQueueStatus(sessionIdRef.current)
+        .then((data) => applyStatus(data))
+        .catch(() => {});
+    };
+
+    document.addEventListener("visibilitychange", handleVisibilityChange);
+    return () => document.removeEventListener("visibilitychange", handleVisibilityChange);
+  }, [applyStatus]);
+
+  const refresh = useCallback(async () => {
+    try {
+      const data = await fetchQueueStatus(sessionId);
+      applyStatus(data);
+    } catch (err: unknown) {
+      setState((s) => ({
+        ...s,
+        error: err instanceof Error ? err.message : "Failed to fetch status",
+      }));
+    }
+  }, [sessionId, applyStatus]);
+
+  return { ...state, refresh };
 }

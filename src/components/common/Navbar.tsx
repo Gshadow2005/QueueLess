@@ -1,3 +1,5 @@
+import QueuelessLogo from "../../assets/QueuelessLogo.ico";
+
 interface NavbarProps {
   onLaunchApp: () => void;
 }
@@ -28,7 +30,7 @@ export default function Navbar({ onLaunchApp }: NavbarProps) {
       >
         {/* Logo */}
         <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-          <span style={{ fontSize: "1.375rem" }}>⏱</span>
+          <img src={QueuelessLogo} alt="QueueLess Logo" style={{ width: 32, height: 32 }} />
           <span className="font-head" style={{ fontSize: "1.25rem", color: "var(--navy)" }}>
             Queue<strong style={{ fontWeight: 800 }}>Less</strong>
           </span>
@@ -58,8 +60,17 @@ export default function Navbar({ onLaunchApp }: NavbarProps) {
         {/* CTA */}
         <button
           onClick={onLaunchApp}
-          className="ml-auto md:ml-2 text-xs md:text-sm font-semibold px-3 md:px-5 py-1.5 md:py-2 rounded-full text-white transition-all duration-200 hover:-translate-y-px"
-          style={{ background: "var(--navy)", border: "2px solid var(--navy)", fontFamily: "var(--font-body)", cursor: "pointer" }}
+          className="ml-auto md:ml-2 font-semibold rounded-full text-white transition-all duration-200 hover:-translate-y-px"
+          style={{
+            background: "var(--navy)",
+            border: "2px solid var(--navy)",
+            fontFamily: "var(--font-body)",
+            cursor: "pointer",
+            fontSize: "0.875rem",
+            padding: "0.5rem 1.1rem",
+            whiteSpace: "nowrap",
+            flexShrink: 0,
+          }}
         >
           Get Started
         </button>

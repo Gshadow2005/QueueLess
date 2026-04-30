@@ -240,7 +240,7 @@ export default function DoneScreen({
                   marginBottom: "0.5rem",
                 }}
               >
-                How was your experience?
+                How was your experience? Disabled
               </h3>
               <p
                 style={{
@@ -283,7 +283,7 @@ export default function DoneScreen({
                         size={20}
                         strokeWidth={1.5}
                         fill="currentColor"
-                        color="#f59e0b"
+                        color="var(--sky)"
                       />
                     ) : (
                       <Star size={20} strokeWidth={2.5} />
@@ -300,7 +300,7 @@ export default function DoneScreen({
                     fontWeight: 600,
                   }}
                 >
-                  Thanks for the {rating}-star rating!
+                  Thanks for the {rating} star rating!
                 </p>
               )}
             </div>
@@ -351,9 +351,13 @@ export default function DoneScreen({
               onClick={() => {
                 const txt =
                   "I just skipped the wait with QueueLess! Check it out.";
-                navigator.clipboard
-                  ?.writeText(txt)
-                  .then(() => alert("Copied!"));
+                if (navigator.share) {
+                  navigator.share({ text: txt });
+                } else {
+                  navigator.clipboard
+                    ?.writeText(txt)
+                    .then(() => alert("Copied to clipboard!"));
+                }
               }}
             >
               Share QueueLess

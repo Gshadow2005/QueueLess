@@ -5,7 +5,7 @@ import {
   type InstitutionType,
 } from "../../types/institution";
 import { useInstitutions } from "../../hooks/useInstitutions";
-import { Building2, Landmark, Zap, Search, RefreshCw } from "lucide-react";
+import { Building2, Landmark, Zap, Search, RefreshCw, AlertTriangle } from "lucide-react";
 import { useToast } from "../../hooks/useToast";
 import Skeleton from "../common/Skeleton";
 import Toast from "../common/Toast";
@@ -86,7 +86,7 @@ export default function InstitutionList({
             gap: 10,
           }}
         >
-          <span style={{ fontSize: "1.1rem", flexShrink: 0 }}>⚠️</span>
+          <AlertTriangle size={18} style={{ color: "#c2410c", flexShrink: 0 }} />
           <p style={{ fontSize: "0.84rem", color: "#c2410c", fontWeight: 500, lineHeight: 1.5, margin: 0 }}>
             You already have an active queue session on this device. Finish or cancel it before joining a new one.
           </p>
@@ -134,6 +134,25 @@ export default function InstitutionList({
         </div>
       </div>
 
+      {/* ── Refresh ── */}
+      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "0.875rem" }}>
+        {loading ? (
+          <Skeleton width={120} height={12} borderRadius={6} />
+        ) : (
+          <p style={{ fontSize: "0.7rem", fontWeight: 500, textTransform: "uppercase", letterSpacing: "0.08em", color: "#94a3b8" }}>
+            {filtered.length} location{filtered.length !== 1 ? "s" : ""} available
+          </p>
+        )}
+        <button
+          onClick={refetch}
+          style={{ display: "flex", alignItems: "center", gap: 4, background: "none", border: "none", color: "#94a3b8", cursor: "pointer", fontSize: "0.75rem", fontFamily: "var(--font-body)" }}
+          onMouseEnter={(e) => (e.currentTarget.style.color = "var(--sky)")}
+          onMouseLeave={(e) => (e.currentTarget.style.color = "#94a3b8")}
+        >
+          <RefreshCw size={12} style={{ animation: loading ? "spin 1s linear infinite" : "none" }} /> Refresh
+        </button>
+      </div>
+
       {/* ── Loading state ── */}
       {loading && (
         <div style={{ display: "flex", flexDirection: "column", gap: "0.625rem", margin: "0 auto" }}>
@@ -174,21 +193,6 @@ export default function InstitutionList({
       {/* ── Results ── */}
       {!loading && !error && (
         <>
-          <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "0.875rem" }}>
-            <p style={{ fontSize: "0.7rem", fontWeight: 500, textTransform: "uppercase", letterSpacing: "0.08em", color: "#94a3b8" }}>
-              {filtered.length} location{filtered.length !== 1 ? "s" : ""} available
-            </p>
-            <button
-              onClick={refetch}
-              title="Refresh"
-              style={{ display: "flex", alignItems: "center", gap: 4, background: "none", border: "none", color: "#94a3b8", cursor: "pointer", fontSize: "0.75rem", fontFamily: "var(--font-body)" }}
-              onMouseEnter={(e) => (e.currentTarget.style.color = "var(--sky)")}
-              onMouseLeave={(e) => (e.currentTarget.style.color = "#94a3b8")}
-            >
-              <RefreshCw size={12} /> Refresh
-            </button>
-          </div>
-
           <div style={{ display: "flex", flexDirection: "column", gap: "0.625rem", margin: "0 auto" }}>
             {filtered.map((inst) => {
               const s = statusColors[inst.status];
