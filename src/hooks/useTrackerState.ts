@@ -137,6 +137,12 @@ export function useTrackerState({
   }, [showNearTurn, showTurnCalled, isServing]);
 
   useEffect(() => {
+    if (isServing && showCancelModal) {
+      setShowCancelModal(false);
+    }
+  }, [isServing, showCancelModal]);
+
+  useEffect(() => {
     if (error) showToast(`Could not update queue status: ${error}`);
   }, [error, showToast]);
 
