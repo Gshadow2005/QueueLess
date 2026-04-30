@@ -89,6 +89,11 @@ export function useTrackerState({
       const mins = Math.round((Date.now() - joinedAt.getTime()) / 60000) || 1;
       onDone(mins, false);
     },
+    onExpired: () => {
+      const mins = Math.round((Date.now() - joinedAt.getTime()) / 60000) || 0;
+      showToast("Your queue session has expired.", "error");
+      setTimeout(() => onDone(mins, true), 2000);
+    },
   });
 
   // ── Notification callbacks ───────────────────────────────────────────────

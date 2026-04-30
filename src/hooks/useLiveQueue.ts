@@ -15,6 +15,7 @@ interface UseLiveQueueOptions {
   sessionId: string;
   institutionId: number;
   onServed: () => void;
+  onExpired: () => void;
 }
 
 interface LiveQueueState {
@@ -32,6 +33,7 @@ export function useLiveQueue({
   sessionId,
   institutionId,
   onServed,
+  onExpired,
 }: UseLiveQueueOptions): LiveQueueState {
   const [state, setState] = useState<LiveQueueState>({
     queueNumber: 0,
@@ -45,16 +47,17 @@ export function useLiveQueue({
   });
 
   const onServedRef = useRef(onServed);
-  useEffect(() => {
-    onServedRef.current = onServed;
-  }, [onServed]);
+  useEffect(() => { onServedRef.current = onServed; }, [onServed]);
+
+  const onExpiredRef = useRef(onExpired);
+  useEffect(() => { onExpiredRef.current = onExpired; }, [onExpired]);
+
   const servedCalledRef = useRef(false);
+  const expiredCalledRef = useRef(false);
   const checkInCalledRef = useRef(false);
 
   const sessionIdRef = useRef(sessionId);
-  useEffect(() => {
-    sessionIdRef.current = sessionId;
-  }, [sessionId]);
+  useEffect(() => { sessionIdRef.current = sessionId; }, [sessionId]);
 
   const flash = useCallback(() => {
     setState((s) => ({ ...s, isFlashing: true }));
@@ -90,6 +93,14 @@ export function useLiveQueue({
         servedCalledRef.current = true;
         setTimeout(() => onServedRef.current(), 5000);
       }
+
+      if (
+        (data.status === "expired" || data.status === "cancelled") &&
+        !expiredCalledRef.current
+      ) {
+        expiredCalledRef.current = true;
+        setTimeout(() => onExpiredRef.current(), 2000);
+      }
     },
     [flash, sessionId]
   );
@@ -98,6 +109,7 @@ export function useLiveQueue({
   useEffect(() => {
     if (!sessionId) return;
     servedCalledRef.current = false;
+    expiredCalledRef.current = false;
     checkInCalledRef.current = false;
     let stopped = false;
 
@@ -149,9 +161,7 @@ export function useLiveQueue({
 
       fetchQueueStatus(sessionIdRef.current)
         .then((data) => applyStatus(data))
-        .catch(() => {
-          // Silently ignore
-        });
+        .catch(() => {});
     };
 
     document.addEventListener("visibilitychange", handleVisibilityChange);

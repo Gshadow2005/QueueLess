@@ -4,9 +4,9 @@ export type NotificationChannel = "browser" | "sms" | "system";
 export type NotificationEventType =
   | "near_turn"
   | "turn_called"
-  | "session_expired"
-  | "session_completed"
-  | "generic";
+  | "session_completed";
+//  | "session_expired"
+//  | "generic";
 
 export interface APINotification {
   id: number;
