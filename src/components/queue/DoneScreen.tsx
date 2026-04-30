@@ -351,9 +351,13 @@ export default function DoneScreen({
               onClick={() => {
                 const txt =
                   "I just skipped the wait with QueueLess! Check it out.";
-                navigator.clipboard
-                  ?.writeText(txt)
-                  .then(() => alert("Copied!"));
+                if (navigator.share) {
+                  navigator.share({ text: txt });
+                } else {
+                  navigator.clipboard
+                    ?.writeText(txt)
+                    .then(() => alert("Copied to clipboard!"));
+                }
               }}
             >
               Share QueueLess
