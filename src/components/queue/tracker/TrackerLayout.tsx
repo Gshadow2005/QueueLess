@@ -80,7 +80,6 @@ function ActionButtons({ isServing, compact, cancelling, refreshing, onShare, on
           cursor: refreshing ? "not-allowed" : "pointer",
           opacity: refreshing ? 0.7 : 1,
         }}
-        title={refreshing ? "Refreshing..." : "Refresh queue status"}
         onMouseEnter={(e) => {
           if (!compact && !refreshing) {
             e.currentTarget.style.background = "var(--sky-pale)";
