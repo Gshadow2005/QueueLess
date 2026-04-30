@@ -27,6 +27,8 @@ export default function ConfirmModal({
 
   useEffect(() => {
     if (open) {
+      document.body.style.overflow = "hidden";
+      document.documentElement.style.overflow = "hidden";
       const mount = setTimeout(() => setMounted(true), 0);
       const enter = setTimeout(() => setVisible(true), 10);
       return () => {
@@ -34,6 +36,8 @@ export default function ConfirmModal({
         clearTimeout(enter);
       };
     } else {
+      document.body.style.overflow = "";
+      document.documentElement.style.overflow = "";
       const hide = setTimeout(() => setVisible(false), 0);
       const exit = setTimeout(() => setMounted(false), 300);
       return () => {
@@ -75,7 +79,7 @@ export default function ConfirmModal({
         background: "rgba(255,255,255,0.08)",
         opacity: visible ? 1 : 0,
         transition: "opacity 0.25s ease",
-        pointerEvents: "none",
+        pointerEvents: visible ? "auto" : "none",
       }}
     >
       {/* Modal card */}
@@ -152,7 +156,7 @@ export default function ConfirmModal({
             onClick={handleCancel}
             style={{
               padding: "11px 16px",
-              borderRadius: 10,
+              borderRadius: 12,
               border: "1.5px solid rgba(13,43,110,0.14)",
               background: "white",
               color: "var(--navy)",
@@ -178,7 +182,7 @@ export default function ConfirmModal({
             onClick={handleConfirm}
             style={{
               padding: "11px 16px",
-              borderRadius: 10,
+              borderRadius: 12,
               border: `1.5px solid ${accentBorder}`,
               background: accentColor,
               color: "white",
