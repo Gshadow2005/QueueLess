@@ -245,7 +245,7 @@ export default function DoneScreen({
                   marginBottom: "0.5rem",
                 }}
               >
-                How was your experience? Disabled
+                How was your experience?
               </h3>
               <p
                 style={{

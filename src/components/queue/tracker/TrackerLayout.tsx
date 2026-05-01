@@ -301,9 +301,7 @@ function WaitTips({ compact }: WaitTipsProps) {
   );
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
 // Main TrackerLayout export
-// ─────────────────────────────────────────────────────────────────────────────
 
 interface TrackerLayoutProps {
   institution: Institution;
