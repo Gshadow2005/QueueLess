@@ -3,7 +3,7 @@ import { type Institution } from "../../types/institution";
 import { useTrackerState } from "../../hooks/useTrackerState";
 import TrackerLayout from "./tracker/TrackerLayout";
 import Toast from "../common/Toast";
-import ConfirmModal from "./modal/ConfirmModal";
+import ConfirmModal from "../common/ConfirmModal";
 
 interface LiveTrackerProps {
   institution: Institution;
