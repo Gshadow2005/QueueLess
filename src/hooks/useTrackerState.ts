@@ -59,6 +59,7 @@ export function useTrackerState({
   const [cancelling, setCancelling] = useState(false);
   const [showCancelModal, setShowCancelModal] = useState(false);
   const [muted, setMuted] = useState(false);
+  const yourTurnPlayedRef = useRef(false);
 
   const { toasts, showToast, removeToast } = useToast();
 
@@ -122,7 +123,8 @@ export function useTrackerState({
 
   const handleTurnCalled = useCallback(() => {
     console.info("[QueueLess] Turn called notification fired");
-    if (!muted) {
+    if (!muted && !yourTurnPlayedRef.current) {
+      yourTurnPlayedRef.current = true;
       playSound(yourTurnAudio);
     }
   }, [muted]);
@@ -159,8 +161,11 @@ export function useTrackerState({
 
   const prevIsServingRef = useRef(false);
   useEffect(() => {
-    if (isServing && !prevIsServingRef.current && !muted) {
-      playSound(yourTurnAudio);
+    if (isServing && !prevIsServingRef.current) {
+      if (!muted && !yourTurnPlayedRef.current) {
+        yourTurnPlayedRef.current = true;
+        playSound(yourTurnAudio);
+      }
     }
     prevIsServingRef.current = isServing;
   }, [isServing, muted]);
