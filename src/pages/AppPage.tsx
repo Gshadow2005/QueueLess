@@ -13,7 +13,7 @@ import JoinQueue from "../components/queue/JoinQueue";
 import EnterQueueNumber from "../components/queue/Enterqueuenumber";
 import LiveTracker from "../components/queue/LiveTracker";
 import DoneScreen from "../components/queue/DoneScreen";
-import QueuelessLogo from "../assets/QueuelessLogo.ico";
+import QueuelessLogo from "../assets/icon/QueuelessLogo.ico";
 
 type Screen = "list" | "join" | "enter-number" | "tracker" | "done";
 
@@ -24,6 +24,7 @@ interface AppState {
   joinedAt: Date | null;
   waitMinutes: number;
   cancelled: boolean;
+  expired: boolean;
   pendingPhone: string;
   pendingNotify: boolean;
 }
@@ -64,6 +65,7 @@ export default function AppPage({ onBack }: AppPageProps) {
         joinedAt: new Date(saved.joinedAt),
         waitMinutes: 0,
         cancelled: false,
+        expired: false,
         pendingPhone: "",
         pendingNotify: true,
       };
@@ -75,6 +77,7 @@ export default function AppPage({ onBack }: AppPageProps) {
       joinedAt: null,
       waitMinutes: 0,
       cancelled: false,
+      expired: false,
       pendingPhone: "",
       pendingNotify: true,
     };
@@ -168,9 +171,9 @@ export default function AppPage({ onBack }: AppPageProps) {
     }
   };
 
-  const handleDone = useCallback((waitMinutes: number, cancelled: boolean) => {
+  const handleDone = useCallback((waitMinutes: number, cancelled: boolean, expired = false) => {
     clearSession();
-    setState((s) => ({ ...s, waitMinutes, cancelled }));
+    setState((s) => ({ ...s, waitMinutes, cancelled, expired }));
     setScreen("done");
   }, []);
 
@@ -185,6 +188,7 @@ export default function AppPage({ onBack }: AppPageProps) {
       joinedAt: null,
       waitMinutes: 0,
       cancelled: false,
+      expired: false,
       pendingPhone: "",
       pendingNotify: true,
     });
@@ -299,6 +303,7 @@ export default function AppPage({ onBack }: AppPageProps) {
             yourNumber={state.yourNumber}
             waitMinutes={state.waitMinutes}
             cancelled={state.cancelled}
+            expired={state.expired}
             onReset={handleReset}
             onGoHome={handleGoHome}
           />
