@@ -13,6 +13,12 @@ import {
 import yourTurnSfx from "../assets/audio/yourturn.mp3";
 import threeSpotSfx from "../assets/audio/3spotaway.mp3";
 
+const yourTurnAudio = new Audio(yourTurnSfx);
+const threeSpotAudio = new Audio(threeSpotSfx);
+
+yourTurnAudio.preload = "auto";
+threeSpotAudio.preload = "auto";
+
 function getSafeNotifPermission(): NotificationPermission {
   try {
     if (typeof Notification === "undefined") return "denied";
@@ -22,9 +28,9 @@ function getSafeNotifPermission(): NotificationPermission {
   }
 }
 
-function playSound(src: string) {
+function playSound(audio: HTMLAudioElement) {
   try {
-    const audio = new Audio(src);
+    audio.currentTime = 0;
     audio.play().catch(() => {});
   } catch {
     // ignore
@@ -110,14 +116,14 @@ export function useTrackerState({
   const handleNearTurn = useCallback((spotsLeft: number) => {
     console.info(`[QueueLess] Near-turn fired: ${spotsLeft} spots left`);
     if (spotsLeft <= 3 && !muted) {
-      playSound(threeSpotSfx);
+      playSound(threeSpotAudio);
     }
   }, [muted]);
 
   const handleTurnCalled = useCallback(() => {
     console.info("[QueueLess] Turn called notification fired");
     if (!muted) {
-      playSound(yourTurnSfx);
+      playSound(yourTurnAudio);
     }
   }, [muted]);
 
