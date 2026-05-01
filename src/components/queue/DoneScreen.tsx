@@ -8,6 +8,7 @@ interface DoneScreenProps {
   yourNumber: number;
   waitMinutes: number;
   cancelled: boolean;
+  expired?: boolean;
   onGoHome: () => void;
   onReset: () => void;
 }
@@ -17,6 +18,7 @@ export default function DoneScreen({
   yourNumber,
   waitMinutes,
   cancelled,
+  expired = false,
   onGoHome,
   onReset,
 }: DoneScreenProps) {
@@ -36,12 +38,12 @@ export default function DoneScreen({
             justifyContent: "center",
             fontSize: "2rem",
             margin: "0 auto 1.25rem",
-            background: cancelled ? "#fff7ed" : "rgba(34,197,94,0.1)",
-            border: `3px solid ${cancelled ? "#f97316" : "#22c55e"}`,
+            background: cancelled ? (expired ? "#fef2f2" : "#fff7ed") : "rgba(34,197,94,0.1)",
+            border: `3px solid ${cancelled ? (expired ? "#ef4444" : "#f97316") : "#22c55e"}`,
           }}
         >
           {cancelled ? (
-            <X size={32} strokeWidth={3} color="#f97316" />
+            <X size={32} strokeWidth={3} color={expired ? "#ef4444" : "#f97316"} />
           ) : (
             <Check size={32} strokeWidth={3} color="#22c55e" />
           )}
@@ -55,7 +57,11 @@ export default function DoneScreen({
             marginBottom: "0.5rem",
           }}
         >
-          {cancelled ? "Queue cancelled" : "You've been served!"}
+          {expired
+            ? "Session expired"
+            : cancelled
+            ? "Queue cancelled"
+            : "You've been served!"}
         </h1>
         <p
           style={{
@@ -65,7 +71,9 @@ export default function DoneScreen({
             margin: "0 auto",
           }}
         >
-          {cancelled
+          {expired
+            ? "Your queue session has expired. You can join the queue again anytime."
+            : cancelled
             ? "You've left the queue. No worries — you can join again anytime."
             : `Queue ${formatQueueNumber(yourNumber)} at ${institution.name} — all done!`}
         </p>
@@ -110,10 +118,7 @@ export default function DoneScreen({
                 },
                 { label: "Your number", value: formatQueueNumber(yourNumber) },
                 { label: "Wait time", value: `${waitMinutes} min` },
-                {
-                  label: "Status",
-                  value: cancelled ? "Cancelled" : "Served",
-                },
+                { label: "Status", value: expired ? "Expired" : cancelled ? "Cancelled" : "Served" },
               ].map((stat) => (
                 <div
                   key={stat.label}

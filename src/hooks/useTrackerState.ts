@@ -36,7 +36,7 @@ interface UseTrackerStateProps {
   sessionId: string;
   yourNumber: number;
   joinedAt: Date;
-  onDone: (waitMinutes: number, cancelled: boolean) => void;
+  onDone: (waitMinutes: number, cancelled: boolean, expired?: boolean) => void;
 }
 
 export function useTrackerState({
@@ -102,7 +102,7 @@ export function useTrackerState({
     onExpired: () => {
       const mins = Math.round((Date.now() - joinedAt.getTime()) / 60000) || 0;
       showToast("Your queue session has expired.", "error");
-      setTimeout(() => onDone(mins, true), 2000);
+      setTimeout(() => onDone(mins, true, true), 2000);
     },
   });
 
