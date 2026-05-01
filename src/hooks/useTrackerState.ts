@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { type Institution } from "../types/institution";
 import { formatQueueNumber } from "../utils/queueHelpers";
 import { cancelQueue } from "../api/queue";
@@ -156,6 +156,14 @@ export function useTrackerState({
       latestNearTurn ||
       (spotsAway <= 5 && spotsAway > 0)
     ) && !showTurnCalled;
+
+  const prevIsServingRef = useRef(false);
+  useEffect(() => {
+    if (isServing && !prevIsServingRef.current && !muted) {
+      playSound(yourTurnAudio);
+    }
+    prevIsServingRef.current = isServing;
+  }, [isServing, muted]);
 
   useEffect(() => {
     if (showNearTurn || showTurnCalled || isServing) {
