@@ -10,7 +10,7 @@ interface LiveTrackerProps {
   sessionId: string;
   yourNumber: number;
   joinedAt: Date;
-  onDone: (waitMinutes: number, cancelled: boolean) => void;
+  onDone: (waitMinutes: number, cancelled: boolean, expired?: boolean) => void;
 }
 
 export default function LiveTracker({
