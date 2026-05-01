@@ -49,14 +49,14 @@ export default function LiveTracker({
     // cancelling
     cancelling,
     showCancelModal,
-    // refresh
-    refreshing,
+    // sound
+    muted,
     // handlers
     handleCancelClick,
     handleCancelConfirm,
     handleCancelClose,
     handleShare,
-    handleRefresh,
+    handleToggleMute,
     handleEnablePush,
     // toasts
     toasts,
@@ -209,12 +209,11 @@ export default function LiveTracker({
         statusBadge={statusBadge}
         pushSubscribed={pushSubscribed}
         cancelling={cancelling}
-        refreshing={refreshing}
+        muted={muted}
         onShare={handleShare}
         onCancel={handleCancelClick}
-        onRefresh={handleRefresh}
+        onToggleMute={handleToggleMute}
       />
-
       {/* ── Cancel confirmation modal ── */}
       <ConfirmModal
         open={showCancelModal}

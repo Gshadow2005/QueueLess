@@ -10,6 +10,8 @@ import {
   subscribeToPush,
   onSwMessage,
 } from "../utils/pushManager";
+import yourTurnSfx from "../assets/audio/yourturn.mp3";
+import threeSpotSfx from "../assets/audio/3spotaway.mp3";
 
 function getSafeNotifPermission(): NotificationPermission {
   try {
@@ -17,6 +19,15 @@ function getSafeNotifPermission(): NotificationPermission {
     return Notification.permission;
   } catch {
     return "denied";
+  }
+}
+
+function playSound(src: string) {
+  try {
+    const audio = new Audio(src);
+    audio.play().catch(() => {});
+  } catch {
+    // ignore
   }
 }
 
@@ -41,7 +52,7 @@ export function useTrackerState({
   const [pushLoading, setPushLoading] = useState(false);
   const [cancelling, setCancelling] = useState(false);
   const [showCancelModal, setShowCancelModal] = useState(false);
-  const [refreshing, setRefreshing] = useState(false);
+  const [muted, setMuted] = useState(false);
 
   const { toasts, showToast, removeToast } = useToast();
 
@@ -81,7 +92,6 @@ export function useTrackerState({
     isFlashing,
     loading: queueLoading,
     error,
-    refresh,
   } = useLiveQueue({
     sessionId,
     institutionId: institution.id,
@@ -99,11 +109,17 @@ export function useTrackerState({
   // ── Notification callbacks ───────────────────────────────────────────────
   const handleNearTurn = useCallback((spotsLeft: number) => {
     console.info(`[QueueLess] Near-turn fired: ${spotsLeft} spots left`);
-  }, []);
+    if (spotsLeft <= 3 && !muted) {
+      playSound(threeSpotSfx);
+    }
+  }, [muted]);
 
   const handleTurnCalled = useCallback(() => {
     console.info("[QueueLess] Turn called notification fired");
-  }, []);
+    if (!muted) {
+      playSound(yourTurnSfx);
+    }
+  }, [muted]);
 
   const { latestNearTurn, latestTurnCalled } = useNotifications({
     sessionId,
@@ -187,18 +203,9 @@ export function useTrackerState({
     }
   }, [yourNumber, institution.name]);
 
-  const handleRefresh = useCallback(async () => {
-    setRefreshing(true);
-    try {
-      await refresh();
-    } catch (err) {
-      showToast(
-        err instanceof Error ? err.message : "Failed to refresh queue status."
-      );
-    } finally {
-      setRefreshing(false);
-    }
-  }, [refresh, showToast]);
+  const handleToggleMute = useCallback(() => {
+    setMuted((prev) => !prev);
+  }, []);
 
   const handleEnablePush = useCallback(async () => {
     setPushLoading(true);
@@ -246,6 +253,7 @@ export function useTrackerState({
     }
   }, [sessionId, showToast]);
 
+  // ── Labels / styles ──────────────────────────────────────────────────────
   const awayLabel = isServing
     ? "Head to the counter now!"
     : isNext
@@ -333,14 +341,14 @@ export function useTrackerState({
     // cancelling
     cancelling,
     showCancelModal,
-    // refresh
-    refreshing,
+    // sound
+    muted,
     // handlers
     handleCancelClick,
     handleCancelConfirm,
     handleCancelClose,
     handleShare,
-    handleRefresh,
+    handleToggleMute,
     handleEnablePush,
     // toasts
     toasts,

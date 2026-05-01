@@ -1,4 +1,4 @@
-import { RefreshCw, Share2, X, ArrowRight } from "lucide-react";
+import { Share2, X, ArrowRight, Volume2, VolumeX } from "lucide-react";
 import { type Institution } from "../../../types/institution";
 import { formatQueueNumber } from "../../../utils/queueHelpers";
 import TrackerCard from "./TrackerCard";
@@ -36,13 +36,13 @@ interface ActionButtonsProps {
   isServing: boolean;
   compact: boolean;
   cancelling: boolean;
-  refreshing: boolean;
+  muted: boolean;
   onShare: () => void;
   onCancel: () => void;
-  onRefresh: () => void;
+  onToggleMute: () => void;
 }
 
-function ActionButtons({ isServing, compact, cancelling, refreshing, onShare, onCancel, onRefresh }: ActionButtonsProps) {
+function ActionButtons({ isServing, compact, cancelling, muted, onShare, onCancel, onToggleMute }: ActionButtonsProps) {
   const size = compact ? 15 : 16;
   const btnBase: React.CSSProperties = {
     padding: "10px",
@@ -65,52 +65,37 @@ function ActionButtons({ isServing, compact, cancelling, refreshing, onShare, on
         marginBottom: compact ? "1rem" : 0,
       }}
     >
-      {/* Auto refresh — now functional */}
+      {/* Mute / Unmute */}
       <button
-        onClick={onRefresh}
-        disabled={refreshing}
+        onClick={onToggleMute}
         style={{
           ...btnBase,
-          color: refreshing ? "#94a3b8" : "var(--navy)",
-          borderColor: refreshing ? "rgba(148,163,184,0.3)" : "rgba(13,43,110,0.12)",
+          color: muted ? "#94a3b8" : "var(--navy)",
+          borderColor: muted ? "rgba(148,163,184,0.3)" : "rgba(13,43,110,0.12)",
           display: "flex",
           alignItems: "center",
           gap: 6,
           justifyContent: "center",
-          cursor: refreshing ? "not-allowed" : "pointer",
-          opacity: refreshing ? 0.7 : 1,
         }}
         onMouseEnter={(e) => {
-          if (!compact && !refreshing) {
+          if (!compact) {
             e.currentTarget.style.background = "var(--sky-pale)";
             e.currentTarget.style.borderColor = "var(--sky)";
           }
         }}
         onMouseLeave={(e) => {
-          if (!compact && !refreshing) {
+          if (!compact) {
             e.currentTarget.style.background = "white";
-            e.currentTarget.style.borderColor = "rgba(13,43,110,0.12)";
+            e.currentTarget.style.borderColor = muted
+              ? "rgba(148,163,184,0.3)"
+              : "rgba(13,43,110,0.12)";
           }
         }}
       >
-        {refreshing ? (
-          <>
-            <span
-              style={{
-                width: size === 15 ? 12 : 14,
-                height: size === 15 ? 12 : 14,
-                border: "2px solid rgba(13,43,110,0.2)",
-                borderTopColor: "var(--sky)",
-                borderRadius: "50%",
-                animation: "spin 0.8s linear infinite",
-                display: "inline-block",
-                flexShrink: 0,
-              }}
-            />
-            Syncing…
-          </>
+        {muted ? (
+          <><VolumeX size={size} /> Unmute</>
         ) : (
-          <><RefreshCw size={size} /> Refresh</>
+          <><Volume2 size={size} /> Mute</>
         )}
       </button>
 
@@ -324,7 +309,6 @@ interface TrackerLayoutProps {
   institution: Institution;
   yourNumber: number;
   joinedAt: Date;
-  // TrackerCard props
   currentServing: number;
   pct: number;
   queueLoading: boolean;
@@ -338,11 +322,10 @@ interface TrackerLayoutProps {
   statusBadge: string;
   pushSubscribed: boolean;
   cancelling: boolean;
-  refreshing: boolean;
-  // handlers
+  muted: boolean;
   onShare: () => void;
   onCancel: () => void;
-  onRefresh: () => void;
+  onToggleMute: () => void;
 }
 
 export default function TrackerLayout({
@@ -362,10 +345,10 @@ export default function TrackerLayout({
   statusBadge,
   pushSubscribed,
   cancelling,
-  refreshing,
+  muted,
   onShare,
   onCancel,
-  onRefresh,
+  onToggleMute,
 }: TrackerLayoutProps) {
   const cardProps = {
     institutionName: institution.name,
@@ -373,7 +356,6 @@ export default function TrackerLayout({
     yourNumber,
     pct,
     queueLoading,
-    refreshing,
     isFlashing,
     isServing,
     isAlmost,
@@ -414,21 +396,18 @@ export default function TrackerLayout({
             alignItems: "start",
           }}
         >
-          {/* Left column: card + action buttons */}
           <div style={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
             <TrackerCard {...cardProps} compact={false} />
             <ActionButtons
               isServing={isServing}
               compact={false}
               cancelling={cancelling}
-              refreshing={refreshing}
+              muted={muted}
               onShare={onShare}
               onCancel={onCancel}
-              onRefresh={onRefresh}
+              onToggleMute={onToggleMute}
             />
           </div>
-
-          {/* Right column: session info + tips */}
           <div style={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
             <SessionInfo rows={sessionRows} compact={false} />
             <WaitTips compact={false} />
@@ -443,10 +422,10 @@ export default function TrackerLayout({
           isServing={isServing}
           compact
           cancelling={cancelling}
-          refreshing={refreshing}
+          muted={muted}
           onShare={onShare}
           onCancel={onCancel}
-          onRefresh={onRefresh}
+          onToggleMute={onToggleMute}
         />
         <SessionInfo rows={sessionRows} compact />
         <WaitTips compact />
