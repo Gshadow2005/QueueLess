@@ -59,10 +59,9 @@ export default function ConfirmModal({
 
   if (!mounted) return null;
 
-  const accentColor = danger ? "#dc2626" : "var(--sky)";
-  const accentBg    = danger ? "#fef2f2" : "var(--sky-pale)";
-  const accentBorder = danger ? "#fca5a5" : "var(--sky-light)";
-  const iconBorder   = danger ? "#fecaca" : "var(--sky-light)";
+  const accentColor  = danger ? "#dc2626" : "var(--sky)";
+  const accentBg     = danger ? "#fff5f5" : "var(--sky-pale)";
+  const accentBorder = danger ? "rgba(220,38,38,0.2)" : "var(--sky-light)";
 
   return (
     <div
@@ -76,7 +75,7 @@ export default function ConfirmModal({
         padding: 20,
         backdropFilter: "blur(6px)",
         WebkitBackdropFilter: "blur(6px)",
-        background: "rgba(255,255,255,0.08)",
+        background: "rgba(13,43,110,0.08)",
         opacity: visible ? 1 : 0,
         transition: "opacity 0.25s ease",
         pointerEvents: visible ? "auto" : "none",
@@ -87,16 +86,15 @@ export default function ConfirmModal({
         style={{
           position: "relative",
           background: "white",
-          border: "1.5px solid rgba(13,43,110,0.14)",
-          borderRadius: 20,
-          padding: "1.75rem",
+          border: "1.5px solid rgba(13,43,110,0.12)",
+          borderRadius: 16,
+          padding: "1.5rem",
           maxWidth: 380,
           width: "100%",
-          boxShadow:
-            "0 24px 60px rgba(13,43,110,0.14), 0 4px 16px rgba(13,43,110,0.06)",
+          boxShadow: "0 8px 32px rgba(13,43,110,0.10), 0 2px 8px rgba(13,43,110,0.06)",
           transform: visible
             ? "scale(1) translateY(0)"
-            : "scale(0.95) translateY(10px)",
+            : "scale(0.96) translateY(8px)",
           transition: "transform 0.25s cubic-bezier(0.16, 1, 0.3, 1)",
           pointerEvents: "auto",
         }}
@@ -104,28 +102,28 @@ export default function ConfirmModal({
         {/* Icon */}
         <div
           style={{
-            width: 44,
-            height: 44,
+            width: 40,
+            height: 40,
             borderRadius: 12,
             background: accentBg,
-            border: `1.5px solid ${iconBorder}`,
+            border: `1.5px solid ${accentBorder}`,
             display: "flex",
             alignItems: "center",
             justifyContent: "center",
-            marginBottom: "1.25rem",
+            marginBottom: "1rem",
           }}
         >
-          <AlertTriangle size={20} strokeWidth={2.5} style={{ color: accentColor }} />
+          <AlertTriangle size={18} strokeWidth={2.5} style={{ color: accentColor }} />
         </div>
 
         {/* Title */}
         <h3
+          className="font-head"
           style={{
-            fontFamily: "var(--font-head)",
-            fontSize: "1.05rem",
+            fontSize: "0.95rem",
             fontWeight: 700,
             color: "var(--navy)",
-            margin: "0 0 0.5rem 0",
+            margin: "0 0 0.4rem 0",
             lineHeight: 1.3,
           }}
         >
@@ -135,10 +133,11 @@ export default function ConfirmModal({
         {/* Message */}
         <p
           style={{
-            fontSize: "0.875rem",
+            fontSize: "0.84rem",
             color: "#6B82A8",
             lineHeight: 1.6,
-            margin: "0 0 1.5rem 0",
+            margin: "0 0 1.25rem 0",
+            fontWeight: 400,
           }}
         >
           {message}
@@ -152,16 +151,17 @@ export default function ConfirmModal({
             gap: 10,
           }}
         >
+          {/* Cancel */}
           <button
             onClick={handleCancel}
             style={{
-              padding: "11px 16px",
+              padding: "10px 16px",
               borderRadius: 12,
-              border: "1.5px solid rgba(13,43,110,0.14)",
+              border: "1.5px solid rgba(13,43,110,0.12)",
               background: "white",
               color: "var(--navy)",
-              fontSize: "0.875rem",
-              fontWeight: 600,
+              fontSize: "0.85rem",
+              fontWeight: 500,
               fontFamily: "var(--font-body)",
               cursor: "pointer",
               transition: "all 0.15s",
@@ -172,21 +172,22 @@ export default function ConfirmModal({
             }}
             onMouseLeave={(e) => {
               e.currentTarget.style.background = "white";
-              e.currentTarget.style.borderColor = "rgba(13,43,110,0.14)";
+              e.currentTarget.style.borderColor = "rgba(13,43,110,0.12)";
             }}
           >
             {cancelLabel}
           </button>
 
+          {/* Confirm */}
           <button
             onClick={handleConfirm}
             style={{
-              padding: "11px 16px",
+              padding: "10px 16px",
               borderRadius: 12,
               border: `1.5px solid ${accentBorder}`,
               background: accentColor,
               color: "white",
-              fontSize: "0.875rem",
+              fontSize: "0.85rem",
               fontWeight: 600,
               fontFamily: "var(--font-body)",
               cursor: "pointer",
