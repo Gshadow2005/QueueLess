@@ -74,7 +74,7 @@ export default function DoneScreen({
           {expired
             ? "Your queue session has expired. You can join the queue again anytime."
             : cancelled
-            ? "You've left the queue. No worries — you can join again anytime."
+            ? "You've left the queue. No worries - you can join again anytime."
             : `Queue ${formatQueueNumber(yourNumber)} at ${institution.name} — all done!`}
         </p>
       </div>
