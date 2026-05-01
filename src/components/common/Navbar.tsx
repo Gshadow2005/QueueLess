@@ -1,4 +1,4 @@
-import QueuelessLogo from "../../assets/QueuelessLogo.ico";
+import QueuelessLogo from "../../assets/icon/QueuelessLogo.ico";
 
 interface NavbarProps {
   onLaunchApp: () => void;

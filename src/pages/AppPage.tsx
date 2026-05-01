@@ -13,7 +13,7 @@ import JoinQueue from "../components/queue/JoinQueue";
 import EnterQueueNumber from "../components/queue/Enterqueuenumber";
 import LiveTracker from "../components/queue/LiveTracker";
 import DoneScreen from "../components/queue/DoneScreen";
-import QueuelessLogo from "../assets/QueuelessLogo.ico";
+import QueuelessLogo from "../assets/icon/QueuelessLogo.ico";
 
 type Screen = "list" | "join" | "enter-number" | "tracker" | "done";
 
