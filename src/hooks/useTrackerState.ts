@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { type Institution } from "../types/institution";
 import { formatQueueNumber } from "../utils/queueHelpers";
 import { cancelQueue } from "../api/queue";
@@ -10,6 +10,14 @@ import {
   subscribeToPush,
   onSwMessage,
 } from "../utils/pushManager";
+import yourTurnSfx from "../assets/audio/yourturn.mp3";
+import threeSpotSfx from "../assets/audio/3spotaway.mp3";
+
+const yourTurnAudio = new Audio(yourTurnSfx);
+const threeSpotAudio = new Audio(threeSpotSfx);
+
+yourTurnAudio.preload = "auto";
+threeSpotAudio.preload = "auto";
 
 function getSafeNotifPermission(): NotificationPermission {
   try {
@@ -20,12 +28,21 @@ function getSafeNotifPermission(): NotificationPermission {
   }
 }
 
+function playSound(audio: HTMLAudioElement) {
+  try {
+    audio.currentTime = 0;
+    audio.play().catch(() => {});
+  } catch {
+    // ignore
+  }
+}
+
 interface UseTrackerStateProps {
   institution: Institution;
   sessionId: string;
   yourNumber: number;
   joinedAt: Date;
-  onDone: (waitMinutes: number, cancelled: boolean) => void;
+  onDone: (waitMinutes: number, cancelled: boolean, expired?: boolean) => void;
 }
 
 export function useTrackerState({
@@ -41,7 +58,8 @@ export function useTrackerState({
   const [pushLoading, setPushLoading] = useState(false);
   const [cancelling, setCancelling] = useState(false);
   const [showCancelModal, setShowCancelModal] = useState(false);
-  const [refreshing, setRefreshing] = useState(false);
+  const [muted, setMuted] = useState(false);
+  const yourTurnPlayedRef = useRef(false);
 
   const { toasts, showToast, removeToast } = useToast();
 
@@ -81,7 +99,6 @@ export function useTrackerState({
     isFlashing,
     loading: queueLoading,
     error,
-    refresh,
   } = useLiveQueue({
     sessionId,
     institutionId: institution.id,
@@ -92,18 +109,25 @@ export function useTrackerState({
     onExpired: () => {
       const mins = Math.round((Date.now() - joinedAt.getTime()) / 60000) || 0;
       showToast("Your queue session has expired.", "error");
-      setTimeout(() => onDone(mins, true), 2000);
+      setTimeout(() => onDone(mins, true, true), 2000);
     },
   });
 
   // ── Notification callbacks ───────────────────────────────────────────────
   const handleNearTurn = useCallback((spotsLeft: number) => {
     console.info(`[QueueLess] Near-turn fired: ${spotsLeft} spots left`);
-  }, []);
+    if (spotsLeft <= 3 && !muted) {
+      playSound(threeSpotAudio);
+    }
+  }, [muted]);
 
   const handleTurnCalled = useCallback(() => {
     console.info("[QueueLess] Turn called notification fired");
-  }, []);
+    if (!muted && !yourTurnPlayedRef.current) {
+      yourTurnPlayedRef.current = true;
+      playSound(yourTurnAudio);
+    }
+  }, [muted]);
 
   const { latestNearTurn, latestTurnCalled } = useNotifications({
     sessionId,
@@ -134,6 +158,17 @@ export function useTrackerState({
       latestNearTurn ||
       (spotsAway <= 5 && spotsAway > 0)
     ) && !showTurnCalled;
+
+  const prevIsServingRef = useRef(false);
+  useEffect(() => {
+    if (isServing && !prevIsServingRef.current) {
+      if (!muted && !yourTurnPlayedRef.current) {
+        yourTurnPlayedRef.current = true;
+        playSound(yourTurnAudio);
+      }
+    }
+    prevIsServingRef.current = isServing;
+  }, [isServing, muted]);
 
   useEffect(() => {
     if (showNearTurn || showTurnCalled || isServing) {
@@ -187,18 +222,9 @@ export function useTrackerState({
     }
   }, [yourNumber, institution.name]);
 
-  const handleRefresh = useCallback(async () => {
-    setRefreshing(true);
-    try {
-      await refresh();
-    } catch (err) {
-      showToast(
-        err instanceof Error ? err.message : "Failed to refresh queue status."
-      );
-    } finally {
-      setRefreshing(false);
-    }
-  }, [refresh, showToast]);
+  const handleToggleMute = useCallback(() => {
+    setMuted((prev) => !prev);
+  }, []);
 
   const handleEnablePush = useCallback(async () => {
     setPushLoading(true);
@@ -246,6 +272,7 @@ export function useTrackerState({
     }
   }, [sessionId, showToast]);
 
+  // ── Labels / styles ──────────────────────────────────────────────────────
   const awayLabel = isServing
     ? "Head to the counter now!"
     : isNext
@@ -333,14 +360,14 @@ export function useTrackerState({
     // cancelling
     cancelling,
     showCancelModal,
-    // refresh
-    refreshing,
+    // sound
+    muted,
     // handlers
     handleCancelClick,
     handleCancelConfirm,
     handleCancelClose,
     handleShare,
-    handleRefresh,
+    handleToggleMute,
     handleEnablePush,
     // toasts
     toasts,

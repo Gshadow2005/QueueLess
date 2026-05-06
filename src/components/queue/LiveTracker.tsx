@@ -10,7 +10,7 @@ interface LiveTrackerProps {
   sessionId: string;
   yourNumber: number;
   joinedAt: Date;
-  onDone: (waitMinutes: number, cancelled: boolean) => void;
+  onDone: (waitMinutes: number, cancelled: boolean, expired?: boolean) => void;
 }
 
 export default function LiveTracker({
@@ -49,14 +49,14 @@ export default function LiveTracker({
     // cancelling
     cancelling,
     showCancelModal,
-    // refresh
-    refreshing,
+    // sound
+    muted,
     // handlers
     handleCancelClick,
     handleCancelConfirm,
     handleCancelClose,
     handleShare,
-    handleRefresh,
+    handleToggleMute,
     handleEnablePush,
     // toasts
     toasts,
@@ -209,12 +209,11 @@ export default function LiveTracker({
         statusBadge={statusBadge}
         pushSubscribed={pushSubscribed}
         cancelling={cancelling}
-        refreshing={refreshing}
+        muted={muted}
         onShare={handleShare}
         onCancel={handleCancelClick}
-        onRefresh={handleRefresh}
+        onToggleMute={handleToggleMute}
       />
-
       {/* ── Cancel confirmation modal ── */}
       <ConfirmModal
         open={showCancelModal}

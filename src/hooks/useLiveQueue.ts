@@ -70,6 +70,7 @@ export function useLiveQueue({
 
   const applyStatus = useCallback(
     (data: QueueStatusResponse) => {
+      //data.status = "expired"; // TEMP: force expired for testing
       setState((prev) => {
         const didAdvance = data.current_serving_number !== prev.currentServing;
         if (didAdvance) flash();
