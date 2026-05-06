@@ -57,7 +57,7 @@ export default function InstitutionList({
   const statusColors = {
     open: { bg: "rgba(34,197,94,0.1)", text: "#16a34a", label: "Open" },
     busy: { bg: "#fff7ed", text: "#c2410c", label: "Busy" },
-    closed: { bg: "#f1f5f9", text: "#94a3b8", label: "Closed" },
+    closed: { bg: "rgba(239,68,68,0.08)", text: "#dc2626", label: "Closed" },
   };
 
   const iconBg: Record<string, string> = {
